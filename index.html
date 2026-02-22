@@ -3,155 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BEL AVENIR - Gestion Centre Social & Holistique</title>
+    <title>BEL AVENIR - Système de Gestion Sociale & Holistique</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
-        :root { --ong-blue: #0056b3; --ong-orange: #ff8c00; --ong-green: #10b981; }
-        body { font-family: 'Poppins', sans-serif; background: #f8fafc; color: #1e293b; }
-        .card { background: white; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); transition: 0.3s; }
-        .input-field { border: 1.5px solid #e2e8f0; padding: 12px; border-radius: 12px; width: 100%; transition: 0.3s; font-size: 0.875rem; }
-        .input-field:focus { border-color: var(--ong-blue); outline: none; box-shadow: 0 0 0 4px rgba(0,86,179,0.1); }
-        .btn-primary { background: var(--ong-blue); color: white; border-radius: 12px; font-weight: 700; transition: 0.3s; cursor: pointer; border: none; }
-        .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
-        .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        :root { --ong-blue: #0056b3; --ong-orange: #ff8c00; }
+        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; color: #1e293b; }
+        .card { background: white; border-radius: 24px; shadow-sm; border: 1px solid #e2e8f0; }
+        .input-field { border: 1.5px solid #cbd5e1; padding: 10px; border-radius: 10px; width: 100%; font-size: 0.85rem; background: #fff; }
+        .label-text { font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .btn-nav { padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; transition: 0.3s; }
+        .btn-active { background: var(--ong-blue); color: white; }
         .section-pane { display: none; }
-        .section-pane.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Overlay de sécurité */
-        #auth-gate { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .section-pane.active { display: block; }
+        .sub-section { border-left: 4px solid var(--ong-blue); padding-left: 20px; margin-bottom: 30px; }
+        #auth-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div id="auth-gate">
-    <div class="bg-white p-10 rounded-[2rem] shadow-2xl w-full max-w-md text-center">
-        <img src="https://ongbelavenir.org/wp-content/uploads/2019/02/logo-bel-avenir.png" class="h-12 mx-auto mb-6" alt="Logo">
-        <h2 class="text-2xl font-black mb-2 text-slate-800 uppercase">Accès Sécurisé</h2>
-        <p class="text-slate-400 text-xs mb-8">Identification requise pour le personnel de l'ONG</p>
-        <div class="space-y-4 text-left">
-            <div>
-                <label class="text-[10px] font-black uppercase text-slate-500 ml-1">Email professionnel</label>
-                <input type="email" id="login-email" class="input-field" placeholder="admin@ongbelavenir.org">
-            </div>
-            <div>
-                <label class="text-[10px] font-black uppercase text-slate-500 ml-1">Mot de passe</label>
-                <input type="password" id="login-pass" class="input-field" placeholder="••••••••">
-            </div>
-            <button id="btn-do-login" class="w-full btn-primary py-4 uppercase text-xs tracking-widest shadow-xl">Entrer dans le système</button>
+<div id="auth-overlay">
+    <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center">
+        <img src="https://ongbelavenir.org/wp-content/uploads/2019/02/logo-bel-avenir.png" class="h-16 mx-auto mb-6">
+        <h2 class="text-xl font-black mb-2 uppercase">Espace Travailleur Social</h2>
+        <div class="space-y-4 mt-8">
+            <input type="email" id="auth-email" placeholder="Email" class="input-field text-center">
+            <input type="password" id="auth-pass" placeholder="Mot de passe" class="input-field text-center">
+            <button id="login-btn" class="w-full bg-blue-700 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest">Entrer dans le système</button>
         </div>
-        <p id="error-msg" class="text-red-500 text-[10px] mt-4 font-bold hidden"></p>
+        <p id="auth-error" class="text-red-500 text-[10px] mt-4 hidden font-bold"></p>
     </div>
 </div>
 
-<nav class="bg-white border-b border-slate-200 p-4 sticky top-0 z-50 hidden" id="main-nav">
+<nav id="main-nav" class="bg-white border-b sticky top-0 z-50 hidden p-4">
     <div class="container mx-auto flex justify-between items-center">
-        <div class="flex items-center gap-4">
-            <img src="https://ongbelavenir.org/wp-content/uploads/2019/02/logo-bel-avenir.png" alt="Logo" class="h-10">
-            <div>
-                <h1 class="font-black text-blue-800 leading-tight uppercase text-sm">Bel Avenir</h1>
-                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Toliara, Madagascar</p>
-            </div>
+        <div class="flex gap-2 overflow-x-auto">
+            <button onclick="showSection('list')" class="btn-nav btn-active" id="nav-list">Registre</button>
+            <button onclick="showSection('form')" class="btn-nav" id="nav-form">Nouvelle Fiche (S1)</button>
+            <button onclick="showSection('sante')" class="btn-nav" id="nav-sante">Suivi Santé (S2)</button>
+            <button onclick="showSection('scolaire')" class="btn-nav" id="nav-scolaire">Suivi Scolaire (S3)</button>
         </div>
-        <div class="flex gap-4">
-            <button onclick="showSection('list')" class="text-[10px] font-black uppercase text-slate-500 hover:text-blue-600">Registre</button>
-            <button id="logout-btn" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase">Déconnexion</button>
-        </div>
+        <button id="logout-btn" class="text-red-500 font-black text-[10px] uppercase bg-red-50 px-4 py-2 rounded-lg">Déconnexion</button>
     </div>
 </nav>
 
-<div class="container mx-auto mt-8 px-4 pb-20 hidden" id="app-content">
-    <div class="flex flex-col lg:flex-row gap-8">
-        <aside class="lg:w-1/4 space-y-4">
-            <div class="card p-4 space-y-2">
-                <button onclick="showSection('list')" class="w-full text-left p-4 rounded-xl font-bold text-xs uppercase flex items-center gap-3 hover:bg-blue-50 hover:text-blue-600 transition"><i class="fas fa-list"></i> Liste des bénéficiaires</button>
-                <button onclick="prepareNew()" class="w-full text-left p-4 rounded-xl font-bold text-xs uppercase flex items-center gap-3 hover:bg-green-50 hover:text-green-600 transition"><i class="fas fa-plus-circle"></i> Nouvelle Fiche</button>
+<div class="container mx-auto py-8 px-4 hidden" id="app-content">
+    
+    <section id="sec-list" class="section-pane active">
+        <div class="card p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-black uppercase">Registre des bénéficiaires</h2>
+                <input type="text" id="search" placeholder="Rechercher par nom ou code..." class="input-field max-w-xs">
             </div>
-            <div class="p-6 bg-blue-900 text-white rounded-3xl">
-                <p class="text-[9px] font-black uppercase opacity-60">Session active</p>
-                <p id="user-email-display" class="font-bold text-xs truncate mt-1"></p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-[10px] uppercase text-slate-400 border-b">
+                            <th class="pb-4">Bénéficiaire</th>
+                            <th class="pb-4">Code ID</th>
+                            <th class="pb-4">Site / Projet</th>
+                            <th class="pb-4">Statut Santé</th>
+                            <th class="pb-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
             </div>
-        </aside>
+        </div>
+    </section>
 
-        <main class="lg:w-3/4">
-            <div id="sec-list" class="section-pane active card p-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-black uppercase">Registre Social</h2>
-                    <input type="text" id="search-bar" placeholder="Rechercher nom..." class="input-field max-w-xs" oninput="renderTable()">
+    <section id="sec-form" class="section-pane">
+        <div class="card p-10 border-t-8 border-blue-600">
+            <div class="flex justify-between items-start mb-10">
+                <div>
+                    <h1 class="text-3xl font-black uppercase">Section 1 : Fiche d'Information</h1>
+                    <p class="text-slate-500 text-sm">ONG BEL AVENIR - Admission Initiale</p>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="text-[10px] uppercase text-slate-400 border-b">
-                                <th class="pb-4">Bénéficiaire</th>
-                                <th class="pb-4">Projet</th>
-                                <th class="pb-4">Santé</th>
-                                <th class="pb-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body" class="text-sm"></tbody>
-                    </table>
-                </div>
+                <button onclick="saveAllData()" class="bg-blue-600 text-white px-10 py-4 rounded-xl font-black uppercase text-xs shadow-lg">Enregistrer le dossier</button>
             </div>
 
-            <div id="sec-form" class="section-pane card p-8">
-                <div class="flex justify-between items-center mb-8 pb-4 border-b">
-                    <h2 class="text-xl font-black uppercase">Dossier Individuel</h2>
-                    <button onclick="saveData()" class="btn-primary px-8 py-2 text-[10px] uppercase shadow-md">Enregistrer</button>
-                </div>
-
-                <div class="grid md:grid-cols-3 gap-8">
+            <div class="sub-section">
+                <h3 class="font-black text-blue-600 mb-6 uppercase text-sm">Informations du bénéficiaire</h3>
+                <div class="grid lg:grid-cols-4 gap-8">
                     <div class="text-center">
-                        <img id="prev-photo" src="https://via.placeholder.com/150" class="w-40 h-40 mx-auto rounded-3xl object-cover mb-4 border-4 border-white shadow-lg">
-                        <input type="file" id="f-photo" class="hidden" accept="image/*" onchange="previewImg(this)">
-                        <button onclick="document.getElementById('f-photo').click()" class="text-[10px] font-black text-blue-600 uppercase">Charger Photo</button>
-                        <input type="text" id="f-id" class="input-field mt-4 text-center font-bold text-orange-500" placeholder="ID (ex: BA-2024)">
+                        <img id="prev-photo" src="https://via.placeholder.com/150" class="w-40 h-40 rounded-3xl mx-auto object-cover border-4 border-slate-100 mb-2">
+                        <input type="file" id="f-photo" class="hidden" onchange="previewImage(this)">
+                        <label for="f-photo" class="text-[10px] font-black text-blue-600 uppercase cursor-pointer">Télécharger Photo ID</label>
                     </div>
-
-                    <div class="md:col-span-2 grid md:grid-cols-2 gap-4">
-                        <div><label class="text-[10px] font-black uppercase text-slate-400">Nom Complet</label><input type="text" id="f-nom" class="input-field"></div>
-                        <div><label class="text-[10px] font-black uppercase text-slate-400">Sexe</label><select id="f-sexe" class="input-field"><option>Masculin</option><option>Féminin</option></select></div>
-                        <div><label class="text-[10px] font-black uppercase text-slate-400">Date de naissance</label><input type="text" id="f-dob" class="input-field" placeholder="JJ/MM/AAAA"></div>
-                        <div><label class="text-[10px] font-black uppercase text-slate-400">Site d'inscription</label><input type="text" id="f-site" class="input-field"></div>
-                    </div>
-                </div>
-
-                <div class="mt-12 grid md:grid-cols-2 gap-8">
-                    <div class="p-6 bg-blue-50 rounded-3xl">
-                        <h3 class="text-xs font-black uppercase mb-4 text-blue-800">Suivi Scolaire</h3>
-                        <input type="text" id="f-niv" placeholder="Dernier Niveau" class="input-field mb-2 bg-white">
-                        <input type="text" id="f-moy" placeholder="Moyenne Générale" class="input-field bg-white">
-                    </div>
-                    <div class="p-6 bg-green-50 rounded-3xl">
-                        <h3 class="text-xs font-black uppercase mb-4 text-green-800">Suivi Médical</h3>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="number" id="f-poids" placeholder="Poids (kg)" class="input-field bg-white">
-                            <input type="number" id="f-taille" placeholder="Taille (cm)" class="input-field bg-white">
-                        </div>
-                    </div>
-                    <div class="md:col-span-2 p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                        <h3 class="text-xs font-black uppercase mb-4">Contexte Familial</h3>
-                        <div class="grid md:grid-cols-3 gap-4">
-                            <input type="text" id="f-tut" placeholder="Nom du tuteur" class="input-field bg-white">
-                            <input type="text" id="f-contact" placeholder="Contact Tuteur" class="input-field bg-white">
-                            <input type="number" id="f-enfants" placeholder="Enfants à charge" class="input-field bg-white">
+                    <div class="lg:col-span-3 grid md:grid-cols-3 gap-4">
+                        <div class="md:col-span-2"><label class="label-text">Nom et Prénom</label><input type="text" id="f-nom" class="input-field"></div>
+                        <div><label class="label-text">Sexe</label><select id="f-sexe" class="input-field"><option>Masculin</option><option>Féminin</option></select></div>
+                        <div><label class="label-text">Âge</label><input type="number" id="f-age" class="input-field"></div>
+                        <div><label class="label-text">Né(e) le (ou vers)</label><input type="text" id="f-dob" class="input-field" placeholder="JJ/MM/AAAA"></div>
+                        <div><label class="label-text">Lieu de naissance</label><input type="text" id="f-lieu" class="input-field"></div>
+                        <div class="md:col-span-2"><label class="label-text">Adresse Exacte</label><input type="text" id="f-adresse" class="input-field"></div>
+                        <div>
+                            <label class="label-text">Acte de naissance</label>
+                            <div class="flex gap-2 text-[10px] font-bold">
+                                <label><input type="radio" name="acte" value="Oui"> OUI</label>
+                                <label><input type="radio" name="acte" value="Non"> NON</label>
+                                <label><input type="radio" name="acte" value="Inconnu"> NE SAIS PAS</label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
+
+            <div class="sub-section">
+                <h3 class="font-black text-blue-600 mb-6 uppercase text-sm">Situation Scolaire</h3>
+                <div class="grid md:grid-cols-4 gap-4 mb-6">
+                    <div><label class="label-text">Cas</label><select id="f-cas" class="input-field"><option>Passant(e)</option><option>Redoublant(e)</option></select></div>
+                    <div><label class="label-text">Bulletin dispo</label><select id="f-bull" class="input-field"><option>Oui</option><option>Non</option></select></div>
+                    <div><label class="label-text">Dernière année (Lieu/Niv)</label><input type="text" id="f-last-sc" class="input-field"></div>
+                    <div><label class="label-text">Niveau Actuel</label><input type="text" id="f-niv-now" class="input-field"></div>
+                </div>
+                
+                <div class="bg-slate-50 p-6 rounded-2xl mb-6">
+                    <p class="text-[10px] font-black mb-4">RELEVÉ DE NOTES & COMPÉTENCES</p>
+                    <table class="w-full text-xs">
+                        <thead><tr class="text-left font-black text-slate-400"><th>Matière</th><th>Coef</th><th>Note /20</th><th>Observations Soutien</th></tr></thead>
+                        <tbody id="notes-body">
+                            <tr>
+                                <td><input type="text" class="input-field n-mat"></td>
+                                <td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td>
+                                <td><input type="number" class="input-field n-val" oninput="calcMoy()"></td>
+                                <td><input type="text" class="input-field n-obs"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button onclick="addNoteRow()" class="mt-4 text-[10px] font-bold text-blue-600 uppercase">+ Ajouter une matière</button>
+                    <div class="mt-4 text-right font-black text-blue-800">Moyenne Générale : <span id="moy-gen">0.00</span> / 20</div>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <h3 class="font-black text-blue-600 mb-6 uppercase text-sm">Évaluation de santé & Psycho-sociale</h3>
+                <div class="grid md:grid-cols-5 gap-4 mb-6">
+                    <div><label class="label-text">Poids (kg)</label><input type="number" id="f-poids" class="input-field" oninput="calcImc()"></div>
+                    <div><label class="label-text">Taille (cm)</label><input type="number" id="f-taille" class="input-field" oninput="calcImc()"></div>
+                    <div><label class="label-text">IMC</label><input type="text" id="f-imc" class="input-field bg-slate-100" readonly></div>
+                    <div><label class="label-text">Température (°C)</label><input type="number" id="f-temp" class="input-field"></div>
+                    <div><label class="label-text">État Nutri.</label><select id="f-nutri" class="input-field"><option>Normal</option><option>Modéré</option><option>Sévère</option></select></div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <textarea id="f-med-obs" placeholder="Observation générale santé & hygiène..." class="input-field h-24"></textarea>
+                    <textarea id="f-psy-obs" placeholder="État émotionnel, traumatismes, besoins psy..." class="input-field h-24"></textarea>
+                </div>
+            </div>
+
+            <div class="sub-section">
+                <h3 class="font-black text-blue-600 mb-6 uppercase text-sm">Situation Familiale & Habitat</h3>
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div><label class="label-text">Tuteur Légal</label><select id="f-tut-type" class="input-field"><option>Mère</option><option>Père</option><option>Père et Mère</option><option>Autre</option></select></div>
+                    <div><label class="label-text">Nom Tuteur</label><input type="text" id="f-tut-nom" class="input-field"></div>
+                    <div><label class="label-text">Contact Urgence</label><input type="text" id="f-tut-tel" class="input-field"></div>
+                    <div><label class="label-text">État Maison</label><input type="text" id="f-maison-etat" class="input-field"></div>
+                    <div class="md:col-span-2"><label class="label-text">Accord Parental & Observations Libres</label><textarea id="f-accord" class="input-field"></textarea></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="sec-sante" class="section-pane">
+        <div class="card p-10">
+            <h2 class="text-2xl font-black uppercase mb-8">Section 2 : Cahier de Suivi Santé</h2>
+            <div class="bg-blue-50 p-6 rounded-2xl mb-8 flex items-center justify-between">
+                <div>
+                    <p id="sante-name" class="text-xl font-bold">---</p>
+                    <p id="sante-code" class="text-blue-600 font-mono">---</p>
+                </div>
+                <button onclick="addSanteRecord()" class="bg-blue-600 text-white px-6 py-2 rounded-lg text-xs font-bold uppercase">Nouvelle consultation</button>
+            </div>
+            
+            <table class="w-full text-xs">
+                <thead><tr class="text-left font-black text-slate-400 border-b pb-4"><th>Date</th><th>Motif / Symptômes</th><th>Diagnostic</th><th>Traitement</th><th>Agent</th></tr></thead>
+                <tbody id="sante-table-body"></tbody>
+            </table>
+        </div>
+    </section>
+
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // Configuration Firebase Originale
+    // CONFIGURATION FIREBASE (REMPLACÉ PAR VOS INFOS)
     const firebaseConfig = {
         apiKey: "AIzaSyDKNy6B4aifDrVDsglGhvU_eCMZOZF6q8g",
         authDomain: "bel-avenir-social-db-878f7.firebaseapp.com",
@@ -167,98 +206,115 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
     let photoData = "";
-    let dataList = [];
 
-    // --- SYSTÈME D'AUTHENTIFICATION RÉEL ---
-    document.getElementById('btn-do-login').addEventListener('click', async () => {
-        const email = document.getElementById('login-email').value;
-        const pass = document.getElementById('login-pass').value;
-        const err = document.getElementById('error-msg');
+    // AUTH LOGIC
+    document.getElementById('login-btn').addEventListener('click', async () => {
+        const email = document.getElementById('auth-email').value;
+        const pass = document.getElementById('auth-pass').value;
         try {
             await signInWithEmailAndPassword(auth, email, pass);
-            err.classList.add('hidden');
         } catch (e) {
-            err.innerText = "Accès refusé. Email ou code incorrect.";
-            err.classList.remove('hidden');
+            document.getElementById('auth-error').classList.remove('hidden');
+            document.getElementById('auth-error').innerText = "Accès refusé.";
         }
     });
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            document.getElementById('auth-gate').style.display = 'none';
+            document.getElementById('auth-overlay').style.display = 'none';
             document.getElementById('main-nav').classList.remove('hidden');
             document.getElementById('app-content').classList.remove('hidden');
-            document.getElementById('user-email-display').innerText = user.email;
             loadData();
         } else {
-            document.getElementById('auth-gate').style.display = 'flex';
+            document.getElementById('auth-overlay').style.display = 'flex';
         }
     });
 
     document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-    // --- GESTION DES DONNÉES (CONTENU ORIGINAL) ---
+    // UI LOGIC
     window.showSection = (id) => {
-        document.querySelectorAll('.section-pane').forEach(s => s.classList.remove('active'));
-        document.getElementById('sec-' + id).classList.add('active');
+        document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('btn-active'));
+        document.getElementById('sec-'+id).classList.add('active');
+        document.getElementById('nav-'+id).classList.add('btn-active');
     };
 
-    window.previewImg = (input) => {
+    window.previewImage = (input) => {
         const reader = new FileReader();
         reader.onload = (e) => { photoData = e.target.result; document.getElementById('prev-photo').src = e.target.result; };
         reader.readAsDataURL(input.files[0]);
     };
 
-    window.prepareNew = () => {
-        photoData = "";
-        document.getElementById('prev-photo').src = "https://via.placeholder.com/150";
-        document.querySelectorAll('.input-field').forEach(i => i.value = "");
-        showSection('form');
+    window.addNoteRow = () => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td>`;
+        document.getElementById('notes-body').appendChild(tr);
     };
 
-    window.saveData = () => {
-        const payload = {
-            f_id: document.getElementById('f-id').value,
-            f_nom: document.getElementById('f-nom').value,
-            f_sexe: document.getElementById('f-sexe').value,
-            f_dob: document.getElementById('f-dob').value,
-            f_site: document.getElementById('f-site').value,
-            f_photo: photoData,
-            scolaire: { niv: document.getElementById('f-niv').value, moy: document.getElementById('f-moy').value },
-            sante: { poids: document.getElementById('f-poids').value, taille: document.getElementById('f-taille').value },
-            social: { tuteur: document.getElementById('f-tut').value, tel: document.getElementById('f-contact').value, enf: document.getElementById('f-enfants').value }
+    window.calcMoy = () => {
+        let pts = 0, coefs = 0;
+        document.querySelectorAll('#notes-body tr').forEach(tr => {
+            const c = parseFloat(tr.querySelector('.n-coef').value) || 0;
+            const v = parseFloat(tr.querySelector('.n-val').value) || 0;
+            pts += (v * c); coefs += c;
+        });
+        document.getElementById('moy-gen').innerText = coefs > 0 ? (pts / coefs).toFixed(2) : "0.00";
+    };
+
+    window.calcImc = () => {
+        const p = parseFloat(document.getElementById('f-poids').value);
+        const t = parseFloat(document.getElementById('f-taille').value) / 100;
+        if(p && t) document.getElementById('f-imc').value = (p / (t * t)).toFixed(1);
+    };
+
+    // SAVE DATA
+    window.saveAllData = () => {
+        const code = "BA-" + Math.floor(1000 + Math.random() * 9000);
+        const data = {
+            id: code,
+            nom: document.getElementById('f-nom').value,
+            sexe: document.getElementById('f-sexe').value,
+            photo: photoData,
+            age: document.getElementById('f-age').value,
+            scolarite: { niv: document.getElementById('f-niv-now').value, moy: document.getElementById('moy-gen').innerText },
+            sante: { imc: document.getElementById('f-imc').value, nutri: document.getElementById('f-nutri').value },
+            famille: { tuteur: document.getElementById('f-tut-nom').value, tel: document.getElementById('f-tut-tel').value }
         };
-        push(ref(db, 'beneficiaires'), payload).then(() => { alert("Dossier Enregistré !"); showSection('list'); });
+        push(ref(db, 'beneficiaires'), data).then(() => {
+            alert("Enregistré ! Code : " + code);
+            showSection('list');
+        });
     };
 
     function loadData() {
         onValue(ref(db, 'beneficiaires'), (snap) => {
-            const val = snap.val();
-            dataList = val ? Object.keys(val).map(k => ({...val[k], key: k})) : [];
-            renderTable();
+            const body = document.getElementById('table-body');
+            body.innerHTML = "";
+            const data = snap.val();
+            if(data) {
+                Object.keys(data).forEach(k => {
+                    const b = data[k];
+                    body.innerHTML += `
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="py-4 flex items-center gap-3">
+                                <img src="${b.photo}" class="w-10 h-10 rounded-full object-cover">
+                                <span class="font-bold">${b.nom}</span>
+                            </td>
+                            <td>${b.id}</td>
+                            <td>Centre Toliara</td>
+                            <td><span class="px-2 py-1 rounded bg-green-100 text-green-700 font-bold text-[10px]">${b.sante.nutri}</span></td>
+                            <td class="text-right">
+                                <button onclick="deleteB('${k}')" class="text-red-400"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
         });
     }
 
-    window.renderTable = () => {
-        const term = document.getElementById('search-bar').value.toLowerCase();
-        const tbody = document.getElementById('table-body');
-        tbody.innerHTML = dataList.filter(b => b.f_nom.toLowerCase().includes(term))
-            .map(b => `
-                <tr class="border-b hover:bg-slate-50 transition">
-                    <td class="py-4 flex items-center gap-3">
-                        <img src="${b.f_photo || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-xl object-cover">
-                        <div><p class="font-black text-slate-700">${b.f_nom}</p><p class="text-[9px] text-slate-400 font-bold uppercase">${b.f_id}</p></div>
-                    </td>
-                    <td class="text-xs font-bold text-slate-500">${b.f_site || '-'}</td>
-                    <td><span class="status-pill bg-blue-100 text-blue-700">${b.sante.poids || '0'}kg</span></td>
-                    <td class="text-right">
-                        <button onclick="deleteRow('${b.key}')" class="text-red-400 hover:text-red-600 p-2"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-    };
-
-    window.deleteRow = (key) => { if(confirm("Supprimer ce dossier ?")) remove(ref(db, 'beneficiaires/' + key)); };
+    window.deleteB = (key) => { if(confirm("Supprimer ce dossier ?")) remove(ref(db, 'beneficiaires/'+key)); };
 
 </script>
 </body>
