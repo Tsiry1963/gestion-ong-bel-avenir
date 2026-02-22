@@ -18,16 +18,12 @@
         .section-pane { display: none; }
         .section-pane.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Sécurité stricte : contenu caché avant auth */
         #auth-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         #main-nav, #app-content { display: none; }
-        
         .dynamic-p { color: var(--p-col); }
         .dynamic-bg-p { background-color: var(--p-col); }
         .sub-tab { padding: 8px 16px; font-size: 10px; font-weight: 800; text-transform: uppercase; border-bottom: 3px solid transparent; cursor: pointer; }
         .sub-tab.active { border-color: var(--p-col); color: var(--p-col); }
-        .stat-badge { font-size: 0.65rem; padding: 2px 8px; border-radius: 20px; background: #f1f5f9; font-weight: 800; }
     </style>
 </head>
 <body>
@@ -35,13 +31,13 @@
 <div id="auth-overlay">
     <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center">
         <img id="login-logo" src="" class="h-20 mx-auto mb-6 hidden">
-        <h2 class="text-xl font-black mb-2 uppercase">Accès Sécurisé</h2>
+        <h2 class="text-xl font-black mb-2 uppercase">Système Bel Avenir</h2>
         <div class="space-y-4 mt-8">
             <input type="email" id="auth-email" placeholder="Email" class="input-field text-center">
             <input type="password" id="auth-pass" placeholder="Mot de passe" class="input-field text-center">
-            <button id="login-btn" class="w-full dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg">Entrer</button>
+            <button id="login-btn" class="w-full dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg">Connexion</button>
         </div>
-        <p id="auth-error" class="text-red-500 text-[10px] mt-4 hidden font-bold">Identifiants incorrects.</p>
+        <p id="auth-error" class="text-red-500 text-[10px] mt-4 hidden font-bold">Identifiants incorrects ou accès restreint.</p>
     </div>
 </div>
 
@@ -68,30 +64,22 @@
 
 <div class="container mx-auto py-8 px-4" id="app-content">
 
-    <div id="global-dashboard" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="card p-4 border-l-4 border-blue-600 shadow-sm">
-            <div class="flex justify-between items-start">
-                <div><p class="label-text">Total Bénéficiaires</p><h3 id="dash-total" class="text-2xl font-black">0</h3></div>
-                <i class="fas fa-users text-blue-100 text-3xl"></i>
-            </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="card p-4 border-l-4 border-blue-600">
+            <p class="label-text">Total Bénéficiaires</p>
+            <h3 id="dash-total" class="text-2xl font-black">0</h3>
         </div>
-        <div class="card p-4 border-l-4 border-orange-500 shadow-sm">
-            <div class="flex justify-between items-start">
-                <div><p class="label-text">Activités Récentes</p><h3 id="dash-reins" class="text-2xl font-black">0</h3></div>
-                <i class="fas fa-calendar-check text-orange-100 text-3xl"></i>
-            </div>
+        <div class="card p-4 border-l-4 border-orange-500">
+            <p class="label-text">Activités Récentes</p>
+            <h3 id="dash-act" class="text-2xl font-black">0</h3>
         </div>
-        <div class="card p-4 border-l-4 border-green-500 shadow-sm">
-            <div class="flex justify-between items-start">
-                <div><p class="label-text">Suivis Médicaux</p><h3 id="dash-med" class="text-2xl font-black">0</h3></div>
-                <i class="fas fa-hand-holding-medical text-green-100 text-3xl"></i>
-            </div>
+        <div class="card p-4 border-l-4 border-green-500">
+            <p class="label-text">Suivis Médicaux</p>
+            <h3 id="dash-med" class="text-2xl font-black">0</h3>
         </div>
-        <div class="card p-4 border-l-4 border-purple-500 shadow-sm">
-            <div class="flex justify-between items-start">
-                <div><p class="label-text">Moyenne Scolaire</p><h3 id="dash-moy" class="text-2xl font-black">0.00</h3></div>
-                <i class="fas fa-graduation-cap text-purple-100 text-3xl"></i>
-            </div>
+        <div class="card p-4 border-l-4 border-purple-500">
+            <p class="label-text">Moyenne Scolaire</p>
+            <h3 id="dash-moy" class="text-2xl font-black">0.00</h3>
         </div>
     </div>
     
@@ -99,9 +87,7 @@
         <div class="card p-8 shadow-sm">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
                 <h2 class="text-2xl font-black uppercase">Registre des Bénéficiaires</h2>
-                <div class="flex gap-2 w-full max-w-md">
-                   <input type="text" id="search-bar" oninput="renderTable()" placeholder="Rechercher par nom ou ID..." class="input-field">
-                </div>
+                <input type="text" id="search-bar" oninput="renderTable()" placeholder="Rechercher un nom ou un ID..." class="input-field max-w-md">
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
@@ -109,7 +95,7 @@
                         <tr class="text-[10px] uppercase text-slate-400 border-b">
                             <th class="pb-4">Bénéficiaire</th>
                             <th class="pb-4">ID Code</th>
-                            <th class="pb-4">Âge Calculé</th>
+                            <th class="pb-4">Âge</th>
                             <th class="pb-4">Projet/Site</th>
                             <th class="pb-4 text-right">Actions</th>
                         </tr>
@@ -123,16 +109,16 @@
     <section id="sec-form" class="section-pane">
         <div class="card p-8 border-t-8 border-blue-600">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black uppercase" id="form-mode-title">Admission / Édition</h2>
+                <h2 class="text-2xl font-black uppercase" id="form-mode-title">Admission Bénéficiaire</h2>
                 <button onclick="submitForm()" class="dynamic-bg-p text-white px-10 py-3 rounded-xl font-black uppercase text-xs shadow-md">Enregistrer le dossier</button>
             </div>
 
             <div class="flex border-b mb-8 overflow-x-auto">
                 <button onclick="showFormTab('ft-ident')" class="sub-tab active" id="btn-ft-ident">1. Identité</button>
                 <button onclick="showFormTab('ft-ba')" class="sub-tab" id="btn-ft-ba">2. Suivi Bel Avenir</button>
-                <button onclick="showFormTab('ft-scol')" class="sub-tab" id="btn-ft-scol">3. Scolarité & Notes</button>
+                <button onclick="showFormTab('ft-scol')" class="sub-tab" id="btn-ft-scol">3. Scolarité</button>
                 <button onclick="showFormTab('ft-fam')" class="sub-tab" id="btn-ft-fam">4. Famille</button>
-                <button onclick="showFormTab('ft-sante')" class="sub-tab" id="btn-ft-sante">5. Santé</button>
+                <button onclick="showFormTab('ft-sante')" class="sub-tab" id="btn-ft-sante">5. Santé initiale</button>
             </div>
 
             <div id="form-tabs-content">
@@ -145,16 +131,17 @@
                         </div>
                         <div class="lg:col-span-3 grid md:grid-cols-3 gap-4">
                             <div class="md:col-span-2"><label class="label-text">Nom et Prénom</label><input type="text" id="f-nom" class="input-field"></div>
-                            <div><label class="label-text">Sexe</label><select id="f-sexe" class="input-field"><option>Masculin</option><option>Féminin</option></select></div>
+                            <div><label class="label-text">Sexe</label><select id="f-sexe" class="input-field"><option value="">Choisir...</option><option>Masculin</option><option>Féminin</option></select></div>
                             <div>
                                 <label class="label-text">Date de naissance</label>
                                 <div class="flex gap-1">
-                                    <input type="text" id="f-dob-vers" placeholder="vers" class="w-16 input-field font-bold text-blue-600 text-center">
+                                    <input type="text" id="f-dob-vers" placeholder="Vers" class="w-16 input-field">
                                     <input type="date" id="f-dob-date" class="input-field" onchange="updateAge()">
                                 </div>
                             </div>
                             <div><label class="label-text">Âge Actuel</label><input type="text" id="f-age-calc" class="input-field bg-slate-50" readonly></div>
-                            <div><label class="label-text">Lieu de naissance</label><input type="text" id="f-lieu" class="input-field"></div>
+                            <div><label class="label-text">Lieu de naissance</label><input type="text" id="f-lieu" class="input-field" placeholder="ex: Toliara"></div>
+                            <div><label class="label-text">Acte de naissance</label><select id="f-acte" class="input-field"><option value="">Choisir...</option><option>Oui</option><option>Non</option><option>Inconnu</option></select></div>
                             <div class="md:col-span-3"><label class="label-text">Adresse Exacte</label><input type="text" id="f-adresse" class="input-field"></div>
                         </div>
                     </div>
@@ -163,64 +150,61 @@
                 <div id="ft-ba" class="form-tab-pane hidden">
                     <div class="grid md:grid-cols-3 gap-6">
                         <div><label class="label-text">Date d'inscription</label><input type="date" id="f-ba-date" class="input-field"></div>
-                        <div><label class="label-text">Responsable</label><input type="text" id="f-ba-resp" class="input-field"></div>
-                        <div><label class="label-text">Site/Projet</label><input type="text" id="f-ba-site" class="input-field"></div>
+                        <div><label class="label-text">Responsable du dossier</label><input type="text" id="f-ba-resp" class="input-field"></div>
+                        <div><label class="label-text">Site / Projet d'inscription</label><input list="list-sites" id="f-ba-site" class="input-field"><datalist id="list-sites"></datalist></div>
                     </div>
-                    <div class="mt-6 p-4 bg-slate-50 rounded-2xl border">
-                        <label class="flex items-center gap-2 font-bold text-xs uppercase mb-4">
-                            <input type="checkbox" id="f-ba-reins-check" onchange="toggleReins(this.checked)"> Réinscription ?
-                        </label>
+                    <div class="mt-6 p-4 bg-white rounded-2xl border border-slate-200">
+                        <label class="flex items-center gap-4 mb-4"><input type="checkbox" id="f-ba-reins-check" onchange="toggleReins(this.checked)" class="w-5 h-5"><span class="label-text">Réinscription ?</span></label>
                         <div id="reins-details" class="hidden grid md:grid-cols-4 gap-4">
                             <div><label class="label-text">Ancien Projet</label><input type="text" id="f-ba-old-proj" class="input-field"></div>
-                            <div><label class="label-text">Ancienne Date</label><input type="date" id="f-ba-old-date" class="input-field" onchange="calcOldAge()"></div>
+                            <div><label class="label-text">Date ancienne inscrip.</label><input type="date" id="f-ba-old-date" class="input-field" onchange="calcOldAge()"></div>
                             <div><label class="label-text">Niveau à l'époque</label><input type="text" id="f-ba-old-niv" class="input-field"></div>
-                            <div><label class="label-text">Âge à l'époque</label><input type="text" id="f-ba-old-age" class="input-field bg-slate-100" readonly></div>
+                            <div><label class="label-text">Âge lors de l'ancienne inscrip.</label><input type="text" id="f-ba-old-age" class="input-field bg-slate-100" readonly></div>
                         </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6 mt-6">
+                        <div><label class="label-text">Situation Sociale</label><select id="f-ba-social" class="input-field"><option>Vulnerable</option><option>Orphelin</option><option>Handicap</option><option>Victime d'agression</option></select></div>
+                        <div><label class="label-text">Activités Parascolaires</label><input list="list-activ" id="f-ba-activ" class="input-field"><datalist id="list-activ"></datalist></div>
                     </div>
                 </div>
 
                 <div id="ft-scol" class="form-tab-pane hidden">
                     <div class="grid md:grid-cols-4 gap-4 mb-6">
+                        <div><label class="label-text">Niveau Actuel</label><input type="text" id="f-sc-niv" class="input-field"></div>
                         <div><label class="label-text">Établissement</label><input type="text" id="f-sc-ecole" class="input-field"></div>
-                        <div><label class="label-text">Niveau</label><input type="text" id="f-sc-niv" class="input-field"></div>
-                        <div>
-                            <label class="label-text">Périodicité</label>
-                            <select id="f-sc-per" class="input-field">
-                                <option>Trimestrielle</option>
-                                <option>Bimestrielle</option>
-                                <option>Annuelle</option>
-                                <option>Période Spécifique</option>
-                            </select>
-                        </div>
-                        <div><label class="label-text">Année Scolaire</label><input type="text" id="f-sc-annee" class="input-field" placeholder="2023-2024"></div>
+                        <div><label class="label-text">Redoublant(e)</label><select id="f-sc-red" class="input-field"><option>Non</option><option>Oui</option></select></div>
+                        <div><label class="label-text">Période du Suivi</label><select id="f-sc-per" class="input-field"><option>Trimestre</option><option>Bimestre</option><option>Annuel</option></select></div>
                     </div>
                     <table class="w-full text-xs mb-4">
-                        <thead><tr class="text-left opacity-50 uppercase"><th>Matière</th><th>Note /20</th><th>Observations</th></tr></thead>
+                        <thead><tr class="text-left font-black opacity-50 uppercase"><th>Matière</th><th>Coef</th><th>Note /20</th><th>Observations</th></tr></thead>
                         <tbody id="f-sc-notes-body">
-                            <tr>
-                                <td><input type="text" class="input-field n-mat"></td>
-                                <td><input type="number" class="input-field n-val" oninput="calcMoy()"></td>
-                                <td><input type="text" class="input-field n-obs"></td>
-                            </tr>
+                            <tr><td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td></tr>
                         </tbody>
                     </table>
-                    <button onclick="addNoteRow()" class="text-[10px] font-black text-blue-600 uppercase">+ Ajouter Matière</button>
+                    <div class="flex justify-between items-center">
+                        <button onclick="addNoteRow()" class="text-[10px] font-black text-blue-600 uppercase">+ Ajouter Matière</button>
+                        <div class="font-black text-lg">Moyenne Générale : <span id="f-sc-moy-gen" class="dynamic-p">0.00</span></div>
+                    </div>
                 </div>
 
                 <div id="ft-fam" class="form-tab-pane hidden">
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div><label class="label-text">Nom du Tuteur</label><input type="text" id="f-fa-tut-nom" class="input-field"></div>
-                        <div><label class="label-text">Contact Tuteur</label><input type="text" id="f-fa-tut-tel" class="input-field"></div>
-                        <div><label class="label-text">Profession</label><input type="text" id="f-fa-job" class="input-field"></div>
+                    <div class="grid md:grid-cols-3 gap-6 mb-6">
+                        <div><label class="label-text">Tuteur Légal</label><select id="f-fa-tut" class="input-field"><option>Mère</option><option>Père</option><option>Père & Mère</option><option>Autre</option></select></div>
+                        <div><label class="label-text">Nom du tuteur</label><input type="text" id="f-fa-tut-nom" class="input-field"></div>
+                        <div><label class="label-text">Contact Urgence</label><input type="text" id="f-fa-tut-tel" class="input-field"></div>
+                        <div><label class="label-text">Enfants à la maison</label><input type="number" id="f-fa-kids" class="input-field"></div>
+                        <div><label class="label-text">État de la maison</label><input type="text" id="f-fa-habitat" class="input-field"></div>
+                        <div><label class="label-text">Profession tuteur</label><input type="text" id="f-fa-job" class="input-field"></div>
                     </div>
-                    <textarea id="f-fa-accord" class="input-field mt-4 h-20" placeholder="Observations sociales ou Accord Parental"></textarea>
+                    <label class="label-text">Accord Parental & Observations Libres</label>
+                    <textarea id="f-fa-accord" class="input-field h-20"></textarea>
                 </div>
 
                 <div id="ft-sante" class="form-tab-pane hidden">
-                    <div class="grid md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div><label class="label-text">Poids (kg)</label><input type="number" id="f-sa-poids" class="input-field" oninput="autoIMC()"></div>
                         <div><label class="label-text">Taille (cm)</label><input type="number" id="f-sa-taille" class="input-field" oninput="autoIMC()"></div>
-                        <div><label class="label-text">IMC</label><input type="text" id="f-sa-imc" class="input-field bg-slate-50" readonly></div>
+                        <div><label class="label-text">IMC</label><input type="text" id="f-sa-imc" class="input-field bg-slate-100" readonly></div>
                         <div><label class="label-text">Température (°C)</label><input type="number" id="f-sa-temp" class="input-field"></div>
                     </div>
                 </div>
@@ -230,18 +214,18 @@
 
     <section id="sec-act" class="section-pane">
         <div class="card p-8">
-            <h2 class="text-2xl font-black mb-8 uppercase text-blue-800"><i class="fas fa-tasks mr-2"></i>Suivi Périodique des Activités</h2>
-            <div class="grid md:grid-cols-5 gap-4 mb-8 bg-slate-50 p-6 rounded-3xl border border-dashed border-blue-200">
-                <div><label class="label-text">Date de l’activité</label><input type="date" id="act-date" class="input-field"></div>
-                <div><label class="label-text">Type d’activité (Cadre Logique)</label><input type="text" id="act-type" class="input-field" placeholder="ex: Sport, Musique..."></div>
+            <h2 class="text-2xl font-black mb-8 uppercase">Suivi Périodique des Activités</h2>
+            <div class="grid md:grid-cols-5 gap-4 mb-8 bg-slate-50 p-6 rounded-3xl">
+                <div><label class="label-text">Date</label><input type="date" id="act-date" class="input-field"></div>
+                <div><label class="label-text">Type d'activité</label><input type="text" id="act-type" class="input-field"></div>
                 <div><label class="label-text">Heure de début</label><input type="time" id="act-start" class="input-field"></div>
                 <div><label class="label-text">Heure de fin</label><input type="time" id="act-end" class="input-field"></div>
                 <div><label class="label-text">Responsable</label><input type="text" id="act-resp" class="input-field"></div>
             </div>
-            <button onclick="saveActivity()" class="dynamic-bg-p text-white px-8 py-3 rounded-xl font-black uppercase text-[10px] shadow-lg">Enregistrer l'activité au registre</button>
+            <button onclick="saveActivity()" class="dynamic-bg-p text-white px-8 py-3 rounded-xl font-black uppercase text-[10px]">Enregistrer l'activité</button>
             <div class="mt-8 overflow-x-auto">
                 <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-100 uppercase"><tr><th class="p-4">Date</th><th>Type d'Activité</th><th>Horaires</th><th>Responsable</th><th class="text-right">Action</th></tr></thead>
+                    <thead class="bg-slate-100 uppercase"><tr><th class="p-3">Date</th><th>Type Activité</th><th>Horaire</th><th>Responsable</th></tr></thead>
                     <tbody id="act-table-body"></tbody>
                 </table>
             </div>
@@ -250,49 +234,37 @@
 
     <section id="sec-med" class="section-pane">
         <div class="card p-8">
-            <h2 class="text-2xl font-black mb-8 uppercase text-red-600"><i class="fas fa-stethoscope mr-2"></i>Accompagnement Médical Périodique</h2>
-            <div class="grid md:grid-cols-3 gap-4 mb-6">
+            <h2 class="text-2xl font-black mb-8 uppercase text-red-600">Fiche de Suivi Médical Périodique</h2>
+            <div class="grid md:grid-cols-4 gap-4 mb-6">
+                <div><label class="label-text">Bénéficiaire (ID)</label><input type="text" id="med-id" class="input-field"></div>
                 <div><label class="label-text">Date de consultation</label><input type="date" id="med-date" class="input-field"></div>
-                <div><label class="label-text">ID Bénéficiaire</label><input type="text" id="med-id" class="input-field" placeholder="BA-XXXX"></div>
-                <div><label class="label-text">Motif de consultation</label><input type="text" id="med-motif" class="input-field"></div>
+                <div><label class="label-text">Motif</label><input type="text" id="med-motif" class="input-field"></div>
+                <div><label class="label-text">Personnel de santé</label><input type="text" id="med-staff" class="input-field"></div>
+                <div><label class="label-text">Structure sanitaire</label><input type="text" id="med-struct" class="input-field"></div>
+                <div><label class="label-text">Prochaine visite</label><input type="date" id="med-next" class="input-field"></div>
             </div>
             <div class="grid md:grid-cols-2 gap-4 mb-6">
-                <div><label class="label-text">Structure Sanitaire</label><input type="text" id="med-structure" class="input-field"></div>
-                <div><label class="label-text">Nom du Personnel de Santé</label><input type="text" id="med-staff" class="input-field"></div>
+                <div><label class="label-text">Observations médicales</label><textarea id="med-obs" class="input-field h-20"></textarea></div>
+                <div><label class="label-text">Traitement prescrit</label><textarea id="med-trait" class="input-field h-20"></textarea></div>
             </div>
-            <div class="grid md:grid-cols-2 gap-4 mb-6">
-                <div><label class="label-text">Observations Médicales</label><textarea id="med-obs" class="input-field h-24"></textarea></div>
-                <div><label class="label-text">Traitement Prescrit</label><textarea id="med-trait" class="input-field h-24"></textarea></div>
-            </div>
-            <div class="grid md:grid-cols-2 gap-4 mb-8">
-                <div><label class="label-text">Prochaine visite prévue</label><input type="date" id="med-next" class="input-field"></div>
-                <div><label class="label-text">Remarques complémentaires</label><input type="text" id="med-rem" class="input-field"></div>
-            </div>
-            <button onclick="saveMedical()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-black uppercase text-[10px] shadow-lg">Ajouter à la fiche de suivi médical</button>
+            <button onclick="saveMedical()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-black uppercase text-[10px]">Sauvegarder Suivi Médical</button>
         </div>
     </section>
 
     <section id="sec-mouv" class="section-pane">
         <div class="card p-8">
-            <h2 class="text-2xl font-black mb-8 uppercase text-slate-700"><i class="fas fa-exchange-alt mr-2"></i>Dossier Administratif : Sorties & Mouvements</h2>
+            <h2 class="text-2xl font-black mb-8 uppercase">Dossier Administratif (Sorties & Mouvements)</h2>
             <div class="grid md:grid-cols-4 gap-4 mb-6">
-                <div><label class="label-text">Bénéficiaire (ID)</label><input type="text" id="mov-id" class="input-field" placeholder="BA-XXXX"></div>
-                <div><label class="label-text">Type de Mouvement</label>
-                    <select id="mov-type" class="input-field">
-                        <option>Décharge</option>
-                        <option>Transfert</option>
-                        <option>Quitter</option>
-                        <option>Renvoi</option>
-                    </select>
-                </div>
-                <div><label class="label-text">Date du mouvement</label><input type="date" id="mov-date" class="input-field"></div>
-                <div><label class="label-text">Responsable sur site</label><input type="text" id="mov-resp" class="input-field"></div>
+                <div><label class="label-text">Bénéficiaire (ID)</label><input type="text" id="mov-id" class="input-field"></div>
+                <div><label class="label-text">Action</label><select id="mov-type" class="input-field"><option>Décharge</option><option>Transfert</option><option>Quitter</option><option>Renvoyer</option></select></div>
+                <div><label class="label-text">Date</label><input type="date" id="mov-date" class="input-field"></div>
+                <div><label class="label-text">Responsable (Saisie)</label><input type="text" id="mov-resp" class="input-field"></div>
             </div>
             <div class="grid md:grid-cols-2 gap-4 mb-6">
                 <div><label class="label-text">Lieu d'origine</label><input type="text" id="mov-ori" class="input-field"></div>
-                <div><label class="label-text">Lieu de destination (si transfert)</label><input type="text" id="mov-dest" class="input-field"></div>
+                <div><label class="label-text">Lieu de destination (Transfert)</label><input type="text" id="mov-dest" class="input-field"></div>
             </div>
-            <button onclick="saveMouvement()" class="bg-slate-800 text-white px-8 py-3 rounded-xl font-black uppercase text-[10px] shadow-lg">Confirmer et Archiver le mouvement</button>
+            <button onclick="saveMouvement()" class="bg-slate-800 text-white px-8 py-3 rounded-xl font-black uppercase text-[10px]">Confirmer le mouvement</button>
         </div>
     </section>
 
@@ -314,22 +286,17 @@
     </section>
 
     <div id="modal-view" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-5xl rounded-[2.5rem] p-8 max-h-[95vh] overflow-hidden flex flex-col shadow-2xl">
-            <div class="flex justify-between items-center mb-6">
-                <div id="modal-header-info" class="flex items-center gap-6"></div>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-black transition p-2"><i class="fas fa-times text-2xl"></i></button>
-            </div>
-
-            <div class="flex border-b mb-6 overflow-x-auto bg-slate-50 rounded-t-xl">
-                <button onclick="showModalTab('vt-ident')" class="sub-tab active" id="btn-vt-ident">Fiche Identité</button>
-                <button onclick="showModalTab('vt-scol')" class="sub-tab" id="btn-vt-scol">Suivi des Notes</button>
-                <button onclick="showModalTab('vt-med')" class="sub-tab" id="btn-vt-med">Suivi Médical</button>
-                <button onclick="showModalTab('vt-fam')" class="sub-tab" id="btn-vt-fam">Social/Famille</button>
+        <div class="bg-white w-full max-w-5xl rounded-[2.5rem] p-8 max-h-[95vh] overflow-hidden flex flex-col relative">
+            <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-400 hover:text-black transition"><i class="fas fa-times text-xl"></i></button>
+            <div id="modal-header-info" class="flex items-center gap-6 mb-8"></div>
+            <div class="flex border-b mb-6 overflow-x-auto">
+                <button onclick="showModalTab('vt-ident')" class="sub-tab active" id="btn-vt-ident">Identité complète</button>
+                <button onclick="showModalTab('vt-scol')" class="sub-tab" id="btn-vt-scol">Suivi Scolaire</button>
+                <button onclick="showModalTab('vt-med')" class="sub-tab" id="btn-vt-med">Accomp. Médical</button>
+                <button onclick="showModalTab('vt-fam')" class="sub-tab" id="btn-vt-fam">Social & Famille</button>
                 <button onclick="showModalTab('vt-mouv')" class="sub-tab" id="btn-vt-mouv">Historique Administratif</button>
             </div>
-
-            <div id="modal-tab-container" class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                </div>
+            <div id="modal-tab-container" class="flex-1 overflow-y-auto"></div>
         </div>
     </div>
 
@@ -338,16 +305,17 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyDKNy6B4aifDrVDsglGhvU_eCMZOZF6q8g",
-        authDomain: "bel-avenir-social-db-878f7.firebaseapp.com",
-        databaseURL: "https://bel-avenir-social-db-878f7-default-rtdb.firebaseio.com",
-        projectId: "bel-avenir-social-db-878f7",
-        storageBucket: "bel-avenir-social-db-878f7.firebasestorage.app",
-        messagingSenderId: "483959875408",
-        appId: "1:483959875408:web:e7708cd4100a9fe9752e55"
+      apiKey: "AIzaSyDKNy6B4aifDrVDsglGhvU_eCMZOZF6q8g",
+      authDomain: "bel-avenir-social-db-878f7.firebaseapp.com",
+      databaseURL: "https://bel-avenir-social-db-878f7-default-rtdb.firebaseio.com",
+      projectId: "bel-avenir-social-db-878f7",
+      storageBucket: "bel-avenir-social-db-878f7.firebasestorage.app",
+      messagingSenderId: "483959875408",
+      appId: "1:483959875408:web:e7708cd4100a9fe9752e55",
+      measurementId: "G-YMWKP5DBKC"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -356,17 +324,13 @@
 
     let currentPhoto = "";
     let benefsData = [];
+    let activitiesData = [];
     let editKey = null;
 
-    // --- SECURITE ---
     document.getElementById('login-btn').addEventListener('click', async () => {
         const email = document.getElementById('auth-email').value;
         const pass = document.getElementById('auth-pass').value;
-        try { 
-            await signInWithEmailAndPassword(auth, email, pass);
-        } catch (e) { 
-            document.getElementById('auth-error').classList.remove('hidden'); 
-        }
+        try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { document.getElementById('auth-error').classList.remove('hidden'); }
     });
 
     onAuthStateChanged(auth, (user) => {
@@ -384,7 +348,6 @@
 
     document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-    // --- NAVIGATION ---
     window.showSection = (id) => {
         document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('btn-active'));
@@ -399,15 +362,13 @@
         document.getElementById('btn-'+id).classList.add('active');
     };
 
-    // --- LOGIQUE METIER & CALCULS ---
     window.updateAge = () => {
-        const dobInput = document.getElementById('f-dob-date').value;
-        const versPrefix = document.getElementById('f-dob-vers').value;
-        if(dobInput) {
-            const dob = new Date(dobInput);
+        const dobStr = document.getElementById('f-dob-date').value;
+        if(dobStr) {
+            const dob = new Date(dobStr);
             const diff = Date.now() - dob.getTime();
-            const age = Math.abs(new Date(diff).getUTCFullYear() - 1970);
-            document.getElementById('f-age-calc').value = (versPrefix ? versPrefix + " " : "") + age + " ans";
+            const age = new Date(diff).getUTCFullYear() - 1970;
+            document.getElementById('f-age-calc').value = age + " ans";
         }
     };
 
@@ -415,7 +376,7 @@
         const dob = new Date(document.getElementById('f-dob-date').value);
         const old = new Date(document.getElementById('f-ba-old-date').value);
         if(!isNaN(dob) && !isNaN(old)) {
-            let a = Math.abs(old.getFullYear() - dob.getFullYear());
+            let a = old.getFullYear() - dob.getFullYear();
             document.getElementById('f-ba-old-age').value = a + " ans";
         }
     };
@@ -424,46 +385,53 @@
 
     window.addNoteRow = () => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td>`;
+        tr.innerHTML = `<td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td>`;
         document.getElementById('f-sc-notes-body').appendChild(tr);
     };
 
     window.calcMoy = () => {
-        let s=0, c=0;
-        document.querySelectorAll('.n-val').forEach(i => { if(i.value){ s+=parseFloat(i.value); c++; } });
-        const res = c>0 ? (s/c).toFixed(2) : "0.00";
-        document.getElementById('dash-moy').innerText = res;
-        return res;
+        let pts = 0, coefs = 0;
+        document.querySelectorAll('#f-sc-notes-body tr').forEach(tr => {
+            const c = parseFloat(tr.querySelector('.n-coef').value) || 0;
+            const v = parseFloat(tr.querySelector('.n-val').value) || 0;
+            pts += (v * c); coefs += c;
+        });
+        const moy = coefs > 0 ? (pts / coefs).toFixed(2) : "0.00";
+        document.getElementById('f-sc-moy-gen').innerText = moy;
+        document.getElementById('dash-moy').innerText = moy;
     };
 
     window.autoIMC = () => {
         const p = parseFloat(document.getElementById('f-sa-poids').value);
-        const t = parseFloat(document.getElementById('f-sa-taille').value)/100;
-        if(p && t) document.getElementById('f-sa-imc').value = (p/(t*t)).toFixed(1);
+        const t = parseFloat(document.getElementById('f-sa-taille').value) / 100;
+        if(p && t) document.getElementById('f-sa-imc').value = (p / (t*t)).toFixed(1);
     };
 
-    // --- GESTION DES DONNEES ---
+    window.processPhoto = (input) => {
+        const r = new FileReader();
+        r.onload = (e) => { currentPhoto = e.target.result; document.getElementById('f-photo-preview').src = e.target.result; };
+        r.readAsDataURL(input.files[0]);
+    };
+
     window.openForm = (key = null) => {
         editKey = key;
         document.querySelectorAll('#sec-form input, #sec-form select, #sec-form textarea').forEach(i => i.value = "");
+        document.getElementById('f-sc-notes-body').innerHTML = '<tr><td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td></tr>';
         document.getElementById('f-photo-preview').src = "https://via.placeholder.com/150";
-        document.getElementById('f-sc-notes-body').innerHTML = `<tr><td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td></tr>`;
+        document.getElementById('f-ba-reins-check').checked = false;
+        document.getElementById('reins-details').classList.add('hidden');
         showFormTab('ft-ident');
-        
         if(key) {
             const b = benefsData.find(x => x.key === key);
-            document.getElementById('form-mode-title').innerText = "Édition du bénéficiaire";
             document.getElementById('f-nom').value = b.nom || "";
+            document.getElementById('f-sexe').value = b.sexe || "";
             document.getElementById('f-dob-date').value = b.dob || "";
             document.getElementById('f-dob-vers').value = b.dob_vers || "";
-            document.getElementById('f-photo-preview').src = b.photo || "https://via.placeholder.com/150";
-            document.getElementById('f-ba-site').value = b.ba_site || "";
+            document.getElementById('f-lieu').value = b.lieu || "";
             document.getElementById('f-adresse').value = b.adresse || "";
-            document.getElementById('f-sexe').value = b.sexe || "Masculin";
-            currentPhoto = b.photo;
+            document.getElementById('f-photo-preview').src = b.photo || "https://via.placeholder.com/150";
+            currentPhoto = b.photo || "";
             updateAge();
-        } else {
-            document.getElementById('form-mode-title').innerText = "Admission / Nouvelle Fiche";
         }
         showSection('form');
     };
@@ -473,6 +441,7 @@
         document.querySelectorAll('#f-sc-notes-body tr').forEach(tr => {
             notes.push({
                 mat: tr.querySelector('.n-mat').value,
+                coef: tr.querySelector('.n-coef').value,
                 val: tr.querySelector('.n-val').value,
                 obs: tr.querySelector('.n-obs').value
             });
@@ -484,19 +453,59 @@
             sexe: document.getElementById('f-sexe').value,
             dob: document.getElementById('f-dob-date').value,
             dob_vers: document.getElementById('f-dob-vers').value,
-            ba_site: document.getElementById('f-ba-site').value,
+            lieu: document.getElementById('f-lieu').value,
             adresse: document.getElementById('f-adresse').value,
+            acte: document.getElementById('f-acte').value,
+            ba_date: document.getElementById('f-ba-date').value,
+            ba_resp: document.getElementById('f-ba-resp').value,
+            ba_site: document.getElementById('f-ba-site').value,
+            ba_reins: document.getElementById('f-ba-reins-check').checked,
+            sc_niv: document.getElementById('f-sc-niv').value,
             sc_notes: notes,
-            sc_moy: calcMoy(),
             photo: currentPhoto,
-            last_update: new Date().toISOString()
+            fa_tut: document.getElementById('f-fa-tut-nom').value,
+            sa_poids: document.getElementById('f-sa-poids').value,
+            sa_imc: document.getElementById('f-sa-imc').value
         };
+        const refD = editKey ? ref(db, `beneficiaires/${editKey}`) : push(ref(db, 'beneficiaires'));
+        set(refD, data).then(() => { alert("Dossier sauvegardé"); showSection('list'); });
+    };
 
-        if(editKey) {
-            update(ref(db, `beneficiaires/${editKey}`), data).then(() => { alert("Dossier mis à jour"); showSection('list'); });
-        } else {
-            push(ref(db, 'beneficiaires'), data).then(() => { alert("Dossier créé"); showSection('list'); });
-        }
+    window.saveActivity = () => {
+        const act = {
+            date: document.getElementById('act-date').value,
+            type: document.getElementById('act-type').value,
+            start: document.getElementById('act-start').value,
+            end: document.getElementById('act-end').value,
+            resp: document.getElementById('act-resp').value
+        };
+        push(ref(db, 'activities'), act).then(() => { alert("Activité ajoutée"); });
+    };
+
+    window.saveMedical = () => {
+        const med = {
+            id: document.getElementById('med-id').value,
+            date: document.getElementById('med-date').value,
+            motif: document.getElementById('med-motif').value,
+            staff: document.getElementById('med-staff').value,
+            struct: document.getElementById('med-struct').value,
+            next: document.getElementById('med-next').value,
+            obs: document.getElementById('med-obs').value,
+            trait: document.getElementById('med-trait').value
+        };
+        push(ref(db, 'medical'), med).then(() => { alert("Suivi médical enregistré"); });
+    };
+
+    window.saveMouvement = () => {
+        const mov = {
+            id: document.getElementById('mov-id').value,
+            type: document.getElementById('mov-type').value,
+            date: document.getElementById('mov-date').value,
+            resp: document.getElementById('mov-resp').value,
+            ori: document.getElementById('mov-ori').value,
+            dest: document.getElementById('mov-dest').value
+        };
+        push(ref(db, 'mouvements'), mov).then(() => { alert("Mouvement confirmé"); });
     };
 
     function syncAll() {
@@ -506,7 +515,16 @@
             renderTable();
             document.getElementById('dash-total').innerText = benefsData.length;
         });
-        
+        onValue(ref(db, 'activities'), (snap) => {
+            const d = snap.val();
+            activitiesData = d ? Object.values(d) : [];
+            document.getElementById('dash-act').innerText = activitiesData.length;
+            document.getElementById('act-table-body').innerHTML = activitiesData.map(a => `<tr><td class="p-3">${a.date}</td><td>${a.type}</td><td>${a.start}-${a.end}</td><td>${a.resp}</td></tr>`).join('');
+        });
+        onValue(ref(db, 'medical'), (snap) => {
+            const d = snap.val();
+            document.getElementById('dash-med').innerText = d ? Object.keys(d).length : 0;
+        });
         onValue(ref(db, 'settings'), (snap) => {
             const s = snap.val();
             if(s) {
@@ -521,32 +539,26 @@
 
     window.renderTable = () => {
         const term = document.getElementById('search-bar').value.toLowerCase();
-        document.getElementById('main-table-body').innerHTML = benefsData.filter(b => b.nom.toLowerCase().includes(term) || b.id.toLowerCase().includes(term))
+        document.getElementById('main-table-body').innerHTML = benefsData.filter(b => b.nom.toLowerCase().includes(term))
             .map(b => `
-                <tr class="border-b hover:bg-slate-50 transition">
-                    <td class="py-4 flex items-center gap-3"><img src="${b.photo || 'https://via.placeholder.com/150'}" class="w-10 h-10 rounded-full object-cover border shadow-sm"><span class="font-bold uppercase">${b.nom}</span></td>
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="py-4 flex items-center gap-3"><img src="${b.photo}" class="w-10 h-10 rounded-full object-cover font-bold uppercase">${b.nom}</td>
                     <td class="text-xs font-mono text-blue-600">${b.id}</td>
-                    <td><span class="stat-badge">${b.dob_vers ? b.dob_vers+' ' : ''}${b.dob ? (Math.abs(new Date(Date.now() - new Date(b.dob).getTime()).getUTCFullYear() - 1970))+' ans' : '-'}</span></td>
+                    <td>${b.dob ? (new Date().getFullYear()-new Date(b.dob).getFullYear())+' ans' : (b.dob_vers ? 'Vers '+b.dob_vers : '-')}</td>
                     <td>${b.ba_site || '-'}</td>
                     <td class="text-right">
-                        <button onclick="viewBenef('${b.key}')" class="p-2 text-slate-400 hover:text-blue-600" title="Voir Dossier Complet"><i class="fas fa-eye"></i></button>
-                        <button onclick="openForm('${b.key}')" class="p-2 text-slate-400 hover:text-green-600" title="Éditer"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteBenef('${b.key}')" class="p-2 text-slate-400 hover:text-red-600" title="Supprimer"><i class="fas fa-trash"></i></button>
+                        <button onclick="viewBenef('${b.key}')" class="p-2 text-slate-400 hover:text-blue-600"><i class="fas fa-eye"></i></button>
+                        <button onclick="openForm('${b.key}')" class="p-2 text-slate-400 hover:text-green-600"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteBenef('${b.key}')" class="p-2 text-slate-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`).join('');
     };
+
     window.viewBenef = (key) => {
         const b = benefsData.find(x => x.key === key);
-        const ageVal = b.dob ? (Math.abs(new Date(Date.now() - new Date(b.dob).getTime()).getUTCFullYear() - 1970)) : 0;
         document.getElementById('modal-header-info').innerHTML = `
-            <img src="${b.photo || 'https://via.placeholder.com/150'}" class="w-24 h-24 rounded-3xl object-cover shadow-lg border-4 border-white">
-            <div>
-                <h2 class="text-2xl font-black uppercase tracking-tight">${b.nom}</h2>
-                <div class="flex gap-2 items-center">
-                    <span class="text-blue-600 font-bold font-mono">${b.id}</span>
-                    <span class="bg-slate-100 px-2 py-1 rounded text-[10px] font-black">${b.dob_vers ? 'Verson '+b.dob_vers : ''} ${ageVal} ANS</span>
-                </div>
-            </div>
+            <img src="${b.photo}" class="w-20 h-20 rounded-2xl object-cover shadow-lg">
+            <div><h2 class="text-xl font-black uppercase">${b.nom}</h2><p class="text-blue-600 font-bold">${b.id}</p></div>
         `;
         showModalTab('vt-ident', b);
         document.getElementById('modal-view').classList.remove('hidden');
@@ -554,7 +566,7 @@
 
     window.showModalTab = (tabId, b) => {
         if(!b) {
-            const currentId = document.querySelector('#modal-header-info span.font-mono').innerText;
+            const currentId = document.querySelector('#modal-header-info p').innerText;
             b = benefsData.find(x => x.id === currentId);
         }
         document.querySelectorAll('#modal-view .sub-tab').forEach(btn => btn.classList.remove('active'));
@@ -562,46 +574,20 @@
         
         let html = "";
         if(tabId === 'vt-ident') {
-            html = `<div class="grid md:grid-cols-2 gap-4 p-6">
-                <div class="card p-4 bg-slate-50"><p class="label-text">Date de Naissance</p><p class="font-bold">${b.dob_vers ? 'Vers ' : ''}${b.dob || '-'}</p></div>
-                <div class="card p-4 bg-slate-50"><p class="label-text">Sexe</p><p class="font-bold">${b.sexe || '-'}</p></div>
-                <div class="card p-4 bg-slate-50 md:col-span-2"><p class="label-text">Adresse</p><p class="font-bold">${b.adresse || '-'}</p></div>
-                <div class="card p-4 bg-slate-50"><p class="label-text">Site/Projet d'accueil</p><p class="font-bold">${b.ba_site || '-'}</p></div>
-                <div class="card p-4 bg-slate-50"><p class="label-text">Dernière Mise à jour</p><p class="font-bold text-xs">${b.last_update ? new Date(b.last_update).toLocaleString() : '-'}</p></div>
-            </div>`;
+            html = `<div class="grid md:grid-cols-2 gap-4"><div class="p-4 bg-slate-50 rounded-2xl"><p class="label-text">Naissance</p><b>${b.dob_vers ? 'Vers ' : ''}${b.dob}</b></div><div class="p-4 bg-slate-50 rounded-2xl"><p class="label-text">Adresse</p><b>${b.adresse || '-'}</b></div></div>`;
         } else if(tabId === 'vt-scol') {
-            html = `<div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-black uppercase text-sm">Bulletins & Notes Périodiques</h3>
-                    <div class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Moyenne: ${b.sc_moy || '0.00'}/20</div>
-                </div>
-                <table class="w-full text-xs">
-                    <thead class="bg-slate-100"><tr><th class="p-2">Matière</th><th>Note</th><th>Obs.</th></tr></thead>
-                    <tbody>${b.sc_notes ? b.sc_notes.map(n => `<tr><td class="p-2 border-b">${n.mat}</td><td class="border-b font-bold">${n.val}/20</td><td class="border-b italic">${n.obs}</td></tr>`).join('') : '<tr><td colspan="3" class="p-4 text-center">Aucune note saisie</td></tr>'}</tbody>
-                </table>
-            </div>`;
+            html = `<div class="p-4 border rounded-2xl"><h4 class="font-bold mb-4 uppercase">Bulletins</h4><table class="w-full text-xs"><thead><tr><th>Matière</th><th>Note</th></tr></thead><tbody>${b.sc_notes ? b.sc_notes.map(n => `<tr><td>${n.mat}</td><td>${n.val}/20</td></tr>`).join('') : 'Aucune note'}</tbody></table></div>`;
         } else if(tabId === 'vt-med') {
-             html = `<div class="p-6">
-                <h3 class="font-black uppercase text-sm mb-4 text-red-600">Historique Médical</h3>
-                <p class="text-xs text-slate-500 mb-6">Fiche de suivi structurée selon les normes sanitaires.</p>
-                <div class="bg-red-50 p-4 rounded-xl border border-red-100">Aucun suivi médical enregistré pour ce bénéficiaire.</div>
-             </div>`;
-        } else if(tabId === 'vt-mouv') {
-             html = `<div class="p-6">
-                <h3 class="font-black uppercase text-sm mb-4">Mouvements Administratifs</h3>
-                <div class="bg-slate-50 p-4 rounded-xl border border-dashed">Historique des décharges, transferts ou renvois vide.</div>
-             </div>`;
+            html = `<div class="p-4 bg-red-50 rounded-2xl"><p>Dernière visite: -</p></div>`;
         }
         document.getElementById('modal-tab-container').innerHTML = html;
     };
 
     window.closeModal = () => document.getElementById('modal-view').classList.add('hidden');
     window.deleteBenef = (key) => { if(confirm("Supprimer définitivement ce bénéficiaire ?")) remove(ref(db, `beneficiaires/${key}`)); };
-    window.processPhoto = (i) => { const r = new FileReader(); r.onload = (e) => { currentPhoto=e.target.result; document.getElementById('f-photo-preview').src=e.target.result; }; r.readAsDataURL(i.files[0]); };
-    window.uploadLogo = (i) => { const r = new FileReader(); r.onload = (e) => document.getElementById('nav-logo').src=e.target.result; r.readAsDataURL(i.files[0]); };
-    window.saveSettings = () => { set(ref(db, 'settings'), { name: document.getElementById('set-name').value, color: document.getElementById('set-color').value, logo: document.getElementById('nav-logo').src }); alert("Configuration enregistrée !"); };
+    window.uploadLogo = (i) => { const r = new FileReader(); r.onload = (e) => document.getElementById('nav-logo').src = e.target.result; r.readAsDataURL(i.files[0]); };
+    window.saveSettings = () => { set(ref(db, 'settings'), { name: document.getElementById('set-name').value, addr: document.getElementById('set-addr').value, color: document.getElementById('set-color').value, logo: document.getElementById('nav-logo').src }); alert("Sauvegardé"); };
     window.updateTheme = (c) => document.documentElement.style.setProperty('--p-col', c);
-
 </script>
 </body>
-</html>
+</html>                                                               
