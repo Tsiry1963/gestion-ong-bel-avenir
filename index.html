@@ -12,17 +12,16 @@
         :root { --ong-orange: #ff8c00; --ong-dark: #0f172a; }
         body { font-family: 'Poppins', sans-serif; background: #f8fafc; color: var(--ong-dark); overflow-x: hidden; }
         
-        /* Layout */
+        /* Navigation & Layout */
         .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid #e2e8f0; }
         .card { background: white; border-radius: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #f1f5f9; }
         
-        /* Form Elements */
+        /* Inputs */
         .input-field { border: 1.5px solid #cbd5e1; padding: 0.6rem 1rem; border-radius: 0.75rem; width: 100%; transition: 0.3s; font-size: 0.875rem; background: #fff; }
-        .input-field:focus { border-color: var(--ong-orange); outline: none; ring: 3px rgba(255, 140, 0, 0.1); }
-        .label-text { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-left: 0.25rem; margin-bottom: 0.2rem; display: block; }
+        .input-field:focus { border-color: var(--ong-orange); outline: none; box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1); }
+        .label-text { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 0.2rem; display: block; }
         
-        /* Navigation */
-        .nav-link { font-size: 0.8rem; font-weight: 700; color: #64748b; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+        .nav-link { font-size: 0.8rem; font-weight: 700; color: #64748b; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: 0.3s; cursor: pointer; border: none; background: transparent; }
         .nav-link:hover, .nav-link.active { color: var(--ong-orange); background: rgba(255, 140, 0, 0.05); }
         
         .btn-primary { background: var(--ong-orange); color: white; font-weight: 700; border-radius: 0.75rem; transition: 0.3s; cursor: pointer; border: none; }
@@ -32,10 +31,7 @@
         .section-pane.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Custom Checkbox */
-        .check-group { display: flex; gap: 1rem; align-items: center; background: #f1f5f9; padding: 0.75rem; border-radius: 0.75rem; }
-        
-        /* Login Overlay */
+        .check-group { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; background: #f1f5f9; padding: 0.75rem; border-radius: 0.75rem; }
         #auth-overlay { position: fixed; inset: 0; background: var(--ong-dark); z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
@@ -45,10 +41,10 @@
     <div class="bg-white p-10 rounded-[2rem] shadow-2xl w-full max-w-md text-center">
         <img src="https://via.placeholder.com/150x50?text=BEL+AVENIR" class="mx-auto mb-6">
         <h2 class="text-2xl font-black mb-2">Accès Administrateur</h2>
-        <p class="text-slate-400 text-sm mb-8">Veuillez vous identifier pour gérer le centre</p>
+        <p class="text-slate-400 text-sm mb-8">Veuillez entrer vos identifiants</p>
         <div class="space-y-4">
-            <input type="email" id="auth-email" placeholder="Email professionnel" class="input-field">
-            <input type="password" id="auth-pass" placeholder="Code secret" class="input-field">
+            <input type="email" id="auth-email" placeholder="Email (ex: admin@ong.org)" class="input-field">
+            <input type="password" id="auth-pass" placeholder="Code secret (ADMIN2024)" class="input-field">
             <button onclick="handleLogin()" class="btn-primary w-full py-4 uppercase tracking-widest text-xs">Se connecter</button>
         </div>
     </div>
@@ -57,18 +53,16 @@
 <nav class="glass-nav sticky top-0 z-50">
     <div class="container mx-auto px-6 h-20 flex justify-between items-center">
         <div class="flex items-center gap-10">
-            <div class="cursor-pointer" onclick="document.getElementById('logo-upload').click()">
-                <img id="main-logo" src="https://via.placeholder.com/150x50?text=LOGO+ONG" class="h-10 object-contain">
-                <input type="file" id="logo-upload" class="hidden" onchange="uploadLogo(this)">
-            </div>
+            <img id="main-logo" src="https://via.placeholder.com/150x50?text=BEL+AVENIR" class="h-10 cursor-pointer" onclick="document.getElementById('logo-upload').click()">
+            <input type="file" id="logo-upload" class="hidden" onchange="uploadLogo(this)">
             <div class="hidden lg:flex gap-2">
-                <button onclick="showSection('home')" class="nav-link active" id="n-home"><i class="fas fa-home"></i> Accueil</button>
-                <button onclick="showSection('stats')" class="nav-link" id="n-stats"><i class="fas fa-chart-pie"></i> Dashboard</button>
-                <button onclick="showSection('list')" class="nav-link" id="n-list"><i class="fas fa-address-book"></i> Registre</button>
-                <button onclick="showSection('form')" class="nav-link" id="n-form"><i class="fas fa-user-plus"></i> Inscription</button>
+                <button onclick="showSection('home')" class="nav-link active" id="n-home">Accueil</button>
+                <button onclick="showSection('stats')" class="nav-link" id="n-stats">Tableau de Bord</button>
+                <button onclick="showSection('list')" class="nav-link" id="n-list">Registre</button>
+                <button onclick="showSection('form')" class="nav-link" id="n-form">Inscription</button>
             </div>
         </div>
-        <button onclick="location.reload()" class="text-red-500 font-bold text-xs uppercase hover:bg-red-50 px-4 py-2 rounded-lg transition"><i class="fas fa-power-off"></i> Déconnexion</button>
+        <button onclick="location.reload()" class="text-red-500 font-bold text-xs uppercase hover:bg-red-50 px-4 py-2 rounded-lg transition">Sortie</button>
     </div>
 </nav>
 
@@ -77,245 +71,185 @@
     <section id="sec-home" class="section-pane active">
         <div class="grid lg:grid-cols-2 gap-10 items-center mt-10">
             <div>
-                <h1 class="text-6xl font-black leading-tight">Gestion Sociale & <span class="text-orange-500">Holistique.</span></h1>
-                <p class="text-slate-500 mt-6 text-lg">Plateforme centralisée de suivi des bénéficiaires : de l'identité à la réussite scolaire, en passant par le bien-être familial.</p>
+                <h1 class="text-6xl font-black leading-tight">Gestion Sociale <br>& <span class="text-orange-500">Scolaire.</span></h1>
+                <p class="text-slate-500 mt-6 text-lg">Système intégral de suivi des bénéficiaires : de l'identité familiale aux compétences académiques.</p>
                 <div class="flex gap-4 mt-10">
                     <button onclick="showSection('form')" class="btn-primary px-8 py-4 text-sm uppercase">Nouvelle Fiche</button>
-                    <button onclick="showSection('list')" class="bg-slate-800 text-white px-8 py-4 rounded-xl text-sm font-bold uppercase hover:bg-slate-700 transition">Voir le Registre</button>
+                    <button onclick="showSection('list')" class="bg-slate-800 text-white px-8 py-4 rounded-xl text-sm font-bold uppercase hover:bg-slate-700 transition">Consulter Registre</button>
                 </div>
             </div>
-            <div class="card p-4">
-                <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800" class="rounded-[1.2rem] w-full">
-            </div>
+            <div class="card p-4"><img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800" class="rounded-[1.2rem] w-full"></div>
         </div>
     </section>
 
     <section id="sec-form" class="section-pane">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="text-3xl font-black uppercase">Fiche d'Inscription Complète</h2>
-            <button onclick="showSection('home')" class="text-slate-400 font-bold text-xs hover:text-orange-500"><i class="fas fa-chevron-left"></i> Retour</button>
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-black uppercase">Fiche d'Inscription</h2>
+            <button onclick="showSection('home')" class="text-slate-400 font-bold text-xs"><i class="fas fa-arrow-left"></i> Retour</button>
         </div>
 
-        <div class="card p-10 shadow-xl border-t-8 border-orange-500">
-            <div class="mb-12">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center font-black">1</span>
-                    <h3 class="text-xl font-bold uppercase">Informations du Bénéficiaire</h3>
+        <div class="card p-10 border-t-8 border-orange-500">
+            <div class="grid lg:grid-cols-4 gap-8 mb-12">
+                <div class="text-center">
+                    <img id="preview-photo" src="https://via.placeholder.com/150" class="w-40 h-40 rounded-[2rem] mx-auto object-cover border-4 border-slate-100 mb-4 shadow-lg">
+                    <input type="file" id="benef-photo" class="hidden" onchange="previewBenefPhoto(this)">
+                    <button onclick="document.getElementById('benef-photo').click()" class="text-[10px] font-black text-blue-600 uppercase">Charger Photo ID</button>
+                    <input type="text" id="f-id" placeholder="Code ID (ex: BA-001)" class="input-field mt-4 text-center font-black text-orange-600">
                 </div>
-                <div class="grid lg:grid-cols-4 gap-6">
-                    <div class="text-center lg:border-r pr-6">
-                        <div class="relative group mx-auto w-32 h-32 mb-4">
-                            <img id="preview-photo" src="https://via.placeholder.com/150" class="w-32 h-32 rounded-[2rem] object-cover border-4 border-slate-100">
-                            <input type="file" id="benef-photo" class="hidden" onchange="previewBenefPhoto(this)">
-                            <button onclick="document.getElementById('benef-photo').click()" class="absolute inset-0 bg-black/50 text-white rounded-[2rem] opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs font-bold">Changer</button>
-                        </div>
-                        <input type="text" id="f-id" placeholder="Code ID" class="input-field text-center font-black text-orange-600">
-                    </div>
-                    <div class="lg:col-span-3 grid md:grid-cols-3 gap-6">
-                        <div><label class="label-text">Nom & Prénom</label><input type="text" id="f-nom" class="input-field"></div>
-                        <div><label class="label-text">Sexe</label><select id="f-sexe" class="input-field"><option value="">Sélectionner</option><option>Masculin</option><option>Féminin</option></select></div>
-                        <div><label class="label-text">Date de naissance (ou 'Vers')</label><input type="text" id="f-dob" class="input-field" placeholder="ex: 12/05/2012 ou Vers 2010"></div>
-                        <div><label class="label-text">Lieu de naissance</label><input type="text" id="f-lieu-naiss" class="input-field"></div>
-                        <div class="md:col-span-2"><label class="label-text">Adresse Exacte</label><input type="text" id="f-adresse" class="input-field"></div>
-                        <div class="md:col-span-3">
-                            <label class="label-text">Possède un acte de naissance ?</label>
-                            <div class="check-group">
-                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="acte" value="Oui"> OUI</label>
-                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="acte" value="Non"> NON</label>
-                                <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="acte" value="Ne sais pas"> NE SAIS PAS</label>
-                            </div>
+                <div class="lg:col-span-3 grid md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2"><label class="label-text">Nom et Prénom</label><input type="text" id="f-nom" class="input-field"></div>
+                    <div><label class="label-text">Sexe</label><select id="f-sexe" class="input-field"><option value="">Sélectionner</option><option>Masculin</option><option>Féminin</option></select></div>
+                    <div><label class="label-text">Date & Lieu de naissance</label><input type="text" id="f-dob" placeholder="12/05/2012 ou Vers 2010" class="input-field"></div>
+                    <div><label class="label-text">Âge</label><input type="number" id="f-age" class="input-field"></div>
+                    <div><label class="label-text">Adresse Exacte</label><input type="text" id="f-adresse" class="input-field"></div>
+                    <div class="md:col-span-3">
+                        <label class="label-text">Acte de naissance</label>
+                        <div class="check-group">
+                            <label class="flex items-center gap-2"><input type="radio" name="acte" value="Oui"> En possède</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="acte" value="Non"> N'en possède pas</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="acte" value="Ne sais pas"> Ne sais pas</label>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="mb-12 bg-slate-50 p-8 rounded-3xl">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-black">2</span>
-                    <h3 class="text-xl font-bold uppercase">Situation Scolaire</h3>
+            <div class="bg-slate-50 p-8 rounded-3xl mb-12">
+                <h3 class="text-orange-600 font-black text-xs uppercase mb-6 flex items-center gap-2"><i class="fas fa-graduation-cap"></i> Situation Scolaire</h3>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="check-group bg-white">
+                        <label class="font-bold text-xs">CAS :</label>
+                        <label><input type="radio" name="cas_scol" value="Passant(e)"> Passant(e)</label>
+                        <label><input type="radio" name="cas_scol" value="Redoublant(e)"> Redoublant(e)</label>
+                    </div>
+                    <div class="check-group bg-white">
+                        <label class="font-bold text-xs">Bulletin :</label>
+                        <label><input type="radio" name="bull" value="Oui"> Oui</label>
+                        <label><input type="radio" name="bull" value="Non"> Non</label>
+                    </div>
                 </div>
-                <div class="grid md:grid-cols-2 gap-8 mb-8">
-                    <div>
-                        <label class="label-text">Cas de l'élève</label>
-                        <div class="check-group">
-                            <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="cas_scolaire" value="Passant(e)"> Passant(e)</label>
-                            <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="cas_scolaire" value="Redoublant(e)"> Redoublant(e)</label>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="label-text">Bulletin disponible ?</label>
-                        <div class="check-group">
-                            <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="bulletin" value="Oui"> OUI</label>
-                            <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="bulletin" value="Non"> NON</label>
-                        </div>
-                    </div>
+                
+                <div class="grid md:grid-cols-4 gap-4 mb-6">
+                    <div><label class="label-text">Dernière année</label><input type="text" id="f-last-date" class="input-field bg-white"></div>
+                    <div><label class="label-text">Lieu</label><input type="text" id="f-last-lieu" class="input-field bg-white"></div>
+                    <div><label class="label-text">Niveau</label><input type="text" id="f-last-niv" class="input-field bg-white"></div>
+                    <div><label class="label-text">Moyenne Générale</label><input type="text" id="f-last-moy" class="input-field bg-white"></div>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 mb-8">
-                    <h4 class="font-black text-xs uppercase mb-4 text-blue-600">Dernière année de scolarité</h4>
-                    <div class="grid md:grid-cols-4 gap-4 mb-6">
-                        <input type="text" id="f-last-date" placeholder="Date" class="input-field">
-                        <input type="text" id="f-last-lieu" placeholder="Lieu" class="input-field">
-                        <input type="text" id="f-last-niv" placeholder="Niveau" class="input-field">
-                        <input type="text" id="f-last-moy-gen" placeholder="Moyenne Générale" class="input-field">
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead>
-                                <tr class="text-[10px] uppercase text-slate-400">
-                                    <th class="pb-2">Matière</th>
-                                    <th class="pb-2">Coefficient</th>
-                                    <th class="pb-2">Note /20</th>
-                                    <th class="pb-2">Compétence / Obs</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="notes-body">
-                                <tr>
-                                    <td><input type="text" class="input-field text-xs n-mat"></td>
-                                    <td><input type="number" class="input-field text-xs n-coef" oninput="calcMoyenne()"></td>
-                                    <td><input type="number" class="input-field text-xs n-val" oninput="calcMoyenne()"></td>
-                                    <td><input type="text" class="input-field text-xs n-obs" placeholder="Soutien ?"></td>
-                                    <td><button onclick="this.parentElement.parentElement.remove(); calcMoyenne();" class="text-red-400 p-2"><i class="fas fa-times"></i></button></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <button onclick="addNoteRow()" class="mt-4 text-[10px] font-black text-blue-600 uppercase">+ Ajouter une matière</button>
-                    </div>
+                <div class="overflow-x-auto bg-white p-6 rounded-2xl border mb-6">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-slate-400 uppercase font-black">
+                                <th class="pb-4">Matière</th><th class="pb-4">Coef</th><th class="pb-4">Note /20</th><th class="pb-4">Observations</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="notes-body">
+                            <tr>
+                                <td><input type="text" class="input-field n-mat"></td>
+                                <td><input type="number" class="input-field n-coef"></td>
+                                <td><input type="number" class="input-field n-val"></td>
+                                <td><input type="text" class="input-field n-obs"></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button onclick="addNoteRow()" class="mt-4 text-[10px] font-black text-blue-600 uppercase">+ Ajouter une matière</button>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-orange-50 p-6 rounded-2xl">
-                        <h4 class="font-black text-xs uppercase mb-4">Niveau Actuel / Réinscription</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="col-span-2">
-                                <label class="label-text">Scolarisé pour la nouvelle année ?</label>
-                                <div class="check-group bg-white">
-                                    <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="new_scol" value="Oui"> OUI</label>
-                                    <label class="flex items-center gap-2 text-xs font-bold"><input type="radio" name="new_scol" value="Non"> NON</label>
-                                </div>
-                            </div>
-                            <input type="text" id="f-new-lieu" placeholder="Lieu" class="input-field bg-white">
-                            <input type="text" id="f-new-niv" placeholder="Niveau" class="input-field bg-white">
-                            <input type="date" id="f-new-date" class="input-field bg-white">
-                            <select id="f-new-by" class="input-field bg-white">
-                                <option value="">Par qui ?</option>
-                                <option>ONG Bel Avenir</option>
-                                <option>Tuteur</option>
-                            </select>
+                    <div class="bg-white p-6 rounded-2xl">
+                        <label class="label-text">Réinscription pour la nouvelle année ?</label>
+                        <div class="check-group mb-4">
+                            <label><input type="radio" name="new_scol" value="Oui"> Oui</label>
+                            <label><input type="radio" name="new_scol" value="Non"> Non</label>
                         </div>
+                        <input type="text" id="f-new-niv" placeholder="Niveau actuel" class="input-field mb-2">
+                        <select id="f-new-by" class="input-field">
+                            <option value="">Financé par ?</option>
+                            <option>ONG Bel Avenir</option><option>Tuteur</option>
+                        </select>
                     </div>
-                    <div class="bg-slate-100 p-6 rounded-2xl">
-                        <h4 class="font-black text-xs uppercase mb-4">Suivi Bel Avenir</h4>
-                        <div class="grid grid-cols-1 gap-4">
-                            <input type="date" id="f-insc-date" class="input-field bg-white">
-                            <input type="text" id="f-insc-resp" placeholder="Nom du responsable" class="input-field bg-white">
-                            <input type="text" id="f-insc-site" list="list-sites" placeholder="Site / Projet d'inscription" class="input-field bg-white">
-                            <datalist id="list-sites"></datalist>
-                            <input type="text" id="f-para" placeholder="Activités parascolaires" class="input-field bg-white">
-                        </div>
+                    <div class="bg-white p-6 rounded-2xl">
+                        <label class="label-text">Suivi ONG</label>
+                        <input type="date" id="f-insc-date" class="input-field mb-2">
+                        <input type="text" id="f-insc-site" list="list-sites" placeholder="Site / Projet d'inscription" class="input-field mb-2">
+                        <datalist id="list-sites"></datalist>
+                        <input type="text" id="f-para" placeholder="Activités parascolaires" class="input-field">
                     </div>
                 </div>
             </div>
 
             <div class="mb-12">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center font-black">3</span>
-                    <h3 class="text-xl font-bold uppercase">Situation Familiale</h3>
-                </div>
+                <h3 class="text-green-600 font-black text-xs uppercase mb-6 flex items-center gap-2"><i class="fas fa-users"></i> Situation Familiale</h3>
                 <div class="grid lg:grid-cols-3 gap-8">
-                    <div class="space-y-4">
+                    <div>
                         <label class="label-text">Tuteur Légal</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <label class="flex items-center gap-2 p-3 border rounded-xl text-[10px] font-bold"><input type="radio" name="tuteur_type" value="Mère"> MÈRE</label>
-                            <label class="flex items-center gap-2 p-3 border rounded-xl text-[10px] font-bold"><input type="radio" name="tuteur_type" value="Père"> PÈRE</label>
-                            <label class="flex items-center gap-2 p-3 border rounded-xl text-[10px] font-bold"><input type="radio" name="tuteur_type" value="Père et Mère"> PÈRE & MÈRE</label>
-                            <label class="flex items-center gap-2 p-3 border rounded-xl text-[10px] font-bold"><input type="radio" name="tuteur_type" value="Autre"> AUTRE</label>
+                        <div class="check-group mb-4">
+                            <label><input type="radio" name="tut_type" value="Mère"> Mère</label>
+                            <label><input type="radio" name="tut_type" value="Père"> Père</label>
+                            <label><input type="radio" name="tut_type" value="Autres"> Autres</label>
                         </div>
-                        <input type="text" id="f-tut-autre" placeholder="Préciser si autre" class="input-field">
+                        <input type="text" id="f-tut-nom" placeholder="Nom complet" class="input-field mb-2">
+                        <input type="text" id="f-tut-contact" placeholder="Contact" class="input-field">
                     </div>
-                    <div class="lg:col-span-2 grid md:grid-cols-2 gap-4">
-                        <input type="text" id="f-tut-nom" placeholder="Nom complet du tuteur" class="input-field">
-                        <input type="text" id="f-tut-prof" placeholder="Profession" class="input-field">
-                        <select id="f-tut-scol" class="input-field">
-                            <option value="">Scolarisé ?</option>
-                            <option>Oui</option><option>Non</option>
-                        </select>
-                        <input type="text" id="f-tut-niv" placeholder="Niveau scolaire tuteur" class="input-field">
-                        <input type="text" id="f-tut-contact" placeholder="Contact / Téléphone" class="input-field">
-                        <input type="text" id="f-tut-adr" placeholder="Adresse du tuteur" class="input-field">
+                    <div class="lg:col-span-2">
+                        <label class="label-text">Détails Tuteur</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" id="f-tut-prof" placeholder="Profession" class="input-field">
+                            <select id="f-tut-scol" class="input-field"><option value="">Scolarisé ?</option><option>Oui</option><option>Non</option></select>
+                            <input type="text" id="f-maison-etat" placeholder="État de la maison" class="input-field">
+                            <input type="text" id="f-maison-nat" placeholder="Nature" class="input-field">
+                        </div>
                     </div>
                 </div>
-                <div class="mt-8 grid md:grid-cols-2 gap-8">
-                    <div class="p-6 bg-slate-50 rounded-3xl">
-                        <h4 class="font-black text-xs uppercase mb-4">Enfants à la maison</h4>
-                        <div id="enfants-maison-list" class="space-y-3">
-                            <div class="grid grid-cols-4 gap-2">
-                                <select class="input-field text-xs em-sexe"><option>M</option><option>F</option></select>
-                                <select class="input-field text-xs em-scol"><option>Scol</option><option>Non</option></select>
-                                <input type="text" class="input-field text-xs em-niv" placeholder="Niveau">
-                                <input type="text" class="input-field text-xs em-etab" placeholder="Etablissement">
-                            </div>
+                <div class="mt-8 p-6 bg-slate-50 rounded-3xl">
+                    <label class="label-text">Autres enfants à la maison</label>
+                    <div id="enfants-list" class="space-y-2">
+                        <div class="grid grid-cols-4 gap-2">
+                            <select class="input-field text-xs em-sexe"><option>M</option><option>F</option></select>
+                            <select class="input-field text-xs em-scol"><option>Scol</option><option>Non</option></select>
+                            <input type="text" class="input-field text-xs em-niv" placeholder="Niveau">
+                            <input type="text" class="input-field text-xs em-etab" placeholder="Etablissement">
                         </div>
-                        <button onclick="addEnfantRow()" class="mt-4 text-[10px] font-black text-green-600 uppercase">+ Ajouter un enfant</button>
                     </div>
-                    <div class="space-y-4">
-                        <h4 class="font-black text-xs uppercase mb-4">Habitat & Observations</h4>
-                        <input type="text" id="f-maison-etat" placeholder="État de la maison" class="input-field">
-                        <input type="text" id="f-maison-nat" placeholder="Nature de la maison" class="input-field">
-                        <textarea id="f-obs-libres" placeholder="Autres observations complémentaires..." class="input-field h-24"></textarea>
-                    </div>
+                    <button onclick="addEnfantRow()" class="mt-4 text-[10px] font-black text-green-600 uppercase">+ Ajouter Enfant</button>
                 </div>
+                <textarea id="f-obs" placeholder="Observations complémentaires..." class="input-field h-24 mt-6"></textarea>
             </div>
 
-            <button onclick="saveBeneficiary()" class="btn-primary w-full py-5 uppercase text-sm tracking-widest flex items-center justify-center gap-3">
+            <button onclick="saveData()" class="btn-primary w-full py-5 uppercase text-sm tracking-widest flex items-center justify-center gap-3">
                 <i class="fas fa-save"></i> Enregistrer le dossier complet
             </button>
         </div>
     </section>
 
     <section id="sec-list" class="section-pane">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-10">
-            <h2 class="text-3xl font-black uppercase">Registre des Bénéficiaires</h2>
-            <div class="flex w-full md:w-auto gap-2">
-                <input type="text" id="search-input" placeholder="Chercher un nom ou ID..." class="input-field" oninput="renderTable()">
-                <select id="filter-site" class="input-field w-32" onchange="renderTable()"><option value="">Tous Sites</option></select>
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+            <h2 class="text-3xl font-black uppercase">Registre</h2>
+            <div class="flex gap-2 w-full md:w-auto">
+                <input type="text" id="search-input" placeholder="Nom ou ID..." class="input-field" oninput="renderTable()">
+                <select id="filter-site" class="input-field w-40" onchange="renderTable()"><option value="">Tous Sites</option></select>
             </div>
         </div>
         <div class="card overflow-hidden">
-            <table class="w-full text-left">
+            <table class="w-full text-left text-sm">
                 <thead class="bg-slate-50 border-b text-[10px] uppercase font-black text-slate-400">
-                    <tr>
-                        <th class="p-5">Bénéficiaire</th>
-                        <th>Identifiant</th>
-                        <th>Site / Projet</th>
-                        <th>Scolarité</th>
-                        <th class="text-right p-5">Actions</th>
-                    </tr>
+                    <tr><th class="p-5">Bénéficiaire</th><th>ID</th><th>Sexe</th><th>Site</th><th class="text-right p-5">Actions</th></tr>
                 </thead>
-                <tbody id="benef-table-body" class="text-sm"></tbody>
+                <tbody id="table-body"></tbody>
             </table>
         </div>
     </section>
 
     <section id="sec-stats" class="section-pane">
-        <h2 class="text-3xl font-black uppercase mb-10">Tableau de Bord Holistique</h2>
+        <h2 class="text-3xl font-black uppercase mb-10">Tableau de Bord</h2>
         <div class="grid md:grid-cols-4 gap-6 mb-10">
-            <div class="card p-6 border-l-8 border-orange-500">
-                <p class="text-[10px] font-black uppercase text-slate-400">Effectif Total</p>
-                <h3 id="stat-total" class="text-3xl font-black">0</h3>
+            <div class="card p-8 border-l-8 border-orange-500">
+                <p class="text-[10px] font-black text-slate-400 uppercase">Total Inscrits</p>
+                <h3 id="st-total" class="text-4xl font-black">0</h3>
             </div>
-            <div class="card p-6 border-l-8 border-blue-500">
-                <p class="text-[10px] font-black uppercase text-slate-400">Taux de Scolarisation</p>
-                <h3 id="stat-scol" class="text-3xl font-black">0%</h3>
-            </div>
-            <div class="card p-6 border-l-8 border-green-500">
-                <p class="text-[10px] font-black uppercase text-slate-400">Garçons / Filles</p>
-                <h3 id="stat-sexe" class="text-lg font-black">0% / 0%</h3>
-            </div>
-            <div class="card p-6 border-l-8 border-purple-500">
-                <p class="text-[10px] font-black uppercase text-slate-400">Moyenne Générale</p>
-                <h3 id="stat-moy" class="text-3xl font-black">0.00</h3>
+            <div class="card p-8 border-l-8 border-blue-500">
+                <p class="text-[10px] font-black text-slate-400 uppercase">Filles / Garçons</p>
+                <h3 id="st-sexe" class="text-lg font-black">0 / 0</h3>
             </div>
         </div>
         <div class="grid lg:grid-cols-2 gap-10">
@@ -323,14 +257,19 @@
             <div class="card p-8"><canvas id="chart-niv"></canvas></div>
         </div>
     </section>
+</div>
 
+<div id="modal-view" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-5xl rounded-[3rem] overflow-hidden shadow-2xl relative h-[90vh]">
+        <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-300 hover:text-red-500 text-3xl z-10"><i class="fas fa-times"></i></button>
+        <div id="view-content" class="h-full overflow-y-auto p-12"></div>
+    </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // Firebase Configuration (Généré dynamiquement selon vos accès précédents)
     const firebaseConfig = {
         apiKey: "AIzaSyDKNy6B4aifDrVDsglGhvU_eCMZOZF6q8g",
         authDomain: "bel-avenir-social-db-878f7.firebaseapp.com",
@@ -343,17 +282,17 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    let allBeneficiaries = [];
-    let benefPhotoBase64 = "";
+    let allData = [];
+    let currentPhoto = "";
 
-    // -- AUTH SYSTEM --
+    // -- FONCTION LOGIN (Globale) --
     window.handleLogin = () => {
-        const email = document.getElementById('auth-email').value;
+        const mail = document.getElementById('auth-email').value;
         const pass = document.getElementById('auth-pass').value;
-        if(email && pass === "ADMIN2024") { // Sécurité basique pour démonstration
+        if(mail.includes('@') && pass === "ADMIN2024") {
             document.getElementById('auth-overlay').style.display = 'none';
         } else {
-            alert("Identifiants incorrects.");
+            alert("Accès refusé. Vérifiez vos identifiants.");
         }
     };
 
@@ -361,190 +300,151 @@
     window.showSection = (name) => {
         document.querySelectorAll('.section-pane').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-        document.getElementById('sec-' + name).classList.add('active');
-        document.getElementById('n-' + name).classList.add('active');
-    };
-
-    // -- LOGO & PHOTOS --
-    window.uploadLogo = (input) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            document.getElementById('main-logo').src = e.target.result;
-            localStorage.setItem('bel_avenir_logo', e.target.result);
-        };
-        reader.readAsDataURL(input.files[0]);
-    };
-    if(localStorage.getItem('bel_avenir_logo')) document.getElementById('main-logo').src = localStorage.getItem('bel_avenir_logo');
-
-    window.previewBenefPhoto = (input) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            benefPhotoBase64 = e.target.result;
-            document.getElementById('preview-photo').src = e.target.result;
-        };
-        reader.readAsDataURL(input.files[0]);
+        document.getElementById('sec-'+name).classList.add('active');
+        document.getElementById('n-'+name).classList.add('active');
     };
 
     // -- FORM LOGIC --
+    window.uploadLogo = (input) => {
+        const reader = new FileReader();
+        reader.onload = (e) => { document.getElementById('main-logo').src = e.target.result; };
+        reader.readAsDataURL(input.files[0]);
+    };
+
+    window.previewBenefPhoto = (input) => {
+        const reader = new FileReader();
+        reader.onload = (e) => { 
+            currentPhoto = e.target.result; 
+            document.getElementById('preview-photo').src = e.target.result; 
+        };
+        reader.readAsDataURL(input.files[0]);
+    };
 
     window.addNoteRow = () => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><input type="text" class="input-field text-xs n-mat"></td>
-            <td><input type="number" class="input-field text-xs n-coef" oninput="calcMoyenne()"></td>
-            <td><input type="number" class="input-field text-xs n-val" oninput="calcMoyenne()"></td>
-            <td><input type="text" class="input-field text-xs n-obs"></td>
-            <td><button onclick="this.parentElement.parentElement.remove(); calcMoyenne();" class="text-red-400 p-2"><i class="fas fa-times"></i></button></td>
-        `;
+        tr.innerHTML = `<td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef"></td><td><input type="number" class="input-field n-val"></td><td><input type="text" class="input-field n-obs"></td><td><button onclick="this.parentElement.parentElement.remove()" class="text-red-400 p-2"><i class="fas fa-trash"></i></button></td>`;
         document.getElementById('notes-body').appendChild(tr);
     };
 
     window.addEnfantRow = () => {
         const div = document.createElement('div');
         div.className = "grid grid-cols-4 gap-2";
-        div.innerHTML = `
-            <select class="input-field text-xs em-sexe"><option>M</option><option>F</option></select>
-            <select class="input-field text-xs em-scol"><option>Scol</option><option>Non</option></select>
-            <input type="text" class="input-field text-xs em-niv" placeholder="Niveau">
-            <input type="text" class="input-field text-xs em-etab" placeholder="Etablissement">
-        `;
-        document.getElementById('enfants-maison-list').appendChild(div);
+        div.innerHTML = `<select class="input-field text-xs em-sexe"><option>M</option><option>F</option></select><select class="input-field text-xs em-scol"><option>Scol</option><option>Non</option></select><input type="text" class="input-field text-xs em-niv" placeholder="Niveau"><input type="text" class="input-field text-xs em-etab" placeholder="Etablissement">`;
+        document.getElementById('enfants-list').appendChild(div);
     };
 
-    window.saveBeneficiary = () => {
+    // -- SAVE --
+    window.saveData = () => {
         const getRadio = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value || "";
         
-        // Collect Notes
-        const notes = Array.from(document.querySelectorAll('#notes-body tr')).map(tr => ({
-            mat: tr.querySelector('.n-mat').value,
-            coef: tr.querySelector('.n-coef').value,
-            val: tr.querySelector('.n-val').value,
-            obs: tr.querySelector('.n-obs').value
-        })).filter(n => n.mat);
-
-        // Collect Enfants Maison
-        const enfants = Array.from(document.querySelectorAll('#enfants-maison-list div')).map(div => ({
-            sexe: div.querySelector('.em-sexe').value,
-            scol: div.querySelector('.em-scol').value,
-            niv: div.querySelector('.em-niv').value,
-            etab: div.querySelector('.em-etab').value
-        }));
-
-        const data = {
+        const payload = {
             id: document.getElementById('f-id').value,
             nom: document.getElementById('f-nom').value,
             sexe: document.getElementById('f-sexe').value,
             dob: document.getElementById('f-dob').value,
-            lieu_naiss: document.getElementById('f-lieu-naiss').value,
+            age: document.getElementById('f-age').value,
             adresse: document.getElementById('f-adresse').value,
             acte: getRadio('acte'),
-            photo: benefPhotoBase64,
-            
+            photo: currentPhoto,
             scol: {
-                cas: getRadio('cas_scolaire'),
-                bull: getRadio('bulletin'),
+                cas: getRadio('cas_scol'),
+                bull: getRadio('bull'),
                 last: {
                     date: document.getElementById('f-last-date').value,
-                    lieu: document.getElementById('f-last-lieu').value,
                     niv: document.getElementById('f-last-niv').value,
-                    moy: document.getElementById('f-last-moy-gen').value,
-                    notes: notes
-                },
-                new: {
-                    scol: getRadio('new_scol'),
-                    lieu: document.getElementById('f-new-lieu').value,
-                    niv: document.getElementById('f-new-niv').value,
-                    date: document.getElementById('f-new-date').value,
-                    by: document.getElementById('f-new-by').value
+                    moy: document.getElementById('f-last-moy').value
                 }
             },
             suivi: {
-                date: document.getElementById('f-insc-date').value,
-                resp: document.getElementById('f-insc-resp').value,
                 site: document.getElementById('f-insc-site').value,
-                para: document.getElementById('f-para').value
+                resp: "Admin",
+                date: document.getElementById('f-insc-date').value
             },
             famille: {
-                tut_type: getRadio('tuteur_type'),
                 tut_nom: document.getElementById('f-tut-nom').value,
-                tut_prof: document.getElementById('f-tut-prof').value,
-                tut_scol: document.getElementById('f-tut-scol').value,
-                tut_niv: document.getElementById('f-tut-niv').value,
-                tut_contact: document.getElementById('f-tut-contact').value,
-                tut_adr: document.getElementById('f-tut-adr').value,
-                enfants_maison: enfants,
-                maison: {
-                    etat: document.getElementById('f-maison-etat').value,
-                    nat: document.getElementById('f-maison-nat').value
-                },
-                obs: document.getElementById('f-obs-libres').value
+                tut_contact: document.getElementById('f-tut-contact').value
             }
         };
 
-        if(!data.nom || !data.id) return alert("Nom et ID obligatoires !");
+        if(!payload.nom || !payload.id) return alert("Veuillez remplir au moins le Nom et l'ID");
 
-        push(ref(db, 'beneficiaires'), data).then(() => {
-            alert("Dossier sauvegardé !");
+        push(ref(db, 'beneficiaires'), payload).then(() => {
+            alert("Dossier Enregistré !");
             location.reload();
         });
     };
 
-    // -- RENDERING --
+    // -- DATA FETCH & RENDER --
     onValue(ref(db, 'beneficiaires'), (snap) => {
         const val = snap.val();
-        allBeneficiaries = val ? Object.keys(val).map(k => ({...val[k], key: k})) : [];
+        allData = val ? Object.keys(val).map(k => ({...val[k], key: k})) : [];
         renderTable();
-        renderStats();
-        updateSiteDatalist();
+        updateStats();
     });
 
     window.renderTable = () => {
         const search = document.getElementById('search-input').value.toLowerCase();
-        const siteF = document.getElementById('filter-site').value;
-        const tbody = document.getElementById('benef-table-body');
-        
-        const filtered = allBeneficiaries.filter(b => 
-            (b.nom.toLowerCase().includes(search) || b.id.toLowerCase().includes(search)) &&
-            (siteF === "" || b.suivi.site === siteF)
-        );
+        const tbody = document.getElementById('table-body');
+        const filtered = allData.filter(b => b.nom.toLowerCase().includes(search) || b.id.toLowerCase().includes(search));
 
         tbody.innerHTML = filtered.map(b => `
             <tr class="border-b hover:bg-slate-50 transition">
-                <td class="p-4 flex items-center gap-3">
-                    <img src="${b.photo || 'https://via.placeholder.com/50'}" class="w-10 h-10 rounded-lg object-cover">
-                    <span class="font-bold">${b.nom}</span>
-                </td>
-                <td class="font-black text-orange-600 uppercase text-xs">${b.id}</td>
-                <td class="text-xs"><b>${b.suivi.site}</b><br>${b.suivi.resp}</td>
-                <td><span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-[10px] font-black uppercase">${b.scol.new.niv || 'N/A'}</span></td>
+                <td class="p-4 flex items-center gap-3"><img src="${b.photo || 'https://via.placeholder.com/50'}" class="w-10 h-10 rounded-xl object-cover"><b>${b.nom}</b></td>
+                <td class="font-black text-orange-600">${b.id}</td>
+                <td>${b.sexe}</td>
+                <td class="text-xs font-bold">${b.suivi.site}</td>
                 <td class="p-4 text-right">
-                    <button onclick="viewBenef('${b.key}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg"><i class="fas fa-eye"></i></button>
-                    <button onclick="deleteBenef('${b.key}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg"><i class="fas fa-trash"></i></button>
+                    <button onclick="viewFull('${b.key}')" class="text-blue-500 p-2"><i class="fas fa-eye text-xl"></i></button>
+                    <button onclick="deleteData('${b.key}')" class="text-red-400 p-2"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>
         `).join('');
     };
 
-    function updateSiteDatalist() {
-        const sites = [...new Set(allBeneficiaries.map(b => b.suivi.site))];
-        document.getElementById('list-sites').innerHTML = sites.map(s => `<option value="${s}">`).join('');
-        document.getElementById('filter-site').innerHTML = `<option value="">Tous Sites</option>` + sites.map(s => `<option value="${s}">${s}</option>`).join('');
+    function updateStats() {
+        document.getElementById('st-total').innerText = allData.length;
     }
 
-    // -- STATS & CHARTS --
-    function renderStats() {
-        const total = allBeneficiaries.length;
-        document.getElementById('stat-total').innerText = total;
-        
-        if(total === 0) return;
+    window.deleteData = (key) => { if(confirm("Supprimer ce dossier ?")) remove(ref(db, 'beneficiaires/'+key)); };
 
-        const scolCount = allBeneficiaries.filter(b => b.scol.new.scol === 'Oui').length;
-        document.getElementById('stat-scol').innerText = ((scolCount/total)*100).toFixed(0) + "%";
+    // -- VUE COMPLETE (YEU) --
+    window.viewFull = (key) => {
+        const b = allData.find(x => x.key === key);
+        const content = `
+            <div class="grid lg:grid-cols-3 gap-12">
+                <div class="text-center">
+                    <img src="${b.photo || 'https://via.placeholder.com/200'}" class="w-64 h-64 rounded-[3rem] mx-auto object-cover border-8 border-orange-50 shadow-2xl mb-6">
+                    <h2 class="text-3xl font-black uppercase text-slate-800">${b.nom}</h2>
+                    <p class="text-orange-500 font-black text-xl">${b.id}</p>
+                    <div class="mt-8 space-y-2 text-left bg-slate-50 p-6 rounded-3xl">
+                        <p class="text-xs"><b>Naissance:</b> ${b.dob}</p>
+                        <p class="text-xs"><b>Sexe:</b> ${b.sexe}</p>
+                        <p class="text-xs"><b>Adresse:</b> ${b.adresse}</p>
+                        <p class="text-xs"><b>Acte:</b> ${b.acte}</p>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 space-y-10">
+                    <div>
+                        <h4 class="text-blue-600 font-black uppercase text-xs mb-4 border-b pb-2">Parcours Scolaire</h4>
+                        <div class="grid grid-cols-2 gap-6">
+                            <p class="text-sm"><b>Dernier Niveau:</b> ${b.scol.last.niv}</p>
+                            <p class="text-sm"><b>Moyenne:</b> ${b.scol.last.moy}</p>
+                            <p class="text-sm"><b>Site Inscription:</b> ${b.suivi.site}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-green-600 font-black uppercase text-xs mb-4 border-b pb-2">Famille</h4>
+                        <p class="text-sm"><b>Tuteur:</b> ${b.famille.tut_nom}</p>
+                        <p class="text-sm"><b>Contact:</b> ${b.famille.tut_contact}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('view-content').innerHTML = content;
+        document.getElementById('modal-view').classList.remove('hidden');
+    };
 
-        const masc = allBeneficiaries.filter(b => b.sexe === 'Masculin').length;
-        const fem = total - masc;
-        document.getElementById('stat-sexe').innerText = `${((masc/total)*100).toFixed(0)}% M / ${((fem/total)*100).toFixed(0)}% F`;
-    }
+    window.closeModal = () => document.getElementById('modal-view').classList.add('hidden');
 
 </script>
 </body>
