@@ -3,664 +3,413 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BEL AVENIR - Gestion Centre Social & Holistique</title>
+    <title>BEL AVENIR - Panel Administrateur</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
-        :root { --ong-blue: #0056b3; --ong-orange: #ff8c00; --ong-green: #10b981; }
-        body { font-family: 'Poppins', sans-serif; background: #f8fafc; color: #1e293b; overflow-x: hidden; }
-        .card { background: white; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); transition: 0.3s; }
-        .input-field { border: 1.5px solid #e2e8f0; padding: 12px; border-radius: 12px; width: 100%; transition: 0.3s; font-size: 0.875rem; }
-        .input-field:focus { border-color: var(--ong-blue); outline: none; box-shadow: 0 0 0 4px rgba(0,86,179,0.1); }
-        .btn-primary { background: var(--ong-blue); color: white; border-radius: 12px; font-weight: 700; transition: 0.3s; }
-        .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
-        .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
-        .section-pane { display: none; }
-        .section-pane.active { display: block; animation: fadeIn 0.4s ease; }
+        :root { --ong-orange: #ff8c00; --ong-dark: #1e293b; }
+        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; color: var(--ong-dark); }
+        
+        .nav-link { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; transition: 0.3s; color: #64748b; }
+        .nav-link:hover, .nav-link.active { color: var(--ong-orange); border-bottom: 2px solid var(--ong-orange); }
+        
+        .card { background: white; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03); }
+        .input-field { border: 1.5px solid #e2e8f0; padding: 10px 15px; border-radius: 12px; width: 100%; font-size: 0.875rem; transition: 0.3s; }
+        .input-field:focus { border-color: var(--ong-orange); outline: none; box-shadow: 0 0 0 4px rgba(255,140,0,0.1); }
+        
+        .btn-orange { background: var(--ong-orange); color: white; font-weight: 700; border-radius: 12px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-orange:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(255,140,0,0.3); }
+
+        .stat-card { border-left: 6px solid var(--ong-orange); }
+        .section-pane { display: none; animation: fadeIn 0.4s ease; }
+        .section-pane.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .glass-effect { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
-        .sidebar-btn-active { background: var(--ong-blue) !important; color: white !important; }
-        .innovative-card { border: 1px solid rgba(226, 232, 240, 0.5); }
-        .hero-gradient { background: linear-gradient(135deg, #0056b3 0%, #00a1ff 100%); }
+
+        #custom-logo { max-height: 45px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<nav class="bg-white border-b border-slate-200 p-4 sticky top-0 z-50 glass-effect">
-    <div class="container mx-auto flex justify-between items-center">
-        <div class="flex items-center gap-4">
-            <div id="logo-zone" class="cursor-pointer" onclick="document.getElementById('logo-upload').click()">
-                <img id="custom-logo-img" src="https://via.placeholder.com/150x50?text=Logo+Bel+Avenir" alt="Logo" class="h-10">
-                <input type="file" id="logo-upload" class="hidden" accept="image/*" onchange="loadLocalLogo(this)">
+<nav class="bg-white border-b sticky top-0 z-50">
+    <div class="container mx-auto px-6 h-20 flex justify-between items-center">
+        <div class="flex items-center gap-8">
+            <div onclick="document.getElementById('logo-upload').click()">
+                <img id="custom-logo" src="https://via.placeholder.com/150x50?text=LOGO+BEL+AVENIR" alt="Logo">
+                <input type="file" id="logo-upload" class="hidden" accept="image/*" onchange="loadLogo(this)">
             </div>
-            <div>
-                <h1 class="font-black text-blue-800 leading-tight uppercase text-sm">Bel Avenir</h1>
-                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Toliara, Madagascar</p>
+            <div class="hidden md:flex gap-6">
+                <a href="#" onclick="showSection('sec-home')" class="nav-link active" id="l-home">Accueil</a>
+                <a href="#" onclick="showSection('sec-stats')" class="nav-link" id="l-stats">Tableau de Bord</a>
+                <a href="#" onclick="showSection('sec-list')" class="nav-link" id="l-list">Registre</a>
+                <a href="#" onclick="showSection('sec-form')" class="nav-link" id="l-form">Inscription</a>
             </div>
         </div>
-        <div class="flex gap-2">
-            <button onclick="showView('view-selection')" class="text-[10px] font-black uppercase p-2 text-slate-500">Accueil</button>
-            <button id="btn-admin-nav" onclick="showView('admin-login')" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase">Espace Travail</button>
-            <button id="btn-logout" onclick="logout()" class="hidden bg-slate-800 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">Déconnexion</button>
+        <div class="flex items-center gap-4">
+            <button onclick="logout()" class="text-xs font-black text-red-500 uppercase flex items-center gap-2 hover:bg-red-50 p-2 rounded-lg transition">
+                <i class="fas fa-sign-out-alt"></i> Sortie
+            </button>
         </div>
     </div>
 </nav>
 
-<section id="view-selection" class="container mx-auto mt-10 px-4">
-    <div class="hero-gradient rounded-[40px] p-12 text-white mb-12 relative overflow-hidden shadow-2xl">
-        <div class="relative z-10 max-w-2xl">
-            <h2 class="text-5xl font-extrabold mb-4 leading-tight">L'éducation comme levier de changement.</h2>
-            <p class="text-blue-100 text-lg mb-8">L'ONG Bel Avenir agit à Toliara pour transformer la vie des enfants vulnérables à travers un accompagnement holistique : Éducation, Santé, Nutrition et Sport.</p>
-            <div class="flex gap-4">
-                <button onclick="showView('user-login')" class="bg-white text-blue-700 px-8 py-4 rounded-2xl font-black uppercase text-xs shadow-xl">Accès Bénéficiaire</button>
-                <button onclick="showView('admin-login')" class="bg-blue-800/30 backdrop-blur-md border border-white/20 px-8 py-4 rounded-2xl font-black uppercase text-xs">Portail Social</button>
+<div class="container mx-auto p-6">
+    <section id="sec-home" class="section-pane active">
+        <div class="card p-12 text-center max-w-3xl mx-auto mt-10">
+            <div class="w-24 h-24 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-user-shield text-4xl"></i>
+            </div>
+            <h1 class="text-4xl font-black mb-4">Panel Social Administrateur</h1>
+            <p class="text-slate-500 mb-8">Bienvenue sur l'outil de gestion centralisée. Gérez les inscriptions, suivez la santé et les performances scolaires des bénéficiaires de l'ONG Bel Avenir.</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="showSection('sec-form')" class="btn-orange p-4 uppercase text-xs">Nouvelle Inscription</button>
+                <button onclick="showSection('sec-list')" class="bg-slate-800 text-white p-4 rounded-xl uppercase text-xs font-bold hover:bg-slate-700 transition">Consulter Registre</button>
             </div>
         </div>
-        <i class="fas fa-hand-holding-heart absolute -right-10 -bottom-10 text-[300px] opacity-10 rotate-12"></i>
-    </div>
+    </section>
 
-    <div class="grid md:grid-cols-3 gap-6 text-center mb-20">
-        <div class="card p-8">
-            <div class="w-14 h-14 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fas fa-school"></i></div>
-            <h3 class="font-bold text-lg mb-2">Éducation</h3>
-            <p class="text-slate-500 text-sm">Scolarisation formelle et soutien scolaire quotidien pour chaque enfant.</p>
+    <section id="sec-stats" class="section-pane">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-black uppercase">Statistiques Globales</h2>
+            <button onclick="showSection('sec-home')" class="text-xs font-bold text-slate-400 hover:text-orange-500"><i class="fas fa-arrow-left"></i> Retour</button>
         </div>
-        <div class="card p-8">
-            <div class="w-14 h-14 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fas fa-heartbeat"></i></div>
-            <h3 class="font-bold text-lg mb-2">Santé & Nutrition</h3>
-            <p class="text-slate-500 text-sm">Suivi médical préventif et compléments nutritionnels pour une croissance saine.</p>
-        </div>
-        <div class="card p-8">
-            <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fas fa-users"></i></div>
-            <h3 class="font-bold text-lg mb-2">Social</h3>
-            <p class="text-slate-500 text-sm">Protection des droits et lutte contre toutes formes de vulnérabilité.</p>
-        </div>
-    </div>
-</section>
-
-<section id="admin-login" class="hidden container mx-auto mt-20 max-w-md p-10 card shadow-2xl text-center">
-    <i class="fas fa-user-shield text-5xl text-blue-600 mb-6"></i>
-    <h2 class="text-2xl font-black mb-2">Portail Professionnel</h2>
-    <p class="text-slate-400 text-sm mb-8">Administrateurs & Travailleurs Sociaux</p>
-    <div class="space-y-4">
-        <input type="email" id="admin-email" placeholder="Email professionnel" class="input-field">
-        <input type="password" id="admin-password" placeholder="Mot de passe" class="input-field">
-        <button onclick="handleAdminAuth()" class="w-full btn-primary py-4 uppercase text-xs tracking-widest">Entrer</button>
-    </div>
-</section>
-
-<section id="user-login" class="hidden container mx-auto mt-20 max-w-md p-10 card shadow-2xl text-center">
-    <i class="fas fa-graduation-cap text-5xl text-orange-500 mb-6"></i>
-    <h2 class="text-2xl font-black mb-2">Mon Espace Bel Avenir</h2>
-    <p class="text-slate-400 text-sm mb-8">Accédez à votre dossier avec votre code personnel</p>
-    <div class="space-y-4">
-        <input type="text" id="user-id-code" placeholder="Votre Code (ex: BA-A1B2)" class="input-field text-center font-bold">
-        <button onclick="handleUserAuth()" class="w-full btn-primary py-4 uppercase text-xs tracking-widest bg-orange-600">Voir mon suivi</button>
-    </div>
-</section>
-
-<section id="admin-dashboard" class="hidden container mx-auto mt-8 px-4 pb-20">
-    <div class="flex flex-col lg:flex-row gap-8">
-        <aside class="lg:w-1/4 space-y-4 no-print">
-            <div class="card p-4 space-y-2 glass-effect sticky top-24">
-                <button onclick="switchAdminTab('list')" id="tab-btn-list" class="sidebar-btn w-full text-left p-4 rounded-xl font-bold text-xs uppercase flex items-center gap-3 hover:bg-slate-50 sidebar-btn-active"><i class="fas fa-address-book"></i> Registre Général</button>
-                <button onclick="prepareNewEntry()" id="tab-btn-form" class="sidebar-btn w-full text-left p-4 rounded-xl font-bold text-xs uppercase flex items-center gap-3 hover:bg-slate-50"><i class="fas fa-user-plus"></i> Inscription</button>
-                <button onclick="switchAdminTab('team')" id="tab-btn-team" class="admin-only hidden sidebar-btn w-full text-left p-4 rounded-xl font-bold text-xs uppercase flex items-center gap-3 hover:bg-slate-50"><i class="fas fa-user-lock"></i> Équipe & Accès</button>
-                <hr class="my-4 opacity-50">
-                <div class="p-4 bg-slate-900 text-white rounded-2xl">
-                    <p class="text-[9px] font-black uppercase opacity-60">Connecté en tant que</p>
-                    <p id="admin-session-name" class="font-bold text-xs truncate">---</p>
-                </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card p-6 stat-card">
+                <p class="text-[10px] font-black uppercase text-slate-400">Total Enfants</p>
+                <h3 id="st-total" class="text-3xl font-black text-slate-800">0</h3>
             </div>
-        </aside>
-
-        <main class="lg:w-3/4 space-y-6">
-            <div id="admin-tab-list" class="admin-tab card p-8">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                    <h2 class="text-2xl font-black uppercase text-slate-800">Registre des Bénéficiaires</h2>
-                    <div class="relative w-full md:w-64">
-                        <i class="fas fa-search absolute left-4 top-4 text-slate-400"></i>
-                        <input type="text" id="admin-search" placeholder="Rechercher..." class="input-field pl-12" oninput="renderBenefList()">
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="text-[10px] uppercase text-slate-400 border-b">
-                            <tr><th class="pb-4">Bénéficiaire</th><th class="pb-4">Site</th><th class="pb-4">Score</th><th class="pb-4 text-right">Actions</th></tr>
-                        </thead>
-                        <tbody id="admin-list-body" class="text-sm font-medium"></tbody>
-                    </table>
-                </div>
+            <div class="card p-6 stat-card">
+                <p class="text-[10px] font-black uppercase text-slate-400">Garçons / Filles</p>
+                <h3 id="st-sexe" class="text-lg font-black text-slate-800">0% / 0%</h3>
             </div>
-
-            <div id="admin-tab-form" class="admin-tab hidden card p-8">
-                <div class="flex justify-between items-center mb-8 border-b pb-4">
-                    <h2 class="text-xl font-black uppercase" id="form-title">Dossier d'Admission Holistique</h2>
-                    <div class="flex gap-2">
-                        <button onclick="switchAdminTab('list')" class="px-6 py-2 text-xs font-black uppercase text-slate-400">Annuler</button>
-                        <button onclick="saveBeneficiaire()" class="btn-primary px-8 py-3 text-xs uppercase shadow-xl">Valider l'inscription</button>
-                    </div>
-                </div>
-
-                <div class="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-                    <button onclick="switchFormStep(1)" class="form-dot active whitespace-nowrap px-4 py-2 rounded-lg border-2 border-blue-600 text-[10px] font-black uppercase transition">1. Identité & Social</button>
-                    <button onclick="switchFormStep(2)" class="form-dot whitespace-nowrap px-4 py-2 rounded-lg border-2 border-transparent text-[10px] font-black uppercase transition">2. Scolarité</button>
-                    <button onclick="switchFormStep(3)" class="form-dot whitespace-nowrap px-4 py-2 rounded-lg border-2 border-transparent text-[10px] font-black uppercase transition">3. Santé & Psy</button>
-                    <button onclick="switchFormStep(4)" class="form-dot whitespace-nowrap px-4 py-2 rounded-lg border-2 border-transparent text-[10px] font-black uppercase transition">4. Famille & Accord</button>
-                </div>
-
-                <div id="form-content">
-                    <div id="step-1" class="form-step space-y-6">
-                        <div class="grid md:grid-cols-3 gap-6">
-                            <div class="card p-6 bg-slate-50 border-2 border-dashed border-slate-200 text-center relative group">
-                                <img id="f-preview-photo" src="https://via.placeholder.com/150" class="w-32 h-32 mx-auto rounded-3xl object-cover mb-4 border-4 border-white shadow-lg">
-                                <input type="file" id="f-photo-input" class="hidden" accept="image/*" onchange="previewImage(this)">
-                                <label for="f-photo-input" class="text-[10px] font-black text-blue-600 uppercase cursor-pointer">Téléverser Photo ID</label>
-                            </div>
-                            <div class="md:col-span-2 grid md:grid-cols-2 gap-4">
-                                <div class="col-span-2"><label class="text-[10px] font-bold uppercase text-slate-400">Nom & Prénoms</label><input type="text" id="f-nom" class="input-field"></div>
-                                <div><label class="text-[10px] font-bold uppercase text-slate-400">Sexe</label><select id="f-sexe" class="input-field"><option>Masculin</option><option>Féminin</option></select></div>
-                                <div><label class="text-[10px] font-bold uppercase text-slate-400">Date/Lieu de naissance</label><input type="text" id="f-dob" class="input-field" placeholder="ex: 12/05/2012 (ou vers 2012)"></div>
-                                <div><label class="text-[10px] font-bold uppercase text-slate-400">Acte de Naissance</label>
-                                    <div class="flex gap-4 mt-2">
-                                        <label class="text-xs flex items-center gap-1"><input type="radio" name="acte" value="Oui"> Oui</label>
-                                        <label class="text-xs flex items-center gap-1"><input type="radio" name="acte" value="Non"> Non</label>
-                                        <label class="text-xs flex items-center gap-1"><input type="radio" name="acte" value="Inconnu"> Sait pas</label>
-                                    </div>
-                                </div>
-                                <div><label class="text-[10px] font-bold uppercase text-slate-400">Adresse Exacte</label><input type="text" id="f-adresse" class="input-field"></div>
-                            </div>
-                        </div>
-                        <div class="p-6 bg-blue-50 rounded-3xl grid md:grid-cols-3 gap-4 border border-blue-100">
-                            <div><label class="text-[10px] font-bold uppercase">Site Bel Avenir</label><input type="text" id="f-site" class="input-field" list="site-options"></div>
-                            <div><label class="text-[10px] font-bold uppercase">Responsable Référent</label><input type="text" id="f-resp" class="input-field"></div>
-                            <div><label class="text-[10px] font-bold uppercase">Date Inscription</label><input type="date" id="f-date-insc" class="input-field"></div>
-                            <div class="col-span-3"><label class="text-[10px] font-bold uppercase">Situation Sociale</label>
-                                <select id="f-so-vulne" class="input-field">
-                                    <option>Stable</option><option>Orphelin</option><option>Vulnerable</option><option>Handicap</option><option>Victime d'agression</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="step-2" class="form-step hidden space-y-6">
-                        <div class="grid md:grid-cols-3 gap-4">
-                            <div><label class="text-[10px] font-bold uppercase">Statut</label><select id="f-sc-statut" class="input-field"><option>Passant(e)</option><option>Redoublant(e)</option></select></div>
-                            <div><label class="text-[10px] font-bold uppercase">Bulletin Disponible ?</label><select id="f-sc-bull" class="input-field"><option>Oui</option><option>Non</option></select></div>
-                            <div><label class="text-[10px] font-bold uppercase">Niveau Actuel</label><input type="text" id="f-sc-niv" class="input-field"></div>
-                        </div>
-                        <div class="card p-6 border-2 border-slate-50">
-                            <h4 class="text-xs font-black uppercase mb-4 flex justify-between">Relevé de notes périodique <span class="text-blue-600">Moyenne: <span id="auto-moyenne">0.00</span></span></h4>
-                            <div id="notes-container" class="space-y-3"></div>
-                            <button onclick="addNoteRow()" class="mt-4 text-[10px] font-black text-blue-600 uppercase flex items-center gap-2"><i class="fas fa-plus"></i> Ajouter une matière</button>
-                        </div>
-                    </div>
-
-                    <div id="step-3" class="form-step hidden space-y-6">
-                        <div class="grid md:grid-cols-4 gap-4">
-                            <div><label class="text-[10px] font-bold uppercase">Poids (kg)</label><input type="number" id="f-sa-poids" class="input-field" oninput="calcIMC()"></div>
-                            <div><label class="text-[10px] font-bold uppercase">Taille (cm)</label><input type="number" id="f-sa-taille" class="input-field" oninput="calcIMC()"></div>
-                            <div><label class="text-[10px] font-bold uppercase">IMC</label><input type="text" id="f-sa-imc" class="input-field bg-slate-50" readonly></div>
-                            <div><label class="text-[10px] font-bold uppercase">Température</label><input type="number" id="f-sa-temp" class="input-field"></div>
-                        </div>
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div class="p-6 bg-slate-50 rounded-2xl">
-                                <h4 class="text-xs font-black uppercase mb-4">Évaluation Psychologique</h4>
-                                <textarea id="f-psy-obs" class="input-field h-24" placeholder="Comportement, état émotionnel, traumatismes..."></textarea>
-                            </div>
-                            <div class="p-6 bg-slate-50 rounded-2xl">
-                                <h4 class="text-xs font-black uppercase mb-4">Antécédents Médicaux</h4>
-                                <textarea id="f-sa-ante" class="input-field h-24" placeholder="Maladies chroniques, allergies, vaccins..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="step-4" class="form-step hidden space-y-6">
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div><label class="text-[10px] font-bold uppercase">Tuteur Légal</label><select id="f-tut-type" class="input-field"><option>Mère</option><option>Père</option><option>Les deux</option><option>Autre</option></select></div>
-                            <div><label class="text-[10px] font-bold uppercase">Nom du tuteur</label><input type="text" id="f-tut-nom" class="input-field"></div>
-                            <div><label class="text-[10px] font-bold uppercase">Contact Tuteur</label><input type="text" id="f-tut-tel" class="input-field"></div>
-                            <div><label class="text-[10px] font-bold uppercase">Nombre d'enfants au foyer</label><input type="number" id="f-fam-enfants" class="input-field"></div>
-                        </div>
-                        <div class="p-6 bg-orange-50 border border-orange-100 rounded-3xl">
-                            <h4 class="text-xs font-black uppercase mb-4">Accord Parental & Engagement</h4>
-                            <textarea id="f-accord" class="input-field h-24 mb-4" placeholder="Saisir les termes de l'accord..."></textarea>
-                            <div class="grid grid-cols-2 gap-8 text-center mt-6">
-                                <div class="border-t pt-2 border-slate-300 text-[10px] uppercase font-bold text-slate-400">Signature Tuteur</div>
-                                <div class="border-t pt-2 border-slate-300 text-[10px] uppercase font-bold text-slate-400">Signature ONG</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="card p-6 stat-card">
+                <p class="text-[10px] font-black uppercase text-slate-400">Sites Actifs</p>
+                <h3 id="st-sites" class="text-3xl font-black text-slate-800">0</h3>
             </div>
-
-            <div id="admin-tab-team" class="admin-tab hidden card p-8">
-                <h2 class="text-xl font-black uppercase mb-8">Gestion de l'Équipe Sociale</h2>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="p-6 bg-slate-50 rounded-3xl space-y-4">
-                        <input type="text" id="t-nom" placeholder="Nom complet" class="input-field">
-                        <input type="email" id="t-email" placeholder="Email" class="input-field">
-                        <input type="password" id="t-pass" placeholder="Mot de passe" class="input-field">
-                        <select id="t-role" class="input-field"><option value="Travailleur Social">Travailleur Social</option><option value="Administrateur">Administrateur</option></select>
-                        <button onclick="saveTeamMember()" class="w-full btn-primary py-3 uppercase text-xs">Créer l'accès</button>
-                    </div>
-                    <div id="team-list" class="space-y-3"></div>
-                </div>
-            </div>
-        </main>
-    </div>
-</section>
-
-<section id="user-dashboard" class="hidden container mx-auto mt-6 px-4 pb-20">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div class="lg:col-span-4 card p-8 flex flex-col md:flex-row items-center gap-8 border-l-[12px] border-blue-600 shadow-xl">
-            <div class="relative">
-                <img id="u-photo" src="" class="w-32 h-32 rounded-[30px] object-cover border-4 border-white shadow-2xl">
-                <div id="u-status-indicator" class="absolute -top-2 -right-2 w-6 h-6 rounded-full border-4 border-white"></div>
-            </div>
-            <div class="flex-1 text-center md:text-left">
-                <div class="flex items-center justify-center md:justify-start gap-3">
-                    <h2 id="u-nom" class="text-3xl font-black text-slate-800 uppercase leading-none">---</h2>
-                    <span id="u-code-pill" class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter">Code: ---</span>
-                </div>
-                <p class="text-slate-400 font-bold text-xs mt-2" id="u-meta">Age: -- • Site: -- • Responsable: --</p>
-                <div id="u-kpi-row" class="mt-4 flex flex-wrap gap-2"></div>
-            </div>
-            <div class="text-center bg-slate-50 p-6 rounded-3xl min-w-[150px]">
-                <div id="u-score-global" class="text-4xl font-black text-blue-600">0%</div>
-                <p class="text-[9px] font-black uppercase text-slate-400 mt-1">Score Holistique</p>
+            <div class="card p-6 stat-card">
+                <p class="text-[10px] font-black uppercase text-slate-400">Moyenne Scolaire</p>
+                <h3 id="st-moyenne" class="text-3xl font-black text-orange-600">0.00</h3>
             </div>
         </div>
 
-        <div class="card p-6 innovative-card flex flex-col justify-between">
-            <h4 class="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2"><i class="fas fa-graduation-cap"></i> Scolarité</h4>
-            <div class="mt-4"><span id="u-kpi-scol" class="text-4xl font-black">0.00</span> <span class="text-xs font-bold text-slate-300">/ 20</span></div>
-            <div id="u-alert-scol" class="mt-2 text-[9px] font-black uppercase p-2 rounded-lg">---</div>
-        </div>
-        <div class="card p-6 innovative-card flex flex-col justify-between">
-            <h4 class="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2"><i class="fas fa-heartbeat"></i> Santé (IMC)</h4>
-            <div class="mt-4 text-4xl font-black" id="u-kpi-health">0.0</div>
-            <div id="u-alert-health" class="mt-2 text-[9px] font-black uppercase p-2 rounded-lg">---</div>
-        </div>
-        <div class="card p-6 innovative-card flex flex-col justify-between">
-            <h4 class="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2"><i class="fas fa-shield-alt"></i> Risque Social</h4>
-            <div class="mt-4 text-xl font-black uppercase" id="u-kpi-social">Stable</div>
-            <div id="u-alert-social" class="mt-2 text-[9px] font-black uppercase p-2 rounded-lg">---</div>
-        </div>
-        <div class="card p-6 bg-slate-900 text-white flex flex-col justify-between">
-            <h4 class="text-[10px] font-black uppercase opacity-40">Actions Urgentes</h4>
-            <div id="u-urgency-list" class="space-y-2 py-4"></div>
-            <button class="w-full bg-blue-600 py-2 rounded-xl text-[9px] font-black uppercase">Détails Dossier</button>
-        </div>
-        <div class="lg:col-span-3 space-y-6">
-            <div class="flex gap-2 bg-white p-2 rounded-2xl shadow-sm no-print overflow-x-auto">
-                <button onclick="uNav('u-sec-health')" class="u-tab-btn active px-6 py-3 rounded-xl text-[10px] font-black uppercase transition whitespace-nowrap">Dossier Santé</button>
-                <button onclick="uNav('u-sec-scol')" class="u-tab-btn px-6 py-3 rounded-xl text-[10px] font-black uppercase transition whitespace-nowrap">Dossier Scolaire</button>
-                <button onclick="uNav('u-sec-social')" class="u-tab-btn px-6 py-3 rounded-xl text-[10px] font-black uppercase transition whitespace-nowrap">Famille & Social</button>
-                <button onclick="uNav('u-sec-chrono')" class="u-tab-btn px-6 py-3 rounded-xl text-[10px] font-black uppercase transition whitespace-nowrap">Chronologie</button>
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="card p-8">
+                <h4 class="text-xs font-black uppercase mb-6 text-slate-400">Répartition par Projet</h4>
+                <canvas id="chartProjets" height="200"></canvas>
             </div>
-
-            <div id="u-tab-container">
-                <div id="u-sec-health" class="u-pane active card p-8 space-y-8">
-                    <div class="grid md:grid-cols-2 gap-12">
-                        <div class="space-y-6">
-                            <h3 class="font-black uppercase text-blue-600 flex items-center gap-2 border-b pb-2"><i class="fas fa-notes-medical"></i> Paramètres Vitaux</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-slate-50 p-4 rounded-2xl">
-                                    <p class="text-[9px] font-black uppercase text-slate-400">Poids</p>
-                                    <p id="ud-poids" class="text-xl font-black">-- kg</p>
-                                </div>
-                                <div class="bg-slate-50 p-4 rounded-2xl">
-                                    <p class="text-[9px] font-black uppercase text-slate-400">Taille</p>
-                                    <p id="ud-taille" class="text-xl font-black">-- cm</p>
-                                </div>
-                            </div>
-                            <div class="bg-blue-50 p-6 rounded-3xl">
-                                <h4 class="text-[10px] font-black uppercase mb-2">Observations Médicales</h4>
-                                <p id="ud-health-obs" class="text-xs text-slate-600 italic">Aucune donnée...</p>
-                            </div>
-                        </div>
-                        <div class="space-y-6">
-                            <h3 class="font-black uppercase text-orange-600 flex items-center gap-2 border-b pb-2"><i class="fas fa-brain"></i> Suivi Psychologique</h3>
-                            <p id="ud-psy-obs" class="text-xs text-slate-600 bg-orange-50 p-6 rounded-3xl italic">Stable...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="u-sec-scol" class="u-pane hidden card p-8">
-                    <h3 class="font-black uppercase mb-6 text-green-600">Résultats & Compétences</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="text-[10px] uppercase border-b pb-4"><tr><th class="pb-2">Matière</th><th class="pb-2">Note</th><th class="pb-2">Statut</th></tr></thead>
-                            <tbody id="ud-notes-table" class="text-sm font-bold"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="u-sec-social" class="u-pane hidden card p-8">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div class="space-y-4">
-                            <h3 class="font-black uppercase mb-4 text-slate-800">Environnement Familial</h3>
-                            <div class="space-y-2 text-xs">
-                                <div class="p-3 border rounded-xl flex justify-between"><span>Tuteur :</span> <span id="ud-tut-nom" class="font-black">---</span></div>
-                                <div class="p-3 border rounded-xl flex justify-between"><span>Contact :</span> <span id="ud-tut-tel" class="font-black">---</span></div>
-                                <div class="p-3 border rounded-xl flex justify-between"><span>Enfants foyer :</span> <span id="ud-tut-enf" class="font-black">---</span></div>
-                            </div>
-                        </div>
-                        <div class="p-6 bg-slate-900 text-white rounded-[40px]">
-                            <h4 class="text-xs font-black uppercase mb-4">Accord Parental</h4>
-                            <p id="ud-accord" class="text-[11px] italic opacity-70 leading-relaxed"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="u-sec-chrono" class="u-pane hidden card p-8">
-                    <h3 class="font-black uppercase mb-8 text-slate-800">Historique des Événements</h3>
-                    <div id="ud-timeline" class="space-y-6 relative before:absolute before:w-1 before:bg-slate-100 before:h-full before:left-2"></div>
-                </div>
+            <div class="card p-8">
+                <h4 class="text-xs font-black uppercase mb-6 text-slate-400">Répartition par Classe</h4>
+                <canvas id="chartClasses" height="200"></canvas>
             </div>
         </div>
-        <div class="lg:col-span-1 space-y-6">
-             <div class="card p-6 innovative-card">
-                 <h4 class="text-[10px] font-black uppercase text-slate-400 mb-4">Statut Global</h4>
-                 <div id="ud-global-status-pill" class="text-center py-4 rounded-2xl font-black uppercase text-sm">---</div>
-                 <p class="text-[10px] text-slate-400 mt-4 leading-relaxed">Le statut est généré automatiquement par l'analyse des domaines santé, scolaire et social.</p>
-             </div>
+    </section>
+
+    <section id="sec-list" class="section-pane">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-black uppercase">Registre des Inscrits</h2>
+            <button onclick="showSection('sec-home')" class="text-xs font-bold text-slate-400 hover:text-orange-500"><i class="fas fa-arrow-left"></i> Retour</button>
+        </div>
+
+        <div class="card p-6 mb-8 grid grid-cols-1 md:grid-cols-5 gap-4">
+            <input type="text" id="filter-search" placeholder="Nom ou ID..." class="input-field col-span-1 md:col-span-1" oninput="renderTable()">
+            <select id="filter-site" class="input-field" onchange="renderTable()">
+                <option value="">Tous les Sites</option>
+                <option value="Toliara">Toliara</option>
+                <option value="Mangily">Mangily</option>
+            </select>
+            <select id="filter-projet" class="input-field" onchange="renderTable()">
+                <option value="">Tous les Projets</option>
+                <option value="Ecole des Salines">Ecole des Salines</option>
+                <option value="Sport Solidaire">Sport Solidaire</option>
+                <option value="Centre d'Accueil">Centre d'Accueil</option>
+            </select>
+            <select id="filter-sexe" class="input-field" onchange="renderTable()">
+                <option value="">Tous les Sexes</option>
+                <option value="Masculin">Garçons</option>
+                <option value="Féminin">Filles</option>
+            </select>
+            <button onclick="renderTable()" class="btn-orange text-xs uppercase p-2">Filtrer</button>
+        </div>
+
+        <div class="card overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-slate-50 border-b text-[10px] uppercase font-black text-slate-400">
+                    <tr>
+                        <th class="p-5">Bénéficiaire</th>
+                        <th>ID / Sexe</th>
+                        <th>Site / Projet</th>
+                        <th>Classe</th>
+                        <th class="text-right p-5">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body" class="text-sm"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="sec-form" class="section-pane">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-black uppercase">Nouvelle Fiche</h2>
+            <button onclick="showSection('sec-home')" class="text-xs font-bold text-slate-400 hover:text-orange-500"><i class="fas fa-arrow-left"></i> Retour</button>
+        </div>
+
+        <div class="card p-10 max-w-4xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h3 class="font-black uppercase text-xs text-orange-600 border-b pb-2">Identité</h3>
+                    <div class="flex items-center gap-4 mb-4">
+                        <img id="form-img" src="https://via.placeholder.com/100" class="w-20 h-20 rounded-2xl object-cover">
+                        <input type="file" id="photo-input" class="hidden" onchange="previewImg(this)">
+                        <button onclick="document.getElementById('photo-input').click()" class="text-[10px] font-black uppercase text-blue-600">Charger Photo</button>
+                    </div>
+                    <input type="text" id="f-nom" placeholder="Nom Complet" class="input-field">
+                    <select id="f-sexe" class="input-field">
+                        <option>Masculin</option>
+                        <option>Féminin</option>
+                    </select>
+                    <input type="date" id="f-dob" class="input-field">
+                </div>
+                <div class="space-y-4">
+                    <h3 class="font-black uppercase text-xs text-orange-600 border-b pb-2">Affectation</h3>
+                    <select id="f-site" class="input-field">
+                        <option>Toliara</option>
+                        <option>Mangily</option>
+                    </select>
+                    <select id="f-projet" class="input-field">
+                        <option>Ecole des Salines</option>
+                        <option>Sport Solidaire</option>
+                        <option>Centre d'Accueil</option>
+                    </select>
+                    <input type="text" id="f-classe" placeholder="Classe (ex: 6ème)" class="input-field">
+                    <input type="text" id="f-id" placeholder="Identifiant (ex: BA-2024-001)" class="input-field">
+                </div>
+                <div class="md:col-span-2 space-y-4">
+                    <h3 class="font-black uppercase text-xs text-orange-600 border-b pb-2">Social & Accord</h3>
+                    <input type="text" id="f-tuteur" placeholder="Nom du Tuteur" class="input-field">
+                    <textarea id="f-accord" placeholder="Détails de l'accord parental..." class="input-field h-24"></textarea>
+                </div>
+            </div>
+            <button onclick="saveData()" class="btn-orange w-full mt-10 p-4 uppercase text-xs tracking-widest">Enregistrer la fiche</button>
+        </div>
+    </section>
+
+    <div id="modal-view" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-4xl rounded-[40px] overflow-hidden relative shadow-2xl">
+            <button onclick="closeModal()" class="absolute top-6 right-6 text-slate-400 hover:text-red-500 text-2xl"><i class="fas fa-times"></i></button>
+            <div id="view-content" class="flex flex-col md:flex-row h-full max-h-[90vh] overflow-y-auto">
+                </div>
         </div>
     </div>
-</section>
-
-<datalist id="site-options">
-    <option value="Centre d'Accueil Toliara">
-    <option value="Projet Salines">
-    <option value="Ferme École Fifeo">
-    <option value="Projet Sport Solidaire">
-</datalist>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDKNy6B4aifDrVDsglGhvU_eCMZOZF6q8g",
-      authDomain: "bel-avenir-social-db-878f7.firebaseapp.com",
-      databaseURL: "https://bel-avenir-social-db-878f7-default-rtdb.firebaseio.com",
-      projectId: "bel-avenir-social-db-878f7",
-      storageBucket: "bel-avenir-social-db-878f7.firebasestorage.app",
-      messagingSenderId: "483959875408",
-      appId: "1:483959875408:web:e7708cd4100a9fe9752e55",
+        apiKey: "AIzaSyDKNy6B4aifDrVDsglGhvU_eCMZOZF6q8g",
+        authDomain: "bel-avenir-social-db-878f7.firebaseapp.com",
+        databaseURL: "https://bel-avenir-social-db-878f7-default-rtdb.firebaseio.com",
+        projectId: "bel-avenir-social-db-878f7",
+        storageBucket: "bel-avenir-social-db-878f7.firebasestorage.app",
+        messagingSenderId: "483959875408",
+        appId: "1:483959875408:web:e7708cd4100a9fe9752e55"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const auth = getAuth(app);
+    let allData = [];
+    let currentImg = "";
 
-    let allBeneficiaires = [];
-    let currentBenefKey = null;
-    let currentPhotoBase64 = "";
-    let userRole = "worker";
-
-    // --- NAVIGATION ---
-    window.showView = (id) => {
-        document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        window.scrollTo(0,0);
-    };
-
-    window.switchAdminTab = (tab) => {
-        document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
-        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('sidebar-btn-active'));
-        document.getElementById('admin-tab-' + tab).classList.remove('hidden');
-        document.getElementById('tab-btn-' + tab).classList.add('sidebar-btn-active');
-    };
-
-    window.switchFormStep = (step) => {
-        document.querySelectorAll('.form-step').forEach(s => s.classList.add('hidden'));
-        document.querySelectorAll('.form-dot').forEach(d => d.classList.remove('active', 'border-blue-600'));
-        document.getElementById('step-' + step).classList.remove('hidden');
-        event.target.classList.add('active', 'border-blue-600');
-    };
-
-    window.uNav = (id) => {
-        document.querySelectorAll('.u-pane').forEach(p => p.classList.remove('active', 'hidden'));
-        document.querySelectorAll('.u-pane').forEach(p => { if(p.id !== id) p.classList.add('hidden'); });
-        document.querySelectorAll('.u-tab-btn').forEach(b => b.classList.remove('active', 'bg-blue-600', 'text-white'));
+    // NAVIGATION
+    window.showSection = (id) => {
+        document.querySelectorAll('.section-pane').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        event.target.classList.add('active', 'bg-blue-600', 'text-white');
+        document.getElementById('l-' + id.split('-')[1]).classList.add('active');
     };
 
-    // --- AUTHENTIFICATION ---
-    window.handleAdminAuth = () => {
-        const email = document.getElementById('admin-email').value;
-        const pass = document.getElementById('admin-password').value;
-        
-        // Vérification locale dans la DB pour le blocage/rôle
-        onValue(ref(db, 'team'), (snap) => {
-            const team = snap.val();
-            const member = Object.values(team || {}).find(m => m.email === email);
-            
-            if(member && !member.active) {
-                alert("Votre accès a été suspendu par l'administrateur.");
-                return;
-            }
+    window.logout = () => { if(confirm("Quitter la session ?")) window.location.reload(); };
 
-            signInWithEmailAndPassword(auth, email, pass)
-                .then((u) => { 
-                    userRole = member ? member.role : "worker";
-                    if(userRole === "Administrateur") document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-                    document.getElementById('admin-session-name').innerText = email;
-                    document.getElementById('btn-logout').classList.remove('hidden');
-                    showView('admin-dashboard');
-                })
-                .catch(err => alert("Email ou mot de passe incorrect."));
-        }, { onlyOnce: true });
-    };
-
-    window.handleUserAuth = () => {
-        const code = document.getElementById('user-id-code').value.toUpperCase();
-        const found = allBeneficiaires.find(b => b.access_code === code || b.f_id === code);
-        if(found) { renderUserDashboard(found); showView('user-dashboard'); }
-        else alert("Code introuvable. Veuillez contacter votre travailleur social.");
-    };
-
-    window.logout = () => { signOut(auth).then(() => location.reload()); };
-
-    // --- GESTION ÉQUIPE ---
-    window.saveTeamMember = () => {
-        const data = {
-            name: document.getElementById('t-nom').value,
-            email: document.getElementById('t-email').value,
-            role: document.getElementById('t-role').value,
-            active: true
+    // LOGO
+    window.loadLogo = (input) => {
+        const reader = new FileReader();
+        reader.onload = (e) => { 
+            document.getElementById('custom-logo').src = e.target.result;
+            localStorage.setItem('ong_logo', e.target.result);
         };
-        push(ref(db, 'team'), data).then(() => alert("Accès créé avec succès !"));
+        reader.readAsDataURL(input.files[0]);
+    };
+    if(localStorage.getItem('ong_logo')) document.getElementById('custom-logo').src = localStorage.getItem('ong_logo');
+
+    // IMAGE PREVIEW
+    window.previewImg = (input) => {
+        const reader = new FileReader();
+        reader.onload = (e) => { currentImg = e.target.result; document.getElementById('form-img').src = e.target.result; };
+        reader.readAsDataURL(input.files[0]);
     };
 
-    onValue(ref(db, 'team'), (snap) => {
-        const list = document.getElementById('team-list');
-        const val = snap.val();
-        list.innerHTML = val ? Object.keys(val).map(k => `
-            <div class="flex justify-between items-center p-4 bg-white border rounded-2xl">
-                <div><p class="font-black text-xs">${val[k].name}</p><p class="text-[9px] uppercase font-bold ${val[k].active ? 'text-green-500' : 'text-red-500'}">${val[k].role} • ${val[k].active ? 'ACTIF' : 'BLOQUÉ'}</p></div>
-                <div class="flex gap-2">
-                    <button onclick="toggleTeam('${k}', ${val[k].active})" class="text-xs p-2 hover:bg-slate-100 rounded-lg"><i class="fas fa-power-off"></i></button>
-                    <button onclick="removeTeam('${k}')" class="text-xs p-2 text-red-500"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-        `).join('') : '';
-    });
-
-    window.toggleTeam = (k, s) => update(ref(db, 'team/'+k), {active: !s});
-    window.removeTeam = (k) => confirm("Supprimer ?") && remove(ref(db, 'team/'+k));
-
-    // --- LOGIQUE BÉNÉFICIAIRES ---
-    window.addNoteRow = (mat="", val="") => {
-        const row = document.createElement('div');
-        row.className = "grid grid-cols-2 gap-4 note-row";
-        row.innerHTML = `<input type="text" placeholder="Matière" class="input-field n-mat" value="${mat}">
-                         <input type="number" placeholder="Note" class="input-field n-val" value="${val}" oninput="calcMoyenne()">`;
-        document.getElementById('notes-container').appendChild(row);
-    };
-
-    window.calcMoyenne = () => {
-        let sum = 0, count = 0;
-        document.querySelectorAll('.note-row').forEach(r => {
-            const v = parseFloat(r.querySelector('.n-val').value);
-            if(!isNaN(v)) { sum += v; count++; }
-        });
-        document.getElementById('auto-moyenne').innerText = count > 0 ? (sum / count).toFixed(2) : "0.00";
-    };
-
-    window.saveBeneficiaire = () => {
-        const notes = [];
-        document.querySelectorAll('.note-row').forEach(r => {
-            notes.push({mat: r.querySelector('.n-mat').value, val: r.querySelector('.n-val').value});
-        });
-
-        const data = {
-            f_nom: document.getElementById('f-nom').value,
-            f_dob: document.getElementById('f-dob').value,
-            f_photo: currentPhotoBase64,
-            f_site: document.getElementById('f-site').value,
-            f_resp: document.getElementById('f-resp').value,
-            f_sc_notes: notes,
-            f_sa_imc: document.getElementById('f-sa-imc').value,
-            f_sa_poids: document.getElementById('f-sa-poids').value,
-            f_sa_taille: document.getElementById('f-sa-taille').value,
-            f_sa_obs: document.getElementById('f-sa-ante').value,
-            f_psy_obs: document.getElementById('f-psy-obs').value,
-            f_so_vulne: document.getElementById('f-so-vulne').value,
-            f_tut_nom: document.getElementById('f-tut-nom').value,
-            f_tut_tel: document.getElementById('f-tut-tel').value,
-            f_tut_enf: document.getElementById('f-fam-enfants').value,
-            f_accord: document.getElementById('f-accord').value,
-            access_code: currentBenefKey ? allBeneficiaires.find(b => b.fbKey === currentBenefKey).access_code : "BA-" + Math.random().toString(36).substring(2,6).toUpperCase()
+    // CRUD
+    window.saveData = () => {
+        const payload = {
+            nom: document.getElementById('f-nom').value,
+            id: document.getElementById('f-id').value,
+            sexe: document.getElementById('f-sexe').value,
+            dob: document.getElementById('f-dob').value,
+            site: document.getElementById('f-site').value,
+            projet: document.getElementById('f-projet').value,
+            classe: document.getElementById('f-classe').value,
+            tuteur: document.getElementById('f-tuteur').value,
+            accord: document.getElementById('f-accord').value,
+            photo: currentImg || "https://via.placeholder.com/100"
         };
-
-        const target = currentBenefKey ? ref(db, 'beneficiaires/' + currentBenefKey) : push(ref(db, 'beneficiaires'));
-        set(target, data).then(() => { alert("Dossier validé ! CODE: " + data.access_code); switchAdminTab('list'); });
+        push(ref(db, 'beneficiaires'), payload).then(() => {
+            alert("Enregistré avec succès !");
+            showSection('sec-list');
+        });
     };
 
     onValue(ref(db, 'beneficiaires'), (snap) => {
         const val = snap.val();
-        allBeneficiaires = val ? Object.keys(val).map(k => ({...val[k], fbKey: k})) : [];
-        renderBenefList();
+        allData = val ? Object.keys(val).map(k => ({...val[k], key: k})) : [];
+        updateStats();
+        renderTable();
     });
 
-    window.renderBenefList = () => {
-        const tbody = document.getElementById('admin-list-body');
-        tbody.innerHTML = allBeneficiaires.map(b => {
-            let sum=0, count=0; b.f_sc_notes?.forEach(n => {sum+=parseFloat(n.val); count++;});
-            const moy = count > 0 ? (sum/count) : 0;
-            const score = (moy * 3) + (b.f_so_vulne === 'Stable' ? 40 : 10);
-            return `
-            <tr class="border-b hover:bg-slate-50">
-                <td class="py-4 flex items-center gap-3">
-                    <img src="${b.f_photo}" class="w-10 h-10 rounded-xl object-cover">
-                    <div><p class="font-black text-xs uppercase">${b.f_nom}</p><p class="text-[9px] text-blue-600 font-bold">Code: ${b.access_code}</p></div>
-                </td>
-                <td class="text-xs text-slate-400 font-bold">${b.f_site}</td>
-                <td class="text-xs font-black ${score > 60 ? 'text-green-500' : 'text-red-500'}">${Math.round(score)}%</td>
-                <td class="text-right">
-                    <button onclick="renderUserDashboardByKey('${b.fbKey}')" class="p-2 text-blue-500"><i class="fas fa-eye"></i></button>
-                    <button onclick="deleteBenef('${b.fbKey}')" class="p-2 text-red-300"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>`;
-        }).join('');
-    };
+    window.deleteItem = (key) => { if(confirm("Supprimer définitivement ?")) remove(ref(db, 'beneficiaires/' + key)); };
 
-    window.renderUserDashboardByKey = (key) => {
-        const b = allBeneficiaires.find(x => x.fbKey === key);
-        renderUserDashboard(b);
-        showView('user-dashboard');
-    };
-
-    window.deleteBenef = (k) => confirm("Supprimer définitivement ?") && remove(ref(db, 'beneficiaires/'+k));
-
-    function renderUserDashboard(b) {
-        document.getElementById('u-nom').innerText = b.f_nom;
-        document.getElementById('u-photo').src = b.f_photo;
-        document.getElementById('u-code-pill').innerText = "Code: " + b.access_code;
-        document.getElementById('u-meta').innerText = `Site: ${b.f_site} • Responsable: ${b.f_resp}`;
-
-        let sum=0, count=0; 
-        b.f_sc_notes?.forEach(n => { sum += parseFloat(n.val); count++; });
-        const moy = count > 0 ? (sum/count).toFixed(2) : "0.00";
+    // STATS
+    function updateStats() {
+        const total = allData.length;
+        document.getElementById('st-total').innerText = total;
         
-        document.getElementById('u-kpi-scol').innerText = moy;
-        document.getElementById('u-kpi-health').innerText = b.f_sa_imc || "0.0";
-        document.getElementById('u-kpi-social').innerText = b.f_so_vulne;
+        const garcons = allData.filter(d => d.sexe === 'Masculin').length;
+        const filles = total - garcons;
+        const pG = total > 0 ? ((garcons/total)*100).toFixed(0) : 0;
+        const pF = total > 0 ? ((filles/total)*100).toFixed(0) : 0;
+        document.getElementById('st-sexe').innerText = `${pG}% G / ${pF}% F`;
 
-        // CALCUL SCORE HOLISTIQUE
-        const scoreScol = (parseFloat(moy) / 20) * 30;
-        const scoreHealth = (b.f_sa_imc > 18 && b.f_sa_imc < 25) ? 30 : 10;
-        const scoreSoc = b.f_so_vulne === 'Stable' ? 40 : 15;
-        const global = Math.min(100, Math.round(scoreScol + scoreHealth + scoreSoc));
-        
-        const scoreEl = document.getElementById('u-score-global');
-        scoreEl.innerText = global + "%";
-        
-        const indicator = document.getElementById('u-status-indicator');
-        const statusPill = document.getElementById('ud-global-status-pill');
-        if(global > 80) { indicator.className = "absolute -top-2 -right-2 w-6 h-6 rounded-full border-4 border-white bg-green-500"; statusPill.className = "text-center py-4 rounded-2xl font-black uppercase text-sm bg-green-100 text-green-700"; statusPill.innerText = "Evolution Positive"; }
-        else if(global > 50) { indicator.className = "absolute -top-2 -right-2 w-6 h-6 rounded-full border-4 border-white bg-orange-500"; statusPill.className = "text-center py-4 rounded-2xl font-black uppercase text-sm bg-orange-100 text-orange-700"; statusPill.innerText = "À Surveiller"; }
-        else { indicator.className = "absolute -top-2 -right-2 w-6 h-6 rounded-full border-4 border-white bg-red-500"; statusPill.className = "text-center py-4 rounded-2xl font-black uppercase text-sm bg-red-100 text-red-700"; statusPill.innerText = "Urgence Intervention"; }
+        const sites = [...new Set(allData.map(d => d.site))].length;
+        document.getElementById('st-sites').innerText = sites;
 
-        // DETAILS
-        document.getElementById('ud-poids').innerText = b.f_sa_poids + " kg";
-        document.getElementById('ud-taille').innerText = b.f_sa_taille + " cm";
-        document.getElementById('ud-health-obs').innerText = b.f_sa_obs;
-        document.getElementById('ud-psy-obs').innerText = b.f_psy_obs;
-        document.getElementById('ud-tut-nom').innerText = b.f_tut_nom;
-        document.getElementById('ud-tut-tel').innerText = b.f_tut_tel;
-        document.getElementById('ud-tut-enf').innerText = b.f_tut_enf;
-        document.getElementById('ud-accord').innerText = b.f_accord;
-        
-        document.getElementById('ud-notes-table').innerHTML = b.f_sc_notes?.map(n => `
-            <tr class="border-b">
-                <td class="py-3 uppercase text-[10px]">${n.mat}</td>
-                <td class="py-3">${n.val}</td>
-                <td class="py-3"><span class="status-pill ${n.val >= 10 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">${n.val >= 10 ? 'Acquis' : 'Soutien Requis'}</span></td>
-            </tr>
-        `).join('') || '';
-
-        // TIMELINE
-    document.getElementById('ud-timeline').innerHTML = `
-            <div class="ml-8 relative">
-                <div class="absolute -left-10 top-1 w-4 h-4 rounded-full bg-blue-600"></div>
-                <p class="text-[10px] font-black uppercase text-slate-400">Date d'inscription</p>
-                <p class="text-xs font-bold">Admission au programme Bel Avenir</p>
-            </div>
-        `;
+        updateCharts();
     }
 
-    // --- LOGO & IMAGES ---
-    window.loadLocalLogo = (input) => {
-        const reader = new FileReader();
-        reader.onload = (e) => { 
-            document.getElementById('custom-logo-img').src = e.target.result;
-            localStorage.setItem('bel_avenir_logo', e.target.result);
-        };
-        reader.readAsDataURL(input.files[0]);
-    };
-    if(localStorage.getItem('bel_avenir_logo')) document.getElementById('custom-logo-img').src = localStorage.getItem('bel_avenir_logo');
+    // CHARTS
+    let chartP, chartC;
+    function updateCharts() {
+        const ctxP = document.getElementById('chartProjets').getContext('2d');
+        const ctxC = document.getElementById('chartClasses').getContext('2d');
 
-    window.previewImage = (input) => {
-        const reader = new FileReader();
-        reader.onload = (e) => { currentPhotoBase64 = e.target.result; document.getElementById('f-preview-photo').src = e.target.result; };
-        reader.readAsDataURL(input.files[0]);
+        const projMap = allData.reduce((acc, d) => { acc[d.projet] = (acc[d.projet] || 0) + 1; return acc; }, {});
+        const classMap = allData.reduce((acc, d) => { acc[d.classe] = (acc[d.classe] || 0) + 1; return acc; }, {});
+
+        if(chartP) chartP.destroy();
+        chartP = new Chart(ctxP, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(projMap),
+                datasets: [{ label: 'Effectifs', data: Object.values(projMap), backgroundColor: '#ff8c00' }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+
+        if(chartC) chartC.destroy();
+        chartC = new Chart(ctxC, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(classMap),
+                datasets: [{ data: Object.values(classMap), backgroundColor: ['#1e293b', '#ff8c00', '#64748b', '#cbd5e1'] }]
+            }
+        });
+    }
+
+    // TABLEAU
+    window.renderTable = () => {
+        const search = document.getElementById('filter-search').value.toLowerCase();
+        const site = document.getElementById('filter-site').value;
+        const projet = document.getElementById('filter-projet').value;
+        const sexe = document.getElementById('filter-sexe').value;
+
+        const filtered = allData.filter(d => {
+            return (d.nom.toLowerCase().includes(search) || d.id.toLowerCase().includes(search)) &&
+                   (site === "" || d.site === site) &&
+                   (projet === "" || d.projet === projet) &&
+                   (sexe === "" || d.sexe === sexe);
+        });
+
+        document.getElementById('table-body').innerHTML = filtered.map(d => `
+            <tr class="border-b hover:bg-slate-50 transition">
+                <td class="p-5 flex items-center gap-4">
+                    <img src="${d.photo}" class="w-10 h-10 rounded-xl object-cover">
+                    <span class="font-bold text-slate-700">${d.nom}</span>
+                </td>
+                <td class="text-xs uppercase font-bold text-slate-400">
+                    <span class="text-orange-600">${d.id}</span><br>${d.sexe}
+                </td>
+                <td class="text-xs">
+                    <span class="font-bold">${d.site}</span><br>${d.projet}
+                </td>
+                <td><span class="bg-slate-100 px-3 py-1 rounded-full text-[10px] font-black">${d.classe}</span></td>
+                <td class="p-5 text-right">
+                    <div class="flex justify-end gap-2">
+                        <button onclick="viewFull('${d.key}')" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition"><i class="fas fa-eye"></i></button>
+                        <button onclick="deleteItem('${d.key}')" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
     };
 
-    window.prepareNewEntry = () => {
-        currentBenefKey = null;
-        document.querySelectorAll('.input-field').forEach(i => i.value = "");
-        document.getElementById('notes-container').innerHTML = "";
-        document.getElementById('f-preview-photo').src = "https://via.placeholder.com/150";
-        switchAdminTab('form');
+    // VUE COMPLETE (YEU)
+    window.viewFull = (key) => {
+        const d = allData.find(x => x.key === key);
+        document.getElementById('view-content').innerHTML = `
+            <div class="w-full md:w-1/3 bg-slate-900 p-10 text-white flex flex-col items-center text-center">
+                <img src="${d.photo}" class="w-48 h-48 rounded-[40px] object-cover mb-6 border-4 border-orange-500 shadow-2xl">
+                <h2 class="text-2xl font-black uppercase mb-2">${d.nom}</h2>
+                <span class="bg-orange-500 px-4 py-1 rounded-full text-[10px] font-black uppercase">${d.id}</span>
+                <div class="mt-10 space-y-4 w-full text-left">
+                    <div class="border-b border-white/10 pb-2">
+                        <p class="text-[9px] uppercase text-slate-400 font-bold">Naissance</p>
+                        <p class="text-sm font-bold">${d.dob}</p>
+                    </div>
+                    <div class="border-b border-white/10 pb-2">
+                        <p class="text-[9px] uppercase text-slate-400 font-bold">Sexe</p>
+                        <p class="text-sm font-bold">${d.sexe}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 p-10 bg-white">
+                <div class="grid grid-cols-2 gap-8 mb-10">
+                    <div>
+                        <h4 class="text-orange-600 font-black uppercase text-xs mb-4">Affectation</h4>
+                        <p class="text-sm"><strong>Site:</strong> ${d.site}</p>
+                        <p class="text-sm"><strong>Projet:</strong> ${d.projet}</p>
+                        <p class="text-sm"><strong>Classe:</strong> ${d.classe}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-orange-600 font-black uppercase text-xs mb-4">Famille</h4>
+                        <p class="text-sm"><strong>Tuteur:</strong> ${d.tuteur}</p>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-orange-600 font-black uppercase text-xs mb-4">Engagement Parental</h4>
+                    <div class="p-6 bg-slate-50 rounded-3xl italic text-sm text-slate-600">
+                        "${d.accord || 'Aucun détail fourni.'}"
+                    </div>
+                </div>
+                <div class="mt-10 flex gap-4">
+                    <button onclick="closeModal()" class="btn-orange flex-1 p-4 uppercase text-xs">Fermer</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('modal-view').classList.remove('hidden');
     };
+
+    window.closeModal = () => document.getElementById('modal-view').classList.add('hidden');
 
 </script>
 </body>
