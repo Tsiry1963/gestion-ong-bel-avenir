@@ -18,12 +18,11 @@
         .section-pane { display: none; }
         .section-pane.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Sécurité : Overlay forcé */
         #auth-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         #app-content, #main-nav { display: none; }
         .dynamic-p { color: var(--p-col); }
         .dynamic-bg-p { background-color: var(--p-col); }
-        .tab-btn { padding: 10px 15px; font-size: 11px; font-weight: 800; text-transform: uppercase; border-bottom: 3px solid transparent; }
-        .tab-btn.active { border-color: var(--p-col); color: var(--p-col); }
     </style>
 </head>
 <body>
@@ -37,7 +36,7 @@
             <input type="password" id="auth-pass" placeholder="Mot de passe" class="input-field text-center">
             <button id="login-btn" class="w-full dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg">Connexion</button>
         </div>
-        <p id="auth-error" class="text-red-500 text-[10px] mt-4 hidden font-bold">Accès refusé.</p>
+        <p id="auth-error" class="text-red-500 text-[10px] mt-4 hidden font-bold">Identifiants incorrects ou accès restreint.</p>
     </div>
 </div>
 
@@ -53,8 +52,6 @@
         <div class="flex gap-2">
             <button onclick="showSection('list')" class="btn-nav btn-active" id="nav-list">Registre</button>
             <button onclick="openForm()" class="btn-nav" id="nav-form">Nouvelle Fiche</button>
-            <button onclick="showSection('activites')" class="btn-nav" id="nav-activites">Activités Centre</button>
-            <button onclick="showSection('mouvements')" class="btn-nav" id="nav-mouvements">Mouvements/Sorties</button>
             <button onclick="showSection('settings')" class="btn-nav" id="nav-settings"><i class="fas fa-cog"></i></button>
             <button id="logout-btn" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-black text-[10px] uppercase">Quitter</button>
         </div>
@@ -62,25 +59,6 @@
 </nav>
 
 <div class="container mx-auto py-8 px-4" id="app-content">
-
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="card p-4 flex items-center justify-between">
-            <div><p class="label-text">Bénéficiaires</p><h3 id="stat-total" class="text-2xl font-black">0</h3></div>
-            <i class="fas fa-users text-slate-200 text-3xl"></i>
-        </div>
-        <div class="card p-4 flex items-center justify-between">
-            <div><p class="label-text">Réinscriptions</p><h3 id="stat-reins" class="text-2xl font-black">0</h3></div>
-            <i class="fas fa-sync text-slate-200 text-3xl"></i>
-        </div>
-        <div class="card p-4 flex items-center justify-between">
-            <div><p class="label-text">Garçons / Filles</p><h3 id="stat-sexe" class="text-lg font-black">0/0</h3></div>
-            <i class="fas fa-venus-mars text-slate-200 text-3xl"></i>
-        </div>
-        <div class="card p-4 flex items-center justify-between">
-            <div><p class="label-text">Moyenne Globale</p><h3 id="stat-moy" class="text-2xl font-black">0.00</h3></div>
-            <i class="fas fa-star text-slate-200 text-3xl"></i>
-        </div>
-    </div>
     
     <section id="sec-list" class="section-pane active">
         <div class="card p-8 shadow-sm">
@@ -94,7 +72,6 @@
                         <tr class="text-[10px] uppercase text-slate-400 border-b">
                             <th class="pb-4">Bénéficiaire</th>
                             <th class="pb-4">ID Code</th>
-                            <th class="pb-4">Âge</th>
                             <th class="pb-4">Projet/Site</th>
                             <th class="pb-4 text-right">Actions</th>
                         </tr>
@@ -120,90 +97,99 @@
                 </div>
                 <div class="lg:col-span-3 grid md:grid-cols-3 gap-4">
                     <div class="md:col-span-2"><label class="label-text">Nom et Prénom</label><input type="text" id="f-nom" class="input-field"></div>
-                    <div><label class="label-text">Sexe</label><select id="f-sexe" class="input-field"><option value="Masculin">Masculin</option><option value="Féminin">Féminin</option></select></div>
-                    <div><label class="label-text">Date de Naissance (ou vers)</label>
-                        <div class="flex gap-1">
-                            <input type="text" id="f-dob-vers" placeholder="Vers" class="w-16 input-field">
-                            <input type="date" id="f-dob-date" class="input-field" onchange="calcAgeAuto()">
-                        </div>
-                    </div>
-                    <div><label class="label-text">Âge Calculé</label><input type="text" id="f-age-calc" class="input-field bg-slate-50" readonly></div>
-                    <div><label class="label-text">Lieu de naissance</label><input type="text" id="f-lieu" class="input-field"></div>
-                    <div class="md:col-span-3"><label class="label-text">Adresse</label><input type="text" id="f-adresse" class="input-field"></div>
+                    <div><label class="label-text">Sexe</label><select id="f-sexe" class="input-field"><option value="">Choisir...</option><option>Masculin</option><option>Féminin</option></select></div>
+                    <div><label class="label-text">Date de naissance</label><input type="date" id="f-dob-date" class="input-field" onchange="updateAgeAtInscription()"></div>
+                    <div><label class="label-text">Lieu de naissance</label><input type="text" id="f-lieu" class="input-field" placeholder="ex: Toliara"></div>
+                    <div><label class="label-text">Acte de naissance</label><select id="f-acte" class="input-field"><option value="">Choisir...</option><option>Oui</option><option>Non</option><option>Inconnu</option></select></div>
+                    <div class="md:col-span-3"><label class="label-text">Adresse Exacte</label><input type="text" id="f-adresse" class="input-field"></div>
                 </div>
             </div>
 
             <div class="p-6 bg-slate-50 rounded-3xl mb-10 border border-slate-200">
                 <h3 class="text-xs font-black uppercase mb-6 dynamic-p"><i class="fas fa-hand-holding-heart mr-2"></i> Section : Suivi Bel Avenir</h3>
                 <div class="grid md:grid-cols-3 gap-6 mb-6">
-                    <div><label class="label-text">Date Inscription</label><input type="date" id="f-ba-date" class="input-field"></div>
-                    <div><label class="label-text">Site d'inscription</label><input list="list-sites" id="f-ba-site" class="input-field"><datalist id="list-sites"></datalist></div>
-                    <div><label class="label-text">Responsable</label><input type="text" id="f-ba-resp" class="input-field"></div>
+                    <div><label class="label-text">Date d'inscription</label><input type="date" id="f-ba-date" class="input-field" onchange="updateAgeAtInscription()"></div>
+                    <div><label class="label-text">Responsable du dossier</label><input type="text" id="f-ba-resp" class="input-field"></div>
+                    <div>
+                        <label class="label-text">Site / Projet d'inscription</label>
+                        <input list="list-sites" id="f-ba-site" class="input-field">
+                        <datalist id="list-sites"></datalist>
+                    </div>
                 </div>
-                <div class="p-4 bg-white rounded-2xl border mb-6">
+                
+                <div class="p-4 bg-white rounded-2xl border border-slate-200 mb-6">
                     <div class="flex items-center gap-4 mb-4">
                         <label class="label-text">Réinscription ?</label>
-                        <select id="f-ba-is-reins" onchange="toggleReins(this.value)" class="input-field w-32"><option value="Non">Non</option><option value="Oui">Oui</option></select>
+                        <input type="checkbox" id="f-ba-reins-check" onchange="toggleReins(this.checked)" class="w-5 h-5">
                     </div>
-                    <div id="reins-fields" class="hidden grid md:grid-cols-3 gap-4">
+                    <div id="reins-details" class="hidden grid md:grid-cols-4 gap-4 animate-pulse">
                         <div><label class="label-text">Ancien Projet</label><input type="text" id="f-ba-old-proj" class="input-field"></div>
-                        <div><label class="label-text">Ancien Niveau</label><input type="text" id="f-ba-old-niv" class="input-field"></div>
-                        <div><label class="label-text">Date ancienne inscription</label><input type="date" id="f-ba-old-date" class="input-field"></div>
+                        <div><label class="label-text">Date ancienne inscrip.</label><input type="date" id="f-ba-old-date" class="input-field"></div>
+                        <div><label class="label-text">Niveau à l'époque</label><input type="text" id="f-ba-old-niv" class="input-field"></div>
+                        <div><label class="label-text">Âge lors de l'ancienne inscrip.</label><input type="text" id="f-ba-old-age" class="input-field bg-slate-100" readonly></div>
                     </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div><label class="label-text">Situation Sociale</label><select id="f-ba-social" class="input-field"><option>Vunérable</option><option>Orphelin</option><option>Handicap</option><option>Victime d'agression</option></select></div>
+                    <div><label class="label-text">Activités Parascolaires</label><input list="list-activ" id="f-ba-activ" class="input-field"><datalist id="list-activ"></datalist></div>
                 </div>
             </div>
 
             <div class="p-6 border rounded-3xl mb-10">
-                <h3 class="text-xs font-black uppercase mb-4"><i class="fas fa-graduation-cap mr-2"></i> Suivi Scolaire Périodique</h3>
-                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <h3 class="text-xs font-black uppercase mb-4"><i class="fas fa-graduation-cap mr-2"></i> Suivi Scolaire & Bulletin</h3>
+                <div class="grid md:grid-cols-4 gap-4 mb-6">
+                    <div><label class="label-text">Niveau Actuel</label><input type="text" id="f-sc-niv" class="input-field"></div>
                     <div><label class="label-text">Établissement</label><input type="text" id="f-sc-ecole" class="input-field"></div>
-                    <div><label class="label-text">Période (Filtre)</label><select id="f-sc-per" class="input-field"><option>Trimestre 1</option><option>Trimestre 2</option><option>Trimestre 3</option><option>Bimestre</option><option>Annuelle</option></select></div>
+                    <div><label class="label-text">Redoublant(e)</label><select id="f-sc-red" class="input-field"><option>Non</option><option>Oui</option></select></div>
+                    <div><label class="label-text">Bulletin disponible</label><select id="f-sc-bull" class="input-field"><option>Oui</option><option>Non</option></select></div>
                 </div>
                 <table class="w-full text-xs mb-4">
-                    <thead><tr class="text-left font-black opacity-50"><th>Matière</th><th>Note /20</th><th>Obs</th></tr></thead>
-                    <tbody id="f-sc-body">
-                        <tr><td><input type="text" class="input-field sc-mat"></td><td><input type="number" class="input-field sc-val" oninput="recalcMoyLocal()"></td><td><input type="text" class="input-field sc-obs"></td></tr>
+                    <thead><tr class="text-left font-black opacity-50"><th>Matière</th><th>Coef</th><th>Note /20</th><th>Observations</th></tr></thead>
+                    <tbody id="f-sc-notes-body">
+                        <tr>
+                            <td><input type="text" class="input-field n-mat"></td>
+                            <td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td>
+                            <td><input type="number" class="input-field n-val" oninput="calcMoy()"></td>
+                            <td><input type="text" class="input-field n-obs"></td>
+                        </tr>
                     </tbody>
                 </table>
-                <button onclick="addScRow()" class="text-[10px] font-black text-blue-600 uppercase">+ Matière</button>
+                <div class="flex justify-between items-center">
+                    <button onclick="addNoteRow()" class="text-[10px] font-black text-blue-600 uppercase">+ Ajouter Matière</button>
+                    <div class="font-black text-lg">Moyenne Générale : <span id="f-sc-moy-gen" class="dynamic-p">0.00</span></div>
+                </div>
             </div>
-        </div>
-    </section>
 
-    <section id="sec-activites" class="section-pane">
-        <div class="card p-8">
-            <h2 class="text-2xl font-black mb-8 uppercase">Organisation des Activités Centre</h2>
-            <div class="grid md:grid-cols-4 gap-4 mb-8">
-                <div><label class="label-text">Date</label><input type="date" id="act-date" class="input-field"></div>
-                <div><label class="label-text">Type Activité</label><input type="text" id="act-type" class="input-field"></div>
-                <div><label class="label-text">Horaire (Début-Fin)</label><input type="text" id="act-time" placeholder="08:00 - 10:00" class="input-field"></div>
-                <div><label class="label-text">Responsable</label><input type="text" id="act-resp" class="input-field"></div>
+            <div class="p-6 bg-blue-50/50 rounded-3xl mb-10">
+                <h3 class="text-xs font-black uppercase mb-6"><i class="fas fa-users mr-2"></i> Situation Familiale Détaillée</h3>
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div><label class="label-text">Tuteur Légal</label><select id="f-fa-tut" class="input-field"><option>Mère</option><option>Père</option><option>Père & Mère</option><option>Autre</option></select></div>
+                    <div><label class="label-text">Nom du tuteur</label><input type="text" id="f-fa-tut-nom" class="input-field"></div>
+                    <div><label class="label-text">Contact Urgence</label><input type="text" id="f-fa-tut-tel" class="input-field"></div>
+                    <div><label class="label-text">Enfants à la maison</label><input type="number" id="f-fa-kids" class="input-field"></div>
+                    <div><label class="label-text">État de la maison</label><input type="text" id="f-fa-habitat" class="input-field"></div>
+                    <div><label class="label-text">Profession tuteur</label><input type="text" id="f-fa-job" class="input-field"></div>
+                </div>
+                <label class="label-text">Accord Parental & Observations Libres</label>
+                <textarea id="f-fa-accord" class="input-field h-20"></textarea>
             </div>
-            <button onclick="saveActivite()" class="dynamic-bg-p text-white px-8 py-3 rounded-xl font-black uppercase text-[10px]">Ajouter au calendrier</button>
-            <div id="activites-list" class="mt-8 space-y-4"></div>
-        </div>
-    </section>
 
-    <section id="sec-mouvements" class="section-pane">
-        <div class="card p-8">
-            <h2 class="text-2xl font-black mb-8 uppercase">Décharge, Transfert, Renvoi</h2>
-            <div class="grid md:grid-cols-4 gap-4 mb-6">
-                <div><label class="label-text">Bénéficiaire (ID)</label><input type="text" id="mov-id" class="input-field" placeholder="ID Code"></div>
-                <div><label class="label-text">Type Mouvement</label><select id="mov-type" class="input-field"><option>Transfert</option><option>Décharge</option><option>Quitter</option><option>Renvoi</option></select></div>
-                <div><label class="label-text">Date</label><input type="date" id="mov-date" class="input-field"></div>
-                <div><label class="label-text">Responsable Site</label><input type="text" id="mov-resp" class="input-field"></div>
+            <div class="p-6 border rounded-3xl mb-10">
+                <h3 class="text-xs font-black uppercase mb-4"><i class="fas fa-heartbeat mr-2"></i> Évaluation de santé initiale</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div><label class="label-text">Poids (kg)</label><input type="number" id="f-sa-poids" class="input-field" oninput="autoIMC()"></div>
+                    <div><label class="label-text">Taille (cm)</label><input type="number" id="f-sa-taille" class="input-field" oninput="autoIMC()"></div>
+                    <div><label class="label-text">IMC</label><input type="text" id="f-sa-imc" class="input-field bg-slate-100" readonly></div>
+                    <div><label class="label-text">Température (°C)</label><input type="number" id="f-sa-temp" class="input-field"></div>
+                </div>
             </div>
-            <div class="grid md:grid-cols-2 gap-4 mb-8">
-                <div><label class="label-text">Lieu d'Origine</label><input type="text" id="mov-ori" class="input-field"></div>
-                <div><label class="label-text">Lieu de Destination (si transfert)</label><input type="text" id="mov-dest" class="input-field"></div>
-            </div>
-            <button onclick="saveMouvement()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-black uppercase text-[10px]">Enregistrer le mouvement</button>
         </div>
     </section>
 
     <section id="sec-settings" class="section-pane">
         <div class="card p-10">
-            <h2 class="text-2xl font-black uppercase mb-10">Paramètres ONG</h2>
+            <h2 class="text-2xl font-black uppercase mb-10">Configuration ONG</h2>
             <div class="grid lg:grid-cols-2 gap-12">
                 <div class="space-y-6">
                     <div><label class="label-text">Logo ONG</label><input type="file" onchange="uploadLogo(this)" class="input-field"></div>
@@ -218,21 +204,10 @@
         </div>
     </section>
 
-    <div id="modal-view" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-2">
-        <div class="bg-white w-full max-w-5xl rounded-[2.5rem] p-8 max-h-[95vh] overflow-hidden flex flex-col relative">
-            <button onclick="closeModal()" class="absolute top-6 right-6 text-slate-400 hover:text-black z-50"><i class="fas fa-times text-xl"></i></button>
-            
-            <div id="view-header" class="flex gap-6 items-center mb-6"></div>
-
-            <div class="flex border-b mb-6 overflow-x-auto">
-                <button onclick="showModalTab('v-ident')" class="tab-btn active" id="btn-v-ident">Identité</button>
-                <button onclick="showModalTab('v-ba')" class="tab-btn" id="btn-v-ba">Suivi BA</button>
-                <button onclick="showModalTab('v-scol')" class="tab-btn" id="btn-v-scol">Scolarité</button>
-                <button onclick="showModalTab('v-med')" class="tab-btn" id="btn-v-med">Médical</button>
-                <button onclick="showModalTab('v-fam')" class="tab-btn" id="btn-v-fam">Famille</button>
-            </div>
-
-            <div id="modal-tab-container" class="flex-1 overflow-y-auto pr-2"></div>
+    <div id="modal-view" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-4xl rounded-[2.5rem] p-10 max-h-[95vh] overflow-y-auto relative">
+            <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-400 hover:text-black transition"><i class="fas fa-times text-xl"></i></button>
+            <div id="view-content"></div>
         </div>
     </div>
 
@@ -261,11 +236,15 @@
     let benefsData = [];
     let editKey = null;
 
-    // --- SECURITE ---
+    // --- SÉCURITÉ & AUTH ---
     document.getElementById('login-btn').addEventListener('click', async () => {
         const email = document.getElementById('auth-email').value;
         const pass = document.getElementById('auth-pass').value;
-        try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { document.getElementById('auth-error').classList.remove('hidden'); }
+        try { 
+            await signInWithEmailAndPassword(auth, email, pass);
+        } catch (e) { 
+            document.getElementById('auth-error').classList.remove('hidden'); 
+        }
     });
 
     onAuthStateChanged(auth, (user) => {
@@ -276,28 +255,59 @@
             syncAll();
         } else {
             document.getElementById('auth-overlay').style.display = 'flex';
+            document.getElementById('main-nav').style.display = 'none';
+            document.getElementById('app-content').style.display = 'none';
         }
     });
 
     document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-    // --- LOGIQUE METIER ---
-    window.calcAgeAuto = () => {
-        const d = new Date(document.getElementById('f-dob-date').value);
-        if(!isNaN(d)) {
-            const age = new Date().getFullYear() - d.getFullYear();
-            document.getElementById('f-age-calc').value = age + " ans";
+    // --- LOGIQUE FORMULAIRE ---
+    window.toggleReins = (val) => {
+        document.getElementById('reins-details').classList.toggle('hidden', !val);
+        if(val) updateAgeAtInscription();
+    };
+
+    window.updateAgeAtInscription = () => {
+        const dob = new Date(document.getElementById('f-dob-date').value);
+        const oldDate = new Date(document.getElementById('f-ba-old-date').value);
+        if(!isNaN(dob) && !isNaN(oldDate)) {
+            let age = oldDate.getFullYear() - dob.getFullYear();
+            const m = oldDate.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && oldDate.getDate() < dob.getDate())) age--;
+            document.getElementById('f-ba-old-age').value = age + " ans";
         }
     };
 
-    window.toggleReins = (val) => document.getElementById('reins-fields').classList.toggle('hidden', val !== 'Oui');
-
-    window.addScRow = () => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td><input type="text" class="input-field sc-mat"></td><td><input type="number" class="input-field sc-val" oninput="recalcMoyLocal()"></td><td><input type="text" class="input-field sc-obs"></td>`;
-        document.getElementById('f-sc-body').appendChild(tr);
+    window.calcMoy = () => {
+        let pts = 0, coefs = 0;
+        document.querySelectorAll('#f-sc-notes-body tr').forEach(tr => {
+            const c = parseFloat(tr.querySelector('.n-coef').value) || 0;
+            const v = parseFloat(tr.querySelector('.n-val').value) || 0;
+            pts += (v * c); coefs += c;
+        });
+        document.getElementById('f-sc-moy-gen').innerText = coefs > 0 ? (pts / coefs).toFixed(2) : "0.00";
     };
 
+    window.autoIMC = () => {
+        const p = parseFloat(document.getElementById('f-sa-poids').value);
+        const t = parseFloat(document.getElementById('f-sa-taille').value) / 100;
+        if(p && t) document.getElementById('f-sa-imc').value = (p / (t*t)).toFixed(1);
+    };
+
+    window.addNoteRow = () => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td>`;
+        document.getElementById('f-sc-notes-body').appendChild(tr);
+    };
+
+    window.processPhoto = (input) => {
+        const reader = new FileReader();
+        reader.onload = (e) => { currentPhoto = e.target.result; document.getElementById('f-photo-preview').src = e.target.result; };
+        reader.readAsDataURL(input.files[0]);
+    };
+
+    // --- ACTIONS ---
     window.showSection = (id) => {
         document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('btn-active'));
@@ -307,74 +317,69 @@
 
     window.openForm = (key = null) => {
         editKey = key;
-        document.querySelectorAll('#sec-form input, #sec-form select').forEach(i => i.value = "");
-        document.getElementById('f-sc-body').innerHTML = `<tr><td><input type="text" class="input-field sc-mat"></td><td><input type="number" class="input-field sc-val"></td><td><input type="text" class="input-field sc-obs"></td></tr>`;
+        document.querySelectorAll('#sec-form input, #sec-form select, #sec-form textarea').forEach(i => i.value = "");
+        document.getElementById('f-ba-reins-check').checked = false;
+        document.getElementById('reins-details').classList.add('hidden');
         document.getElementById('f-photo-preview').src = "https://via.placeholder.com/150";
+        currentPhoto = "";
+        
         if(key) {
             const b = benefsData.find(x => x.key === key);
             document.getElementById('f-nom').value = b.nom;
+            document.getElementById('f-sexe').value = b.sexe;
             document.getElementById('f-dob-date').value = b.dob;
-            document.getElementById('f-photo-preview').src = b.photo;
+            document.getElementById('f-ba-site').value = b.ba_site || "";
+            document.getElementById('f-photo-preview').src = b.photo || "";
             currentPhoto = b.photo;
-            calcAgeAuto();
         }
         showSection('form');
     };
 
     window.submitForm = () => {
-        const notes = [];
-        document.querySelectorAll('#f-sc-body tr').forEach(tr => {
-            notes.push({ mat: tr.querySelector('.sc-mat').value, val: tr.querySelector('.sc-val').value });
-        });
-        const d = {
+        const data = {
             id: editKey ? benefsData.find(x => x.key === editKey).id : "BA-" + Date.now().toString().slice(-4),
             nom: document.getElementById('f-nom').value,
             sexe: document.getElementById('f-sexe').value,
             dob: document.getElementById('f-dob-date').value,
-            dob_vers: document.getElementById('f-dob-vers').value,
             ba_site: document.getElementById('f-ba-site').value,
-            sc_notes: notes,
+            ba_is_reins: document.getElementById('f-ba-reins-check').checked,
+            ba_old_proj: document.getElementById('f-ba-old-proj').value,
+            ba_old_age: document.getElementById('f-ba-old-age').value,
+            sc_moy: document.getElementById('f-sc-moy-gen').innerText,
             photo: currentPhoto
         };
-        const r = editKey ? ref(db, `beneficiaires/${editKey}`) : push(ref(db, 'beneficiaires'));
-        set(r, d).then(() => { alert("Enregistré"); showSection('list'); });
+        const refPath = editKey ? ref(db, `beneficiaires/${editKey}`) : push(ref(db, 'beneficiaires'));
+        set(refPath, data).then(() => { alert("Enregistré !"); showSection('list'); });
     };
 
     function syncAll() {
-        onValue(ref(db, 'beneficiaires'), snap => {
-            benefsData = snap.val() ? Object.keys(snap.val()).map(k => ({...snap.val()[k], key: k})) : [];
+        onValue(ref(db, 'beneficiaires'), (snap) => {
+            const d = snap.val();
+            benefsData = d ? Object.keys(d).map(k => ({...d[k], key: k})) : [];
             renderTable();
-            updateStats();
         });
-        onValue(ref(db, 'settings'), snap => {
+        onValue(ref(db, 'settings'), (snap) => {
             const s = snap.val();
             if(s) {
                 document.getElementById('ong-name-display').innerText = s.name;
                 document.getElementById('nav-logo').src = s.logo;
                 document.getElementById('login-logo').src = s.logo;
+                document.getElementById('login-logo').classList.remove('hidden');
                 document.documentElement.style.setProperty('--p-col', s.color);
             }
         });
     }
 
-    function updateStats() {
-        document.getElementById('stat-total').innerText = benefsData.length;
-        const g = benefsData.filter(x => x.sexe === 'Masculin').length;
-        document.getElementById('stat-sexe').innerText = `${g}G / ${benefsData.length - g}F`;
-    }
-
     window.renderTable = () => {
-        const t = document.getElementById('search-bar').value.toLowerCase();
-        document.getElementById('main-table-body').innerHTML = benefsData.filter(b => b.nom.toLowerCase().includes(t))
+        const term = document.getElementById('search-bar').value.toLowerCase();
+        document.getElementById('main-table-body').innerHTML = benefsData.filter(b => b.nom.toLowerCase().includes(term))
             .map(b => `
                 <tr class="border-b hover:bg-slate-50">
-                    <td class="py-4 flex items-center gap-3"><img src="${b.photo}" class="w-10 h-10 rounded-full object-cover font-bold">${b.nom}</td>
-                    <td class="text-xs font-mono text-blue-600">${b.id}</td>
-                    <td class="text-xs">${new Date().getFullYear() - new Date(b.dob).getFullYear()} ans</td>
-                    <td class="text-xs">${b.ba_site || '-'}</td>
+                    <td class="py-4 flex items-center gap-3"><img src="${b.photo}" class="w-10 h-10 rounded-full object-cover"><b>${b.nom}</b></td>
+                    <td class="text-xs font-mono">${b.id}</td>
+                    <td>${b.ba_site || '-'}</td>
                     <td class="text-right">
                         <button onclick="viewBenef('${b.key}')" class="p-2 text-slate-400 hover:text-blue-600"><i class="fas fa-eye"></i></button>
-                        <button onclick="openForm('${b.key}')" class="p-2 text-slate-400 hover:text-green-600"><i class="fas fa-edit"></i></button>
                         <button onclick="deleteBenef('${b.key}')" class="p-2 text-slate-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`).join('');
@@ -382,37 +387,34 @@
 
     window.viewBenef = (key) => {
         const b = benefsData.find(x => x.key === key);
-        document.getElementById('view-header').innerHTML = `
-            <img src="${b.photo}" class="w-24 h-24 rounded-3xl object-cover border-4 border-white shadow-lg">
-            <div>
-                <h2 class="text-2xl font-black uppercase">${b.nom}</h2>
-                <p class="text-blue-600 font-bold">${b.id} • ${b.dob_vers ? 'Vers ' + b.dob_vers : b.dob}</p>
+        document.getElementById('view-content').innerHTML = `
+            <div class="flex gap-8 items-center mb-8">
+                <img src="${b.photo}" class="w-32 h-32 rounded-3xl object-cover shadow-lg">
+                <div>
+                    <h2 class="text-2xl font-black uppercase">${b.nom}</h2>
+                    <p class="text-blue-600 font-bold">${b.id}</p>
+                </div>
             </div>
-        `;
-        showModalTab('v-ident', b);
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="p-6 bg-slate-50 rounded-2xl">
+                    <h3 class="font-black text-xs uppercase mb-4 text-blue-600">Détails Bel Avenir</h3>
+                    <p><b>Réinscrit :</b> ${b.ba_is_reins ? 'OUI' : 'NON'}</p>
+                    <p><b>Ancien Projet :</b> ${b.ba_old_proj || '-'}</p>
+                    <p><b>Âge à l'inscription initiale :</b> ${b.ba_old_age || '-'}</p>
+                </div>
+                <div class="p-6 bg-blue-50 rounded-2xl">
+                    <h3 class="font-black text-xs uppercase mb-4 text-blue-600">Scolarité</h3>
+                    <p><b>Moyenne Générale :</b> ${b.sc_moy || '0.00'}/20</p>
+                </div>
+            </div>`;
         document.getElementById('modal-view').classList.remove('hidden');
-    };
-
-    window.showModalTab = (tab, data = null) => {
-        if(!data) data = benefsData.find(x => x.id === document.querySelector('#view-header p').innerText.split(' • ')[0]);
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('btn-'+tab).classList.add('active');
-        
-        let html = "";
-        if(tab === 'v-ident') html = `<div class="p-6 bg-slate-50 rounded-3xl"><b>Sexe:</b> ${data.sexe}<br><b>Adresse:</b> ${data.adresse || '-'}</div>`;
-        if(tab === 'v-scol') html = `<div class="p-6"><b>Notes Périodiques:</b><table class="w-full mt-4">${data.sc_notes ? data.sc_notes.map(n => `<tr><td>${n.mat}</td><td>${n.val}/20</td></tr>`).join('') : 'Pas de notes'}</table></div>`;
-        if(tab === 'v-med') html = `<div class="p-6 bg-red-50 rounded-3xl"><h3 class="font-black">Suivi Médical Périodique</h3><p class="text-xs mt-2">Dernière visite: - <br> Observations: -</p></div>`;
-        
-        document.getElementById('modal-tab-container').innerHTML = html;
     };
 
     window.closeModal = () => document.getElementById('modal-view').classList.add('hidden');
     window.deleteBenef = (key) => { if(confirm("Supprimer ?")) remove(ref(db, `beneficiaires/${key}`)); };
-    window.processPhoto = (input) => { const r = new FileReader(); r.onload = (e) => { currentPhoto = e.target.result; document.getElementById('f-photo-preview').src = e.target.result; }; r.readAsDataURL(input.files[0]); };
     window.uploadLogo = (input) => { const r = new FileReader(); r.onload = (e) => document.getElementById('nav-logo').src = e.target.result; r.readAsDataURL(input.files[0]); };
-    window.saveSettings = () => { set(ref(db, 'settings'), { name: document.getElementById('set-name').value, addr: document.getElementById('set-addr').value, color: document.getElementById('set-color').value, logo: document.getElementById('nav-logo').src }).then(() => alert("Sauvegardé")); };
-    window.updateTheme = (c) => document.documentElement.style.setProperty('--p-col', c);
-
+    window.saveSettings = () => { set(ref(db, 'settings'), { name: document.getElementById('set-name').value, addr: document.getElementById('set-addr').value, color: document.getElementById('set-color').value, logo: document.getElementById('nav-logo').src }).then(() => alert("Ok")); };
+    window.updateTheme = (c) => { document.documentElement.style.setProperty('--p-col', c); };
 </script>
 </body>
 </html>
