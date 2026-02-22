@@ -26,8 +26,8 @@
         .dynamic-bg-p { background-color: var(--p-col); }
         .sub-tab { padding: 8px 16px; font-size: 10px; font-weight: 800; text-transform: uppercase; border-bottom: 3px solid transparent; cursor: pointer; }
         .sub-tab.active { border-color: var(--p-col); color: var(--p-col); }
-        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: white; border-right: 1px solid #e2e8f0; z-index: 100; overflow-y: auto; }
-        .main-container { margin-left: 260px; min-height: 100vh; }
+        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: white; border-right: 1px solid #e2e8f0; z-index: 40; }
+        .main-container { margin-left: 260px; padding: 20px; }
         @media (max-width: 1024px) { .sidebar { display: none; } .main-container { margin-left: 0; } }
     </style>
 </head>
@@ -46,285 +46,290 @@
     </div>
 </div>
 
-<div class="sidebar shadow-xl" id="sidebar">
-    <div class="p-6 border-b text-center">
-        <img id="nav-logo" src="" class="h-16 mx-auto mb-2 object-contain">
-        <h1 id="ong-name-display" class="font-black dynamic-p leading-tight uppercase text-xs"></h1>
-        <p id="ong-addr-display" class="text-[8px] text-slate-400 font-bold uppercase tracking-widest"></p>
+<div class="sidebar flex flex-col p-4" id="main-nav">
+    <div class="flex items-center gap-3 mb-8 px-2">
+        <img id="nav-logo" src="" class="h-10 object-contain">
+        <div class="overflow-hidden">
+            <h1 id="ong-name-display" class="font-black dynamic-p leading-tight uppercase text-[10px] truncate"></h1>
+            <p id="ong-addr-display" class="text-[8px] text-slate-400 font-bold uppercase tracking-widest"></p>
+        </div>
     </div>
-    <div class="p-4 space-y-1">
-        <p class="text-[9px] font-black text-slate-400 uppercase px-4 mb-2">Navigation</p>
-        <button onclick="showSection('dash')" class="btn-nav w-full btn-active" id="nav-dash"><i class="fas fa-chart-line"></i> Tableaux de bord</button>
-        <button onclick="showSection('list')" class="btn-nav w-full" id="nav-list"><i class="fas fa-users"></i> Bénéficiaires <span id="count-benef" class="ml-auto bg-slate-100 px-2 rounded-full text-[9px]">0</span></button>
-        <button onclick="openForm()" class="btn-nav w-full" id="nav-form"><i class="fas fa-user-plus"></i> Nouvelle Fiche</button>
+    
+    <div class="flex flex-col gap-1 flex-1 overflow-y-auto">
+        <p class="text-[9px] font-black text-slate-400 px-4 mt-4 uppercase">Navigation</p>
+        <button onclick="showSection('list')" class="btn-nav btn-active" id="nav-list"><i class="fas fa-users"></i> Bénéficiaires <span class="ml-auto text-[10px] bg-slate-100 px-2 py-0.5 rounded-full" id="count-benefs">0</span></button>
+        <button onclick="openForm()" class="btn-nav" id="nav-form"><i class="fas fa-plus-circle"></i> Admission</button>
         
-        <p class="text-[9px] font-black text-slate-400 uppercase px-4 mt-4 mb-2">Suivis & Dossiers</p>
-        <button onclick="showSection('act')" class="btn-nav w-full" id="nav-act"><i class="fas fa-calendar-check"></i> Suivi des Activités</button>
-        <button onclick="showSection('med')" class="btn-nav w-full" id="nav-med"><i class="fas fa-hand-holding-medical"></i> Accompagnement Médical</button>
-        <button onclick="showSection('scol')" class="btn-nav w-full" id="nav-scol"><i class="fas fa-graduation-cap"></i> Suivi Scolaire</button>
-        <button onclick="showSection('mouv')" class="btn-nav w-full" id="nav-mouv"><i class="fas fa-folder-open"></i> Dossier Administratif</button>
+        <p class="text-[9px] font-black text-slate-400 px-4 mt-4 uppercase">Suivis</p>
+        <button onclick="showSection('act')" class="btn-nav" id="nav-act"><i class="fas fa-calendar-check"></i> Activités</button>
+        <button onclick="showSection('med')" class="btn-nav" id="nav-med"><i class="fas fa-hand-holding-medical"></i> Médical</button>
+        <button onclick="showSection('mouv')" class="btn-nav" id="nav-mouv"><i class="fas fa-folder-open"></i> Administratif</button>
         
-        <button onclick="showSection('settings')" class="btn-nav w-full mt-4" id="nav-settings"><i class="fas fa-cog"></i> Paramètres</button>
-        <button id="logout-btn" class="w-full mt-8 bg-red-50 text-red-600 p-3 rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2"><i class="fas fa-sign-out-alt"></i> Quitter</button>
+        <p class="text-[9px] font-black text-slate-400 px-4 mt-4 uppercase">Système</p>
+        <button onclick="showSection('settings')" class="btn-nav" id="nav-settings"><i class="fas fa-cog"></i> Paramètres</button>
     </div>
+
+    <button id="logout-btn" class="mt-auto bg-red-50 text-red-600 p-4 rounded-xl font-black text-[10px] uppercase flex items-center justify-center gap-2"><i class="fas fa-power-off"></i> Déconnexion</button>
 </div>
 
 <div class="main-container" id="app-content">
-    <nav id="main-nav" class="bg-white border-b sticky top-0 z-50 p-4 lg:hidden flex justify-between items-center">
-        <h1 class="font-black dynamic-p uppercase text-xs">Bel Avenir</h1>
-        <button onclick="toggleSidebar()" class="text-xl"><i class="fas fa-bars"></i></button>
-    </nav>
 
-    <div class="p-4 lg:p-8">
-        <div id="top-dash-stats" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="card p-4 border-l-4 border-blue-600">
-                <p class="label-text">Total Présents</p>
-                <h3 id="dash-total" class="text-2xl font-black">0</h3>
-                <div class="flex gap-2 text-[9px] font-bold mt-1"><span class="text-blue-500">M: <span id="dash-m">0</span></span> <span class="text-pink-500">F: <span id="dash-f">0</span></span></div>
-            </div>
-            <div class="card p-4 border-l-4 border-orange-500">
-                <p class="label-text">Activités Récentes</p>
-                <h3 id="dash-act" class="text-2xl font-black">0</h3>
-                <p class="text-[9px] font-bold text-slate-400 uppercase">Taux Partic.: <span id="dash-taux">0%</span></p>
-            </div>
-            <div class="card p-4 border-l-4 border-green-500">
-                <p class="label-text">Suivis Médicaux</p>
-                <h3 id="dash-med" class="text-2xl font-black">0</h3>
-                <p id="alert-med" class="text-[9px] font-bold text-red-500 uppercase"></p>
-            </div>
-            <div class="card p-4 border-l-4 border-purple-500">
-                <p class="label-text">Moyenne Scolaire</p>
-                <h3 id="dash-moy" class="text-2xl font-black">0.00</h3>
-                <p class="text-[9px] font-bold text-slate-400 uppercase">Cycle Majoritaire</p>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="card p-4 border-l-4 border-blue-600">
+            <p class="label-text">Bénéficiaires Actifs</p>
+            <h3 id="dash-total" class="text-2xl font-black">0</h3>
+            <div class="flex gap-2 text-[9px] font-bold mt-2">
+                <span class="text-blue-500">M: <span id="dash-m">0</span></span>
+                <span class="text-pink-500">F: <span id="dash-f">0</span></span>
             </div>
         </div>
-        
-        <section id="sec-dash" class="section-pane active">
-            <div class="card p-8 mb-8">
-                <h2 class="text-xl font-black uppercase mb-6">Ventilation des Effectifs par Site</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-50 uppercase font-black">
-                            <tr><th class="p-3">Site / Projet</th><th>Présents</th><th>Transférés</th><th>Quittés</th><th>M</th><th>F</th><th>Total</th></tr>
-                        </thead>
-                        <tbody id="stats-site-body"></tbody>
-                    </table>
+        <div class="card p-4 border-l-4 border-orange-500">
+            <p class="label-text">Activités du mois</p>
+            <h3 id="dash-act" class="text-2xl font-black">0</h3>
+            <p class="text-[9px] text-slate-400 font-bold uppercase mt-2">Taux part.: <span id="dash-part">0%</span></p>
+        </div>
+        <div class="card p-4 border-l-4 border-green-500">
+            <p class="label-text">Urgences Médicales</p>
+            <h3 id="dash-med" class="text-2xl font-black">0</h3>
+            <p class="text-[9px] text-red-500 font-bold uppercase mt-2" id="med-alert">Aucune alerte</p>
+        </div>
+        <div class="card p-4 border-l-4 border-purple-500">
+            <p class="label-text">Cycle Scolaire Dominant</p>
+            <h3 id="dash-cycle" class="text-lg font-black uppercase text-purple-600">N/A</h3>
+        </div>
+    </div>
+    
+    <section id="sec-list" class="section-pane active">
+        <div class="card p-8 shadow-sm">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                <h2 class="text-2xl font-black uppercase">Registre Central</h2>
+                <div class="flex gap-2">
+                    <button onclick="exportToExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase"><i class="fas fa-file-excel mr-2"></i>Excel</button>
+                    <button onclick="exportToPDF()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase"><i class="fas fa-file-pdf mr-2"></i>PDF</button>
                 </div>
             </div>
-        </section>
 
-        <section id="sec-list" class="section-pane">
-            <div class="card p-8 shadow-sm">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-                    <h2 class="text-xl font-black uppercase">Registre des Bénéficiaires</h2>
-                    <div class="flex gap-2">
-                        <button onclick="exportExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-[9px] font-black uppercase"><i class="fas fa-file-excel"></i> Excel</button>
-                        <button onclick="exportPDF()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-[9px] font-black uppercase"><i class="fas fa-file-pdf"></i> PDF</button>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6 bg-slate-50 p-4 rounded-2xl">
-                    <div><label class="label-text">Rechercher</label><input type="text" id="search-bar" oninput="renderTable()" class="input-field text-xs"></div>
-                    <div><label class="label-text">Site</label><select id="filter-site" onchange="renderTable()" class="input-field text-xs"><option value="">Tous</option></select></div>
-                    <div><label class="label-text">Projet</label><select id="filter-proj" onchange="renderTable()" class="input-field text-xs"><option value="">Tous</option></select></div>
-                    <div><label class="label-text">Sexe</label><select id="filter-sexe" onchange="renderTable()" class="input-field text-xs"><option value="">Tous</option><option>Masculin</option><option>Féminin</option></select></div>
-                    <div><label class="label-text">Statut</label><select id="filter-statut" onchange="renderTable()" class="input-field text-xs"><option value="Actif">Actif</option><option value="Transféré">Transféré</option><option value="Quitté">Quitté</option><option value="Renvoyé">Renvoyé</option></select></div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm" id="main-table">
-                        <thead>
-                            <tr class="text-[10px] uppercase text-slate-400 border-b">
-                                <th class="pb-4">Bénéficiaire</th>
-                                <th class="pb-4">ID Code</th>
-                                <th class="pb-4">Âge</th>
-                                <th class="pb-4">Classe/Cycle</th>
-                                <th class="pb-4">Statut</th>
-                                <th class="pb-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="main-table-body"></tbody>
-                    </table>
-                </div>
-                <div id="pagination" class="mt-6 flex justify-center gap-2"></div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6 bg-slate-50 p-4 rounded-2xl">
+                <div><label class="label-text">Site</label><select id="filter-site" onchange="renderTable()" class="input-field text-xs"></select></div>
+                <div><label class="label-text">Projet</label><select id="filter-proj" onchange="renderTable()" class="input-field text-xs"></select></div>
+                <div><label class="label-text">Sexe</label><select id="filter-sexe" onchange="renderTable()" class="input-field text-xs"><option value="">Tous</option><option>Masculin</option><option>Féminin</option></select></div>
+                <div><label class="label-text">Statut</label><select id="filter-statut" onchange="renderTable()" class="input-field text-xs"><option value="Actif">Actif</option><option>Quitté</option><option>Transféré</option><option>Renvoyé</option></select></div>
+                <div><label class="label-text">Recherche</label><input type="text" id="search-bar" oninput="renderTable()" placeholder="Nom ou ID..." class="input-field text-xs"></div>
             </div>
-        </section>
 
-        <section id="sec-form" class="section-pane">
-            <div class="card p-8 border-t-8 border-blue-600">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-black uppercase" id="form-mode-title">Admission Bénéficiaire</h2>
-                    <div class="flex gap-4">
-                        <div class="text-right">
-                            <label class="label-text">ID Généré</label>
-                            <input type="text" id="f-id-display" class="bg-slate-100 font-bold text-xs p-2 rounded text-center" readonly placeholder="AUTO-GEN">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm" id="benef-table">
+                    <thead>
+                        <tr class="text-[10px] uppercase text-slate-400 border-b">
+                            <th class="pb-4">Identité & ID</th>
+                            <th class="pb-4">Cycle / Classe</th>
+                            <th class="pb-4">Site & Projet</th>
+                            <th class="pb-4">Statut</th>
+                            <th class="pb-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="main-table-body"></tbody>
+                </table>
+            </div>
+            <div id="pagination" class="flex justify-center gap-2 mt-6"></div>
+        </div>
+    </section>
+
+    <section id="sec-form" class="section-pane">
+        <div class="card p-8 border-t-8 border-blue-600">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-black uppercase" id="form-mode-title">Admission Bénéficiaire</h2>
+                    <p class="text-[10px] font-bold text-slate-400">ID GÉNÉRÉ : <span id="f-generated-id" class="text-blue-600">---</span></p>
+                </div>
+                <button onclick="submitForm()" class="dynamic-bg-p text-white px-10 py-3 rounded-xl font-black uppercase text-xs shadow-md">Valider & Enregistrer</button>
+            </div>
+
+            <div class="flex border-b mb-8 overflow-x-auto">
+                <button onclick="showFormTab('ft-ident')" class="sub-tab active" id="btn-ft-ident">1. Identité</button>
+                <button onclick="showFormTab('ft-ba')" class="sub-tab" id="btn-ft-ba">2. Projet & Site</button>
+                <button onclick="showFormTab('ft-scol')" class="sub-tab" id="btn-ft-scol">3. Scolarité</button>
+                <button onclick="showFormTab('ft-fam')" class="sub-tab" id="btn-ft-fam">4. Famille</button>
+                <button onclick="showFormTab('ft-sante')" class="sub-tab" id="btn-ft-sante">5. Santé initiale</button>
+            </div>
+
+            <div id="form-tabs-content">
+                <div id="ft-ident" class="form-tab-pane">
+                    <div class="grid lg:grid-cols-4 gap-8">
+                        <div class="text-center">
+                            <img id="f-photo-preview" src="https://via.placeholder.com/150" class="w-40 h-40 rounded-[2rem] mx-auto object-cover border-4 border-slate-100 mb-2">
+                            <input type="file" id="f-photo-input" class="hidden" onchange="processPhoto(this)">
+                            <button onclick="document.getElementById('f-photo-input').click()" class="text-[10px] font-black text-blue-600 uppercase">Charger Photo</button>
                         </div>
-                        <button onclick="submitForm()" class="dynamic-bg-p text-white px-10 py-3 rounded-xl font-black uppercase text-xs shadow-md">Enregistrer le dossier</button>
-                    </div>
-                </div>
-
-                <div class="flex border-b mb-8 overflow-x-auto">
-                    <button onclick="showFormTab('ft-ident')" class="sub-tab active" id="btn-ft-ident">1. Identité</button>
-                    <button onclick="showFormTab('ft-ba')" class="sub-tab" id="btn-ft-ba">2. Suivi Bel Avenir</button>
-                    <button onclick="showFormTab('ft-scol')" class="sub-tab" id="btn-ft-scol">3. Scolarité</button>
-                    <button onclick="showFormTab('ft-fam')" class="sub-tab" id="btn-ft-fam">4. Famille</button>
-                </div>
-
-                <div id="form-tabs-content">
-                    <div id="ft-ident" class="form-tab-pane">
-                        <div class="grid lg:grid-cols-4 gap-8">
-                            <div class="text-center">
-                                <img id="f-photo-preview" src="https://via.placeholder.com/150" class="w-40 h-40 rounded-[2rem] mx-auto object-cover border-4 border-slate-100 mb-2">
-                                <input type="file" id="f-photo-input" class="hidden" onchange="processPhoto(this)">
-                                <button onclick="document.getElementById('f-photo-input').click()" class="text-[10px] font-black text-blue-600 uppercase">Charger Photo</button>
+                        <div class="lg:col-span-3 grid md:grid-cols-3 gap-4">
+                            <div class="md:col-span-2"><label class="label-text">Nom et Prénom *</label><input type="text" id="f-nom" class="input-field" required></div>
+                            <div><label class="label-text">Sexe *</label><select id="f-sexe" class="input-field" onchange="updateGeneratedID()" required><option value="">Choisir...</option><option value="M">Masculin</option><option value="F">Féminin</option></select></div>
+                            <div>
+                                <label class="label-text">Date de naissance</label>
+                                <div class="flex gap-1">
+                                    <input type="text" id="f-dob-vers" placeholder="Vers" class="w-16 input-field">
+                                    <input type="date" id="f-dob-date" class="input-field" onchange="updateAge()">
+                                </div>
                             </div>
-                            <div class="lg:col-span-3 grid md:grid-cols-3 gap-4">
-                                <div class="md:col-span-2"><label class="label-text">Nom et Prénom *</label><input type="text" id="f-nom" class="input-field" required></div>
-                                <div><label class="label-text">Sexe *</label><select id="f-sexe" class="input-field" required onchange="generateID()"><option value="">Choisir...</option><option value="M">Masculin</option><option value="F">Féminin</option></select></div>
-                                <div><label class="label-text">Date de naissance</label><div class="flex gap-1"><input type="text" id="f-dob-vers" placeholder="Vers" class="w-16 input-field"><input type="date" id="f-dob-date" class="input-field" onchange="updateAge()"></div></div>
-                                <div><label class="label-text">Âge Actuel</label><input type="text" id="f-age-calc" class="input-field bg-slate-50" readonly></div>
-                                <div><label class="label-text">Lieu de naissance</label><input type="text" id="f-lieu" class="input-field"></div>
-                                <div class="md:col-span-3"><label class="label-text">Adresse Exacte</label><input type="text" id="f-adresse" class="input-field"></div>
-                            </div>
+                            <div><label class="label-text">Âge Actuel</label><input type="text" id="f-age-calc" class="input-field bg-slate-50" readonly></div>
+                            <div><label class="label-text">Lieu de naissance</label><input type="text" id="f-lieu" class="input-field"></div>
+                            <div class="md:col-span-3"><label class="label-text">Adresse Exacte</label><input type="text" id="f-adresse" class="input-field"></div>
                         </div>
                     </div>
-                    
-                    <div id="ft-ba" class="form-tab-pane hidden">
-                        <div class="grid md:grid-cols-3 gap-6">
-                            <div><label class="label-text">Projet * (ex: OCN)</label><input type="text" id="f-ba-proj-code" class="input-field" placeholder="CODEPROJET" oninput="generateID()"></div>
-                            <div><label class="label-text">Site *</label><input list="list-sites" id="f-ba-site" class="input-field" required></div>
-                            <div><label class="label-text">Responsable Saisie</label><input type="text" id="f-ba-resp" class="input-field"></div>
-                        </div>
-                    </div>
+                </div>
 
-                    <div id="ft-scol" class="form-tab-pane hidden">
-                        <div class="grid md:grid-cols-4 gap-4 mb-6">
-                            <div><label class="label-text">Classe</label><input type="text" id="f-sc-niv" class="input-field" placeholder="ex: 6ème" oninput="calcCycle()"></div>
-                            <div><label class="label-text">Cycle</label><input type="text" id="f-sc-cycle" class="input-field bg-slate-100" readonly></div>
-                            <div><label class="label-text">Établissement</label><input type="text" id="f-sc-ecole" class="input-field"></div>
-                            <div><label class="label-text">Période</label><select id="f-sc-per" class="input-field"><option>Trimestre 1</option><option>Trimestre 2</option><option>Trimestre 3</option><option>Annuel</option></select></div>
-                        </div>
-                        <table class="w-full text-xs mb-4">
-                            <thead><tr class="text-left font-black opacity-50 uppercase"><th>Matière</th><th>Note /20</th><th>Observations</th></tr></thead>
-                            <tbody id="f-sc-notes-body">
-                                <tr><td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td></tr>
-                            </tbody>
-                        </table>
-                        <button onclick="addNoteRow()" class="text-[10px] font-black text-blue-600 uppercase">+ Matière</button>
+                <div id="ft-ba" class="form-tab-pane hidden">
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div><label class="label-text">Code Projet *</label><input type="text" id="f-ba-codeproj" class="input-field" placeholder="ex: OCN" oninput="this.value = this.value.toUpperCase(); updateGeneratedID();" required></div>
+                        <div><label class="label-text">Site d'inscription *</label><select id="f-ba-site" class="input-field" required></select></div>
+                        <div><label class="label-text">Responsable Saisie</label><input type="text" id="f-ba-resp" class="input-field"></div>
+                        <div><label class="label-text">Date d'admission</label><input type="date" id="f-ba-date" class="input-field"></div>
+                        <div><label class="label-text">Statut Dossier</label><select id="f-ba-statut" class="input-field"><option>Actif</option><option>En attente</option></select></div>
                     </div>
+                </div>
 
-                    <div id="ft-fam" class="form-tab-pane hidden">
-                        <div class="grid md:grid-cols-3 gap-6 mb-6">
-                            <div><label class="label-text">Tuteur Légal</label><input type="text" id="f-fa-tut-nom" class="input-field"></div>
-                            <div><label class="label-text">Contact</label><input type="text" id="f-fa-tut-tel" class="input-field"></div>
+                <div id="ft-scol" class="form-tab-pane hidden">
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div><label class="label-text">Classe Actuelle</label>
+                            <select id="f-sc-niv" class="input-field" onchange="updateCycle(this.value)">
+                                <option value="">Choisir...</option>
+                                <optgroup label="Primaire"><option>11ème</option><option>10ème</option><option>9ème</option><option>8ème</option><option>7ème</option></optgroup>
+                                <optgroup label="Collège"><option>6ème</option><option>5ème</option><option>4ème</option><option>3ème</option></optgroup>
+                                <optgroup label="Lycée"><option>2nde</option><option>1ère</option><option>Terminale</option></optgroup>
+                            </select>
                         </div>
+                        <div><label class="label-text">Cycle</label><input type="text" id="f-sc-cycle" class="input-field bg-slate-100" readonly></div>
+                        <div><label class="label-text">Établissement</label><input type="text" id="f-sc-ecole" class="input-field"></div>
+                    </div>
+                    <table class="w-full text-xs mb-4">
+                        <thead><tr class="text-left font-black opacity-50 uppercase"><th>Matière</th><th>Coef</th><th>Note /20</th><th>Observations</th></tr></thead>
+                        <tbody id="f-sc-notes-body">
+                            <tr><td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td></tr>
+                        </tbody>
+                    </table>
+                    <button onclick="addNoteRow()" class="text-[10px] font-black text-blue-600 uppercase">+ Ajouter Matière</button>
+                </div>
+
+                <div id="ft-fam" class="form-tab-pane hidden">
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div><label class="label-text">Tuteur Légal</label><input type="text" id="f-fa-tut-nom" class="input-field"></div>
+                        <div><label class="label-text">Contact</label><input type="text" id="f-fa-tut-tel" class="input-field"></div>
+                        <div class="md:col-span-3"><label class="label-text">Observations Sociales</label><textarea id="f-fa-accord" class="input-field h-20"></textarea></div>
+                    </div>
+                </div>
+
+                <div id="ft-sante" class="form-tab-pane hidden">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div><label class="label-text">Poids (kg)</label><input type="number" id="f-sa-poids" class="input-field" oninput="autoIMC()"></div>
+                        <div><label class="label-text">Taille (cm)</label><input type="number" id="f-sa-taille" class="input-field" oninput="autoIMC()"></div>
+                        <div><label class="label-text">IMC</label><input type="text" id="f-sa-imc" class="input-field bg-slate-100" readonly></div>
+                        <div><label class="label-text">Groupe Sanguin</label><input type="text" id="f-sa-gs" class="input-field"></div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="sec-act" class="section-pane">
-            <div class="card p-8">
-                <h2 class="text-xl font-black mb-8 uppercase">Suivi des Activités</h2>
-                <div class="grid md:grid-cols-4 gap-4 mb-8 bg-slate-50 p-6 rounded-3xl">
-                    <div><label class="label-text">Intitulé Projet concerné</label><input type="text" id="act-proj" class="input-field"></div>
-                    <div><label class="label-text">Site</label><input type="text" id="act-site" class="input-field"></div>
-                    <div><label class="label-text">Lieu de l'activité</label><input type="text" id="act-lieu" class="input-field"></div>
-                    <div><label class="label-text">Date</label><input type="date" id="act-date" class="input-field"></div>
-                    <div class="md:col-span-2"><label class="label-text">Objectif spécifique</label><input type="text" id="act-obj" class="input-field"></div>
-                    <div class="md:col-span-2"><label class="label-text">Classes concernées</label>
-                        <div class="flex flex-wrap gap-2 mt-2" id="act-classes-check">
-                            <label class="text-[10px] font-bold flex items-center gap-1"><input type="checkbox" value="Primaire"> Primaire</label>
-                            <label class="text-[10px] font-bold flex items-center gap-1"><input type="checkbox" value="Collège"> Collège</label>
-                            <label class="text-[10px] font-bold flex items-center gap-1"><input type="checkbox" value="Lycée"> Lycée</label>
-                        </div>
-                    </div>
-                </div>
-                <button onclick="generatePresenceSheet()" class="dynamic-bg-p text-white px-8 py-3 rounded-xl font-black uppercase text-[10px]">Générer Fiche de Présence</button>
-                
-                <div id="presence-sheet-area" class="mt-8 hidden">
-                    <h3 class="font-black uppercase text-sm mb-4">Appel / Liste de présence</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-100 uppercase"><tr><th class="p-3">Bénéficiaire</th><th>Classe</th><th>Présent ?</th></tr></thead>
-                            <tbody id="presence-table-body"></tbody>
-                        </table>
-                    </div>
-                    <div class="mt-4 flex justify-between items-center p-4 bg-blue-50 rounded-xl">
-                        <div class="text-[10px] font-black uppercase">Stats: <span id="act-count-p">0</span> Présents | <span id="act-count-a">0</span> Absents | Taux: <span id="act-taux">0%</span></div>
-                        <button onclick="saveActivity()" class="dynamic-bg-p text-white px-6 py-2 rounded-lg font-black uppercase text-[9px]">Valider l'activité</button>
+    <section id="sec-act" class="section-pane">
+        <div class="card p-8">
+            <h2 class="text-2xl font-black mb-6 uppercase">Gestion des Activités</h2>
+            <div class="grid md:grid-cols-3 gap-4 mb-8 bg-slate-50 p-6 rounded-3xl">
+                <div><label class="label-text">Intitulé de l'activité</label><input type="text" id="act-type" class="input-field"></div>
+                <div><label class="label-text">Lieu</label><input type="text" id="act-lieu" class="input-field"></div>
+                <div><label class="label-text">Projet concerné</label><select id="act-proj" class="input-field"></select></div>
+                <div><label class="label-text">Objectif spécifique</label><input type="text" id="act-obj" class="input-field"></div>
+                <div class="md:col-span-2">
+                    <label class="label-text">Classes concernées</label>
+                    <div class="flex flex-wrap gap-4 mt-2" id="act-classes-check">
+                        <label class="flex items-center gap-2 text-[10px] font-bold"><input type="checkbox" value="Primaire"> PRIMAIRE</label>
+                        <label class="flex items-center gap-2 text-[10px] font-bold"><input type="checkbox" value="Collège"> COLLÈGE</label>
+                        <label class="flex items-center gap-2 text-[10px] font-bold"><input type="checkbox" value="Lycée"> LYCÉE</label>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <section id="sec-med" class="section-pane">
-            <div class="card p-8">
-                <h2 class="text-xl font-black mb-8 uppercase text-red-600">Accompagnement Médical</h2>
-                <div class="grid md:grid-cols-4 gap-4 mb-6">
-                    <div><label class="label-text">ID Bénéficiaire *</label><input type="text" id="med-id" class="input-field" list="list-benefs-ids"></div>
-                    <div><label class="label-text">Type de suivi</label><select id="med-type" class="input-field"><option>Périodique</option><option>Urgence</option><option>Spécialisé</option></select></div>
-                    <div><label class="label-text">Date</label><input type="date" id="med-date" class="input-field"></div>
-                    <div><label class="label-text">Prochaine visite</label><input type="date" id="med-next" class="input-field"></div>
-                </div>
-                <textarea id="med-obs" class="input-field h-20 mb-4" placeholder="Observations et Traitement..."></textarea>
-                <button onclick="saveMedical()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-black uppercase text-[10px]">Enregistrer</button>
-                
-                <div class="mt-10">
-                    <h3 class="font-black uppercase text-xs mb-4">Historique Médical Global</h3>
-                    <div id="med-history-list" class="space-y-2"></div>
+            
+            <div class="mb-6">
+                <h4 class="label-text mb-4">Appel / Liste de présence</h4>
+                <div class="max-h-60 overflow-y-auto border rounded-xl" id="act-attendance-list">
+                    <p class="p-4 text-center text-slate-400 text-xs italic">Sélectionnez les classes pour charger les bénéficiaires...</p>
                 </div>
             </div>
-        </section>
 
-        <section id="sec-mouv" class="section-pane">
-            <div class="card p-8">
-                <h2 class="text-xl font-black mb-8 uppercase">Mouvement & Transfert Multi-Site</h2>
-                <div class="grid md:grid-cols-4 gap-4 mb-6">
-                    <div><label class="label-text">ID Bénéficiaire</label><input type="text" id="mov-id" class="input-field" list="list-benefs-ids"></div>
-                    <div><label class="label-text">Action</label><select id="mov-type" class="input-field" onchange="toggleDest(this.value)"><option value="Quitter">Départ / Abandon</option><option value="Transfert">Transfert de Site</option><option value="Renvoyer">Renvoi</option></select></div>
-                    <div id="dest-box" class="hidden"><label class="label-text">Site de Destination</label><select id="mov-dest" class="input-field"></select></div>
+            <button onclick="saveActivity()" class="dynamic-bg-p text-white px-8 py-3 rounded-xl font-black uppercase text-[10px]">Générer la fiche d'activité</button>
+        </div>
+    </section>
+
+    <section id="sec-med" class="section-pane">
+        <div class="card p-8">
+            <h2 class="text-2xl font-black mb-8 uppercase text-red-600">Suivi Médical</h2>
+            <div class="grid md:grid-cols-4 gap-4 mb-6">
+                <div><label class="label-text">ID Bénéficiaire *</label><input type="text" id="med-id" class="input-field" placeholder="OCN-000-X-000"></div>
+                <div><label class="label-text">Type de suivi</label><select id="med-type" class="input-field"><option>Visite routine</option><option>Urgence</option><option>Vaccination</option><option>Dentaire</option></select></div>
+                <div><label class="label-text">Structure</label><input type="text" id="med-struct" class="input-field"></div>
+                <div><label class="label-text">Prochaine visite</label><input type="date" id="med-next" class="input-field"></div>
+            </div>
+            <textarea id="med-obs" class="input-field h-24 mb-4" placeholder="Observations médicales..."></textarea>
+            <button onclick="saveMedical()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-black uppercase text-[10px]">Enregistrer</button>
+        </div>
+    </section>
+
+    <section id="sec-mouv" class="section-pane">
+        <div class="card p-8">
+            <h2 class="text-2xl font-black mb-8 uppercase">Sorties & Transferts</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="space-y-4">
+                    <div><label class="label-text">ID Bénéficiaire</label><input type="text" id="mov-id" class="input-field"></div>
+                    <div><label class="label-text">Action</label><select id="mov-type" class="input-field" onchange="toggleTransfert(this.value)"><option>Quitter</option><option>Transfert</option><option>Renvoyer</option><option>Décharge</option></select></div>
+                </div>
+                <div class="space-y-4">
                     <div><label class="label-text">Date</label><input type="date" id="mov-date" class="input-field"></div>
-                    <div><label class="label-text">Motif</label><input type="text" id="mov-motif" class="input-field"></div>
+                    <div id="div-dest" class="hidden"><label class="label-text">Site de destination</label><select id="mov-dest" class="input-field"></select></div>
                 </div>
-                <button onclick="processMovement()" class="bg-slate-800 text-white px-8 py-3 rounded-xl font-black uppercase text-[10px]">Exécuter le mouvement</button>
-            </div>
-        </section>
-
-        <section id="sec-settings" class="section-pane">
-            <div class="card p-10">
-                <h2 class="text-xl font-black uppercase mb-10">Paramètres ONG</h2>
-                <div class="grid lg:grid-cols-2 gap-12">
-                    <div class="space-y-6">
-                        <div><label class="label-text">Logo ONG</label><input type="file" onchange="uploadLogo(this)" class="input-field"></div>
-                        <div><label class="label-text">Nom ONG</label><input type="text" id="set-name" class="input-field"></div>
-                        <div><label class="label-text">Adresse</label><input type="text" id="set-addr" class="input-field"></div>
-                    </div>
-                    <div class="space-y-6">
-                        <div><label class="label-text">Couleur Thème</label><input type="color" id="set-color" class="w-full h-12 rounded-xl cursor-pointer" onchange="updateTheme(this.value)"></div>
-                        <button onclick="saveSettings()" class="w-full dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-xs shadow-lg">Sauvegarder</button>
-                    </div>
+                <div class="space-y-4">
+                    <div><label class="label-text">Motif / Remarques</label><textarea id="mov-motif" class="input-field h-24"></textarea></div>
+                    <button onclick="saveMouvement()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-black uppercase text-[10px]">Confirmer le mouvement</button>
                 </div>
             </div>
-        </section>
-    </div>
-</div>
-
-<datalist id="list-sites"></datalist>
-<datalist id="list-benefs-ids"></datalist>
-
-<div id="modal-view" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-5xl rounded-[2.5rem] p-8 max-h-[95vh] overflow-hidden flex flex-col relative">
-        <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-400 hover:text-black transition"><i class="fas fa-times text-xl"></i></button>
-        <div id="modal-header-info" class="flex items-center gap-6 mb-8"></div>
-        <div class="flex border-b mb-6 overflow-x-auto">
-            <button onclick="showModalTab('vt-ident')" class="sub-tab active" id="btn-vt-ident">Identité complète</button>
-            <button onclick="showModalTab('vt-scol')" class="sub-tab" id="btn-vt-scol">Suivi Scolaire</button>
-            <button onclick="showModalTab('vt-med')" class="sub-tab" id="btn-vt-med">Accomp. Médical</button>
-            <button onclick="showModalTab('vt-fam')" class="sub-tab" id="btn-vt-fam">Social & Famille</button>
         </div>
-        <div id="modal-tab-container" class="flex-1 overflow-y-auto"></div>
+    </section>
+
+    <section id="sec-settings" class="section-pane">
+        <div class="card p-10">
+            <h2 class="text-2xl font-black uppercase mb-10">Paramètres ONG</h2>
+            <div class="grid lg:grid-cols-2 gap-12">
+                <div class="space-y-6">
+                    <div><label class="label-text">Logo ONG</label><input type="file" onchange="uploadLogo(this)" class="input-field"></div>
+                    <div><label class="label-text">Nom ONG</label><input type="text" id="set-name" class="input-field"></div>
+                    <div><label class="label-text">Adresse</label><input type="text" id="set-addr" class="input-field"></div>
+                </div>
+                <div class="space-y-6">
+                    <div><label class="label-text">Couleur Thème</label><input type="color" id="set-color" class="w-full h-12 rounded-xl cursor-pointer" onchange="updateTheme(this.value)"></div>
+                    <div><label class="label-text">Ajouter un Site</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="new-site" class="input-field" placeholder="Nom du site">
+                            <button onclick="addSite()" class="bg-blue-600 text-white px-4 rounded-xl text-xs font-bold uppercase">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button onclick="saveSettings()" class="w-full dynamic-bg-p text-white py-4 mt-8 rounded-xl font-black uppercase text-xs shadow-lg">Sauvegarder Global</button>
+        </div>
+    </section>
+
+    <div id="modal-view" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-5xl rounded-[2.5rem] p-8 max-h-[95vh] overflow-hidden flex flex-col relative">
+            <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-400 hover:text-black transition"><i class="fas fa-times text-xl"></i></button>
+            <div id="modal-header-info" class="flex items-center gap-6 mb-8"></div>
+            <div class="flex border-b mb-6 overflow-x-auto">
+                <button onclick="showModalTab('vt-ident')" class="sub-tab active" id="btn-vt-ident">Identité complète</button>
+                <button onclick="showModalTab('vt-scol')" class="sub-tab" id="btn-vt-scol">Suivi Scolaire</button>
+                <button onclick="showModalTab('vt-med')" class="sub-tab" id="btn-vt-med">Accomp. Médical</button>
+                <button onclick="showModalTab('vt-mouv')" class="sub-tab" id="btn-vt-mouv">Historique Administratif</button>
+            </div>
+            <div id="modal-tab-container" class="flex-1 overflow-y-auto"></div>
+        </div>
     </div>
+
 </div>
 
 <script type="module">
@@ -349,9 +354,10 @@
 
     let currentPhoto = "";
     let benefsData = [];
+    let activitiesData = [];
+    let settingsData = { sites: [], projects: [] };
     let editKey = null;
 
-    // AUTH
     document.getElementById('login-btn').addEventListener('click', async () => {
         const email = document.getElementById('auth-email').value;
         const pass = document.getElementById('auth-pass').value;
@@ -361,34 +367,25 @@
     onAuthStateChanged(auth, (user) => {
         if (user) {
             document.getElementById('auth-overlay').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'block';
+            document.getElementById('main-nav').style.display = 'flex';
             document.getElementById('app-content').style.display = 'block';
             syncAll();
         } else {
             document.getElementById('auth-overlay').style.display = 'flex';
-            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('main-nav').style.display = 'none';
             document.getElementById('app-content').style.display = 'none';
         }
     });
 
     document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-    // NAVIGATION
     window.showSection = (id) => {
         document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('btn-active'));
-        const target = document.getElementById('sec-'+id);
-        if(target) target.classList.add('active');
-        const nav = document.getElementById('nav-'+id);
-        if(nav) nav.classList.add('btn-active');
+        document.getElementById('sec-'+id).classList.add('active');
+        document.getElementById('nav-'+id).classList.add('btn-active');
     };
 
-    window.toggleSidebar = () => {
-        const sb = document.getElementById('sidebar');
-        sb.style.display = sb.style.display === 'block' ? 'none' : 'block';
-    };
-
-    // FORM HELPER
     window.showFormTab = (id) => {
         document.querySelectorAll('.form-tab-pane').forEach(p => p.classList.add('hidden'));
         document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
@@ -396,246 +393,209 @@
         document.getElementById('btn-'+id).classList.add('active');
     };
 
-    window.generateID = () => {
-        const proj = document.getElementById('f-ba-proj-code').value || "PROJ";
+    window.updateGeneratedID = () => {
+        const codeProj = document.getElementById('f-ba-codeproj').value || "PROJ";
         const year = new Date().getFullYear();
         const sexe = document.getElementById('f-sexe').value || "X";
         const count = (benefsData.length + 1).toString().padStart(3, '0');
-        const id = `${proj}-${year}-${sexe}-${count}`;
-        document.getElementById('f-id-display').value = id;
+        const id = `${codeProj}-${year}-${sexe}-${count}`;
+        document.getElementById('f-generated-id').innerText = id;
+        return id;
     };
 
-    window.calcCycle = () => {
-        const val = document.getElementById('f-sc-niv').value.toLowerCase();
-        let cycle = "Primaire";
-        if(["6ème","5ème","4ème","3ème"].some(c => val.includes(c))) cycle = "Collège";
-        if(["2nde","1ère","terminale"].some(c => val.includes(c))) cycle = "Lycée";
+    window.updateCycle = (classe) => {
+        let cycle = "";
+        const prim = ["11ème", "10ème", "9ème", "8ème", "7ème"];
+        const coll = ["6ème", "5ème", "4ème", "3ème"];
+        const lyc = ["2nde", "1ère", "Terminale"];
+        if(prim.includes(classe)) cycle = "Primaire";
+        else if(coll.includes(classe)) cycle = "Collège";
+        else if(lyc.includes(classe)) cycle = "Lycée";
         document.getElementById('f-sc-cycle').value = cycle;
     };
 
     window.updateAge = () => {
-        const d = document.getElementById('f-dob-date').value;
-        if(d) document.getElementById('f-age-calc').value = (new Date().getFullYear() - new Date(d).getFullYear()) + " ans";
+        const dobStr = document.getElementById('f-dob-date').value;
+        if(dobStr) {
+            const dob = new Date(dobStr);
+            const age = new Date().getFullYear() - dob.getFullYear();
+            document.getElementById('f-age-calc').value = age + " ans";
+        }
     };
 
-    // SYNC DATA
+    window.submitForm = () => {
+        const id = updateGeneratedID();
+        const data = {
+            id: id,
+            nom: document.getElementById('f-nom').value,
+            sexe: document.getElementById('f-sexe').value,
+            dob: document.getElementById('f-dob-date').value,
+            dob_vers: document.getElementById('f-dob-vers').value,
+            lieu: document.getElementById('f-lieu').value,
+            adresse: document.getElementById('f-adresse').value,
+            ba_codeproj: document.getElementById('f-ba-codeproj').value,
+            ba_site: document.getElementById('f-ba-site').value,
+            ba_statut: "Actif",
+            sc_niv: document.getElementById('f-sc-niv').value,
+            sc_cycle: document.getElementById('f-sc-cycle').value,
+            photo: currentPhoto,
+            created_at: new Date().toISOString(),
+            resp: document.getElementById('f-ba-resp').value
+        };
+        
+        if(!data.nom || !data.ba_site || !data.ba_codeproj) {
+            alert("Veuillez remplir les champs obligatoires (*)");
+            return;
+        }
+
+        const refD = editKey ? ref(db, `beneficiaires/${editKey}`) : push(ref(db, 'beneficiaires'));
+        set(refD, data).then(() => { 
+            alert("Bénéficiaire enregistré ! ID: " + id); 
+            showSection('list'); 
+        });
+    };
+
     function syncAll() {
         onValue(ref(db, 'beneficiaires'), (snap) => {
             const d = snap.val();
             benefsData = d ? Object.keys(d).map(k => ({...d[k], key: k})) : [];
             renderTable();
             updateDashboard();
-            updateDatalists();
-        });
-        onValue(ref(db, 'medical'), (snap) => {
-            const d = snap.val();
-            const meds = d ? Object.values(d) : [];
-            document.getElementById('med-history-list').innerHTML = meds.map(m => `
-                <div class="p-3 bg-white border rounded-xl text-[10px] flex justify-between items-center">
-                    <div><b>${m.id}</b> - ${m.type} - ${m.date}</div>
-                    <div class="text-red-500 font-bold">Next: ${m.next}</div>
-                </div>
-            `).join('');
-            document.getElementById('dash-med').innerText = meds.length;
         });
         onValue(ref(db, 'settings'), (snap) => {
             const s = snap.val();
             if(s) {
+                settingsData = s;
                 document.getElementById('ong-name-display').innerText = s.name;
                 document.getElementById('nav-logo').src = s.logo;
-                document.getElementById('login-logo').src = s.logo;
-                document.getElementById('login-logo').classList.remove('hidden');
-                document.documentElement.style.setProperty('--p-col', s.color);
+                updateDropdowns(s.sites);
             }
         });
     }
 
-    function updateDatalists() {
-        const sites = [...new Set(benefsData.map(b => b.ba_site).filter(x => x))];
-        document.getElementById('list-sites').innerHTML = sites.map(s => `<option value="${s}">`).join('');
-        document.getElementById('filter-site').innerHTML = '<option value="">Tous les sites</option>' + sites.map(s => `<option value="${s}">${s}</option>`).join('');
-        document.getElementById('list-benefs-ids').innerHTML = benefsData.map(b => `<option value="${b.id}">`).join('');
-        document.getElementById('mov-dest').innerHTML = sites.map(s => `<option value="${s}">${s}</option>`).join('');
-    }
-
-    function updateDashboard() {
-        const act = benefsData.filter(b => b.statut !== 'Quitté' && b.statut !== 'Renvoyé');
-        document.getElementById('dash-total').innerText = act.length;
-        document.getElementById('count-benef').innerText = act.length;
-        document.getElementById('dash-m').innerText = act.filter(b => b.sexe === 'M').length;
-        document.getElementById('dash-f').innerText = act.filter(b => b.sexe === 'F').length;
-        
-        // Stats table
-        const sites = [...new Set(benefsData.map(b => b.ba_site))];
-        document.getElementById('stats-site-body').innerHTML = sites.map(s => {
-            const sb = benefsData.filter(b => b.ba_site === s);
-            return `<tr><td class="p-3 font-bold">${s}</td><td>${sb.filter(x => x.statut === 'Actif').length}</td><td>${sb.filter(x => x.statut === 'Transféré').length}</td><td>${sb.filter(x => x.statut === 'Quitté').length}</td><td>${sb.filter(x => x.sexe === 'M').length}</td><td>${sb.filter(x => x.sexe === 'F').length}</td><td class="font-black">${sb.length}</td></tr>`;
-        }).join('');
+    function updateDropdowns(sites) {
+        const html = '<option value="">Choisir site...</option>' + (sites || []).map(s => `<option>${s}</option>`).join('');
+        document.getElementById('f-ba-site').innerHTML = html;
+        document.getElementById('filter-site').innerHTML = '<option value="">Tous les sites</option>' + (sites || []).map(s => `<option>${s}</option>`).join('');
+        document.getElementById('mov-dest').innerHTML = html;
     }
 
     window.renderTable = () => {
-        const term = document.getElementById('search-bar').value.toLowerCase();
-        const fSite = document.getElementById('filter-site').value;
-        const fSexe = document.getElementById('filter-sexe').value;
-        const fStatut = document.getElementById('filter-statut').value || 'Actif';
-        
+        const site = document.getElementById('filter-site').value;
+        const sexe = document.getElementById('filter-sexe').value;
+        const statut = document.getElementById('filter-statut').value;
+        const search = document.getElementById('search-bar').value.toLowerCase();
+
         const filtered = benefsData.filter(b => {
-            return (b.nom.toLowerCase().includes(term) || b.id.toLowerCase().includes(term)) &&
-                   (!fSite || b.ba_site === fSite) &&
-                   (!fSexe || (fSexe === 'Masculin' ? b.sexe === 'M' : b.sexe === 'F')) &&
-                   (b.statut === fStatut || (!b.statut && fStatut === 'Actif'));
+            return (!site || b.ba_site === site) &&
+                   (!sexe || (b.sexe === 'M' ? 'Masculin' : 'Féminin') === sexe) &&
+                   (b.ba_statut === statut) &&
+                   (b.nom.toLowerCase().includes(search) || b.id.toLowerCase().includes(search));
         });
 
         document.getElementById('main-table-body').innerHTML = filtered.map(b => `
             <tr class="border-b hover:bg-slate-50">
-                <td class="py-4 flex items-center gap-3"><img src="${b.photo || 'https://via.placeholder.com/150'}" class="w-8 h-8 rounded-full object-cover font-bold uppercase">${b.nom}</td>
-                <td class="text-[10px] font-mono font-bold text-blue-600">${b.id}</td>
-                <td class="text-xs">${b.dob ? (new Date().getFullYear()-new Date(b.dob).getFullYear())+' ans' : '-'}</td>
-                <td class="text-xs">${b.sc_niv || '-'} / <span class="text-[9px] uppercase opacity-50">${b.sc_cycle || '-'}</span></td>
-                <td><span class="px-2 py-1 rounded-full text-[9px] font-black uppercase ${b.statut === 'Quitté' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">${b.statut || 'Actif'}</span></td>
+                <td class="py-4">
+                    <div class="flex items-center gap-3">
+                        <img src="${b.photo || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-full object-cover">
+                        <div>
+                            <p class="font-bold text-xs uppercase">${b.nom}</p>
+                            <p class="text-[9px] font-mono text-blue-600">${b.id}</p>
+                        </div>
+                    </div>
+                </td>
+                <td><p class="text-xs font-bold">${b.sc_niv || '-'}</p><p class="text-[9px] uppercase opacity-50">${b.sc_cycle || '-'}</p></td>
+                <td><p class="text-xs font-bold">${b.ba_site || '-'}</p><p class="text-[9px] uppercase opacity-50">${b.ba_codeproj || '-'}</p></td>
+                <td><span class="px-2 py-1 rounded-full text-[8px] font-black uppercase ${b.ba_statut === 'Actif' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">${b.ba_statut}</span></td>
                 <td class="text-right">
                     <button onclick="viewBenef('${b.key}')" class="p-2 text-slate-400 hover:text-blue-600"><i class="fas fa-eye"></i></button>
                     <button onclick="openForm('${b.key}')" class="p-2 text-slate-400 hover:text-green-600"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteBenef('${b.key}')" class="p-2 text-slate-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
                 </td>
-            </tr>`).join('');
+            </tr>
+        `).join('');
+        document.getElementById('count-benefs').innerText = filtered.length;
     };
 
-    // FORM ACTIONS
+    function updateDashboard() {
+        const actifs = benefsData.filter(b => b.ba_statut === 'Actif');
+        document.getElementById('dash-total').innerText = actifs.length;
+        document.getElementById('dash-m').innerText = actifs.filter(b => b.sexe === 'M').length;
+        document.getElementById('dash-f').innerText = actifs.filter(b => b.sexe === 'F').length;
+        
+        const cycles = actifs.reduce((acc, b) => {
+            if(b.sc_cycle) acc[b.sc_cycle] = (acc[b.sc_cycle] || 0) + 1;
+            return acc;
+        }, {});
+        const dominant = Object.keys(cycles).reduce((a, b) => cycles[a] > cycles[b] ? a : b, "N/A");
+        document.getElementById('dash-cycle').innerText = dominant;
+    }
+
+    window.toggleTransfert = (val) => {
+        document.getElementById('div-dest').classList.toggle('hidden', val !== 'Transfert');
+    };
+
+    window.saveMouvement = () => {
+        const id = document.getElementById('mov-id').value;
+        const type = document.getElementById('mov-type').value;
+        const dest = document.getElementById('mov-dest').value;
+        const b = benefsData.find(x => x.id === id);
+
+        if(!b) { alert("Bénéficiaire introuvable"); return; }
+
+        const updates = {};
+        updates[`beneficiaires/${b.key}/ba_statut`] = type;
+        
+        if(type === 'Transfert' && dest) {
+            const newBenef = {...b, ba_site: dest, ba_statut: 'Actif', key: null, id: b.id + "-T"};
+            push(ref(db, 'beneficiaires'), newBenef);
+        }
+
+        update(ref(db), updates).then(() => alert("Mouvement enregistré"));
+    };
+
+    window.exportToExcel = () => {
+        const ws = XLSX.utils.json_to_sheet(benefsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Bénéficiaires");
+        XLSX.writeFile(wb, "Registre_Bel_Avenir.xlsx");
+    };
+
     window.processPhoto = (input) => {
         const r = new FileReader();
         r.onload = (e) => { currentPhoto = e.target.result; document.getElementById('f-photo-preview').src = e.target.result; };
         r.readAsDataURL(input.files[0]);
     };
 
+    window.addSite = () => {
+        const site = document.getElementById('new-site').value;
+        if(site) {
+            const sites = settingsData.sites || [];
+            sites.push(site);
+            update(ref(db, 'settings'), { sites: sites });
+            document.getElementById('new-site').value = "";
+        }
+    };
+    
     window.openForm = (key = null) => {
         editKey = key;
-        document.querySelectorAll('#sec-form input, #sec-form select').forEach(i => i.value = "");
-        document.getElementById('f-photo-preview').src = "https://via.placeholder.com/150";
-        currentPhoto = "";
-        if(key) {
-            const b = benefsData.find(x => x.key === key);
-            document.getElementById('f-nom').value = b.nom;
-            document.getElementById('f-id-display').value = b.id;
-            document.getElementById('f-ba-site').value = b.ba_site;
-            document.getElementById('f-photo-preview').src = b.photo || "https://via.placeholder.com/150";
-            currentPhoto = b.photo;
-        } else {
-            generateID();
-        }
+        document.querySelectorAll('#sec-form input, #sec-form select, #sec-form textarea').forEach(i => i.value = "");
+        if(!key) updateGeneratedID();
         showSection('form');
     };
 
-    window.submitForm = () => {
-        const data = {
-            id: document.getElementById('f-id-display').value,
-            nom: document.getElementById('f-nom').value,
-            sexe: document.getElementById('f-sexe').value,
-            dob: document.getElementById('f-dob-date').value,
-            dob_vers: document.getElementById('f-dob-vers').value,
-            ba_site: document.getElementById('f-ba-site').value,
-            sc_niv: document.getElementById('f-sc-niv').value,
-            sc_cycle: document.getElementById('f-sc-cycle').value,
-            photo: currentPhoto,
-            statut: "Actif",
-            updated_at: new Date().toISOString()
-        };
-        if(!data.nom || !data.ba_site) return alert("Champs critiques obligatoires");
-        
-        const r = editKey ? ref(db, `beneficiaires/${editKey}`) : push(ref(db, 'beneficiaires'));
-        set(r, data).then(() => { alert("Enregistré"); showSection('list'); });
-    };
-
-    // MOUVEMENTS
-    window.toggleDest = (v) => document.getElementById('dest-box').classList.toggle('hidden', v !== 'Transfert');
-
-    window.processMovement = () => {
-        const id = document.getElementById('mov-id').value;
-        const type = document.getElementById('mov-type').value;
-        const b = benefsData.find(x => x.id === id);
-        if(!b) return alert("Bénéficiaire introuvable");
-
-        const updates = { statut: type, last_mov_date: document.getElementById('mov-date').value };
-        if(type === 'Transfert') {
-            const newSite = document.getElementById('mov-dest').value;
-            updates.ba_site = newSite;
-        }
-        update(ref(db, `beneficiaires/${b.key}`), updates).then(() => {
-            alert("Mouvement validé");
-            showSection('list');
-        });
-    };
-
-    // MEDICAL
-    window.saveMedical = () => {
-        const med = {
-            id: document.getElementById('med-id').value,
-            type: document.getElementById('med-type').value,
-            date: document.getElementById('med-date').value,
-            next: document.getElementById('med-next').value,
-            obs: document.getElementById('med-obs').value
-        };
-        if(!med.id) return alert("ID obligatoire");
-        push(ref(db, 'medical'), med).then(() => alert("Suivi enregistré"));
-    };
-
-    // ACTIVITIES
-    window.generatePresenceSheet = () => {
-        const classes = Array.from(document.querySelectorAll('#act-classes-check input:checked')).map(c => c.value);
-        const filtered = benefsData.filter(b => classes.includes(b.sc_cycle) && b.statut === 'Actif');
-        document.getElementById('presence-table-body').innerHTML = filtered.map(b => `
-            <tr><td class="p-2">${b.nom}</td><td>${b.sc_niv}</td><td><input type="checkbox" class="pres-check w-4 h-4" onchange="calcPres()"></td></tr>
-        `).join('');
-        document.getElementById('presence-sheet-area').classList.remove('hidden');
-        calcPres();
-    };
-
-    window.calcPres = () => {
-        const total = document.querySelectorAll('.pres-check').length;
-        const pres = document.querySelectorAll('.pres-check:checked').length;
-        document.getElementById('act-count-p').innerText = pres;
-        document.getElementById('act-count-a').innerText = total - pres;
-        document.getElementById('act-taux').innerText = total > 0 ? Math.round((pres/total)*100) + "%" : "0%";
-    };
-
-    // EXPORTS
-    window.exportExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(benefsData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Bénéficiaires");
-        XLSX.writeFile(wb, "BelAvenir_Registre.xlsx");
-    };
-
-    window.exportPDF = () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("REGISTRE BEL AVENIR", 10, 10);
-        let y = 20;
-        benefsData.forEach(b => {
-            doc.text(`${b.id} - ${b.nom} - ${b.ba_site}`, 10, y);
-            y += 10;
-        });
-        doc.save("BelAvenir_Registre.pdf");
-    };
-
-    // MODAL
-    window.viewBenef = (key) => {
-        const b = benefsData.find(x => x.key === key);
-        document.getElementById('modal-header-info').innerHTML = `<img src="${b.photo || 'https://via.placeholder.com/150'}" class="w-20 h-20 rounded-2xl object-cover"><div class="flex-1"><h2 class="text-xl font-black uppercase">${b.nom}</h2><p class="text-blue-600 font-bold">${b.id} • ${b.ba_site}</p></div>`;
-        showModalTab('vt-ident', b);
-        document.getElementById('modal-view').classList.remove('hidden');
-    };
-
-    window.showModalTab = (tid, b) => {
-        document.querySelectorAll('#modal-view .sub-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('btn-'+tid).classList.add('active');
-        document.getElementById('modal-tab-container').innerHTML = `<div class="p-10 text-center opacity-30 font-black uppercase text-xs">Données en chargement...</div>`;
-    };
-
-    window.closeModal = () => document.getElementById('modal-view').classList.add('hidden');
-    window.uploadLogo = (i) => { const r = new FileReader(); r.onload = (e) => document.getElementById('nav-logo').src = e.target.result; r.readAsDataURL(i.files[0]); };
-    window.saveSettings = () => { set(ref(db, 'settings'), { name: document.getElementById('set-name').value, addr: document.getElementById('set-addr').value, color: document.getElementById('set-color').value, logo: document.getElementById('nav-logo').src }); alert("Sauvegardé"); };
+    window.deleteBenef = (key) => { if(confirm("Supprimer ?")) remove(ref(db, `beneficiaires/${key}`)); };
     window.updateTheme = (c) => document.documentElement.style.setProperty('--p-col', c);
-
+    window.saveSettings = () => { 
+        const data = {
+            name: document.getElementById('set-name').value,
+            addr: document.getElementById('set-addr').value,
+            color: document.getElementById('set-color').value,
+            logo: document.getElementById('nav-logo').src,
+            sites: settingsData.sites || []
+        };
+        set(ref(db, 'settings'), data).then(() => alert("Paramètres mis à jour"));
+    };
 </script>
 </body>
 </html>
