@@ -98,7 +98,7 @@
                     <div><label class="label-text">Sexe</label><select id="f-sexe" class="input-field"><option value="">Choisir...</option><option>Masculin</option><option>Féminin</option></select></div>
                     <div><label class="label-text">Date & Lieu de naissance</label><input type="text" id="f-dob" class="input-field" placeholder="ex: 10/02/2012 à Toliara"></div>
                     <div><label class="label-text">Âge</label><input type="number" id="f-age" class="input-field"></div>
-                    <div><label class="label-text">Acte de naissance</label><select id="f-acte" class="input-field"><option value="">Choisir...</option><option>En possède</option><option>N'en possède pas</option><option>Ne sais pas</option></select></div>
+                    <div><label class="label-text">Acte de naissance</label><select id="f-acte" class="input-field"><option value="">Choisir...</option><option>Oui</option><option>Non</option><option>Inconnu</option></select></div>
                     <div class="md:col-span-3"><label class="label-text">Adresse Exacte</label><input type="text" id="f-adresse" class="input-field"></div>
                 </div>
             </div>
@@ -110,42 +110,65 @@
                     <div><label class="label-text">Responsable du dossier</label><input type="text" id="f-ba-resp" class="input-field"></div>
                     <div>
                         <label class="label-text">Site / Projet d'inscription</label>
-                        <input list="list-sites" id="f-ba-site" class="input-field" placeholder="Saisir ou choisir...">
+                        <input list="list-sites" id="f-ba-site" class="input-field">
                         <datalist id="list-sites"></datalist>
                     </div>
                     <div>
                         <label class="label-text">Activités Parascolaires</label>
-                        <input list="list-activ" id="f-ba-activ" class="input-field" placeholder="Saisir ou choisir...">
+                        <input list="list-activ" id="f-ba-activ" class="input-field">
                         <datalist id="list-activ"></datalist>
                     </div>
-                    <div>
-                        <label class="label-text">Situation Sociale</label>
-                        <select id="f-ba-social" class="input-field">
-                            <option value="">Choisir...</option>
-                            <option>Orphelin</option><option>Vulnérable</option><option>Handicap</option><option>Victime d'agression sexuelle</option><option>Autres</option>
-                        </select>
-                    </div>
+                    <div><label class="label-text">Situation Sociale</label><select id="f-ba-social" class="input-field"><option>Vunérable</option><option>Orphelin</option><option>Handicap</option><option>Victime d'agression</option></select></div>
                     <div><label class="label-text">Réinscription</label><select id="f-ba-reins" class="input-field"><option>Non</option><option>Oui</option></select></div>
                 </div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-8 mb-10">
-                <div class="p-6 border rounded-3xl">
-                    <h3 class="text-xs font-black uppercase mb-4">Évaluation de santé initiale</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="label-text">Poids (kg)</label><input type="number" id="f-sa-poids" class="input-field" oninput="autoIMC()"></div>
-                        <div><label class="label-text">Taille (cm)</label><input type="number" id="f-sa-taille" class="input-field" oninput="autoIMC()"></div>
-                        <div><label class="label-text">IMC</label><input type="text" id="f-sa-imc" class="input-field bg-slate-100" readonly></div>
-                        <div><label class="label-text">Température</label><input type="text" id="f-sa-temp" class="input-field"></div>
-                    </div>
+            <div class="p-6 border rounded-3xl mb-10">
+                <h3 class="text-xs font-black uppercase mb-4"><i class="fas fa-graduation-cap mr-2"></i> Suivi Scolaire & Bulletin</h3>
+                <div class="grid md:grid-cols-4 gap-4 mb-6">
+                    <div><label class="label-text">Niveau Actuel</label><input type="text" id="f-sc-niv" class="input-field"></div>
+                    <div><label class="label-text">Établissement</label><input type="text" id="f-sc-ecole" class="input-field"></div>
+                    <div><label class="label-text">Redoublant(e)</label><select id="f-sc-red" class="input-field"><option>Non</option><option>Oui</option></select></div>
+                    <div><label class="label-text">Bulletin disponible</label><select id="f-sc-bull" class="input-field"><option>Oui</option><option>Non</option></select></div>
                 </div>
-                <div class="p-6 border rounded-3xl">
-                    <h3 class="text-xs font-black uppercase mb-4">Situation Familiale</h3>
-                    <div class="space-y-4">
-                        <select id="f-so-tut" class="input-field"><option value="">Tuteur...</option><option>Mère</option><option>Père</option><option>Père et Mère</option><option>Autres</option></select>
-                        <input type="text" id="f-so-tut-nom" placeholder="Nom du tuteur" class="input-field">
-                        <input type="text" id="f-so-tut-tel" placeholder="Contact d'urgence" class="input-field">
-                    </div>
+                <table class="w-full text-xs mb-4">
+                    <thead><tr class="text-left font-black opacity-50"><th>Matière</th><th>Coef</th><th>Note /20</th><th>Observations</th></tr></thead>
+                    <tbody id="f-sc-notes-body">
+                        <tr>
+                            <td><input type="text" class="input-field n-mat"></td>
+                            <td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td>
+                            <td><input type="number" class="input-field n-val" oninput="calcMoy()"></td>
+                            <td><input type="text" class="input-field n-obs"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="flex justify-between items-center">
+                    <button onclick="addNoteRow()" class="text-[10px] font-black text-blue-600 uppercase">+ Matière</button>
+                    <div class="font-black text-lg">Moyenne : <span id="f-sc-moy-gen" class="dynamic-p">0.00</span></div>
+                </div>
+            </div>
+
+            <div class="p-6 bg-blue-50/50 rounded-3xl mb-10">
+                <h3 class="text-xs font-black uppercase mb-6"><i class="fas fa-users mr-2"></i> Situation Familiale Détaillée</h3>
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div><label class="label-text">Tuteur Légal</label><select id="f-fa-tut" class="input-field"><option>Mère</option><option>Père</option><option>Père & Mère</option><option>Autre</option></select></div>
+                    <div><label class="label-text">Nom du tuteur</label><input type="text" id="f-fa-tut-nom" class="input-field"></div>
+                    <div><label class="label-text">Contact Urgence</label><input type="text" id="f-fa-tut-tel" class="input-field"></div>
+                    <div><label class="label-text">Enfants à la maison</label><input type="number" id="f-fa-kids" class="input-field" placeholder="Nombre total"></div>
+                    <div><label class="label-text">État de la maison</label><input type="text" id="f-fa-habitat" class="input-field" placeholder="ex: Bois, Dur, etc."></div>
+                    <div><label class="label-text">Profession tuteur</label><input type="text" id="f-fa-job" class="input-field"></div>
+                </div>
+                <label class="label-text">Accord Parental & Observations</label>
+                <textarea id="f-fa-accord" class="input-field h-20" placeholder="Saisir l'accord parental ici..."></textarea>
+            </div>
+
+            <div class="p-6 border rounded-3xl mb-10">
+                <h3 class="text-xs font-black uppercase mb-4"><i class="fas fa-heartbeat mr-2"></i> Évaluation de santé initiale</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div><label class="label-text">Poids (kg)</label><input type="number" id="f-sa-poids" class="input-field" oninput="autoIMC()"></div>
+                    <div><label class="label-text">Taille (cm)</label><input type="number" id="f-sa-taille" class="input-field" oninput="autoIMC()"></div>
+                    <div><label class="label-text">IMC</label><input type="text" id="f-sa-imc" class="input-field bg-slate-100" readonly></div>
+                    <div><label class="label-text">État Hygiène</label><select id="f-sa-hyg" class="input-field"><option>Bon</option><option>Passable</option><option>Mauvais</option></select></div>
                 </div>
             </div>
         </div>
@@ -153,35 +176,23 @@
 
     <section id="sec-settings" class="section-pane">
         <div class="card p-10">
-            <h2 class="text-2xl font-black uppercase mb-10">Personnalisation de l'Interface</h2>
+            <h2 class="text-2xl font-black uppercase mb-10">Personnalisation ONG</h2>
             <div class="grid lg:grid-cols-2 gap-12">
                 <div class="space-y-6">
-                    <div>
-                        <label class="label-text">Logo de l'ONG (Image locale)</label>
-                        <input type="file" id="set-logo-input" onchange="uploadLogo(this)" class="input-field">
-                    </div>
-                    <div>
-                        <label class="label-text">Nom de l'Organisation</label>
-                        <input type="text" id="set-name" class="input-field">
-                    </div>
-                    <div>
-                        <label class="label-text">Adresse et Contact</label>
-                        <input type="text" id="set-addr" class="input-field">
-                    </div>
+                    <div><label class="label-text">Logo ONG</label><input type="file" onchange="uploadLogo(this)" class="input-field"></div>
+                    <div><label class="label-text">Nom ONG</label><input type="text" id="set-name" class="input-field"></div>
+                    <div><label class="label-text">Adresse</label><input type="text" id="set-addr" class="input-field"></div>
                 </div>
                 <div class="space-y-6">
-                    <div>
-                        <label class="label-text">Couleur Principale (Thème)</label>
-                        <input type="color" id="set-color" class="w-full h-12 rounded-xl cursor-pointer" onchange="updateTheme(this.value)">
-                    </div>
-                    <button onclick="saveSettings()" class="w-full dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-xs shadow-lg">Enregistrer les préférences</button>
+                    <div><label class="label-text">Couleur Thème</label><input type="color" id="set-color" class="w-full h-12 rounded-xl cursor-pointer" onchange="updateTheme(this.value)"></div>
+                    <button onclick="saveSettings()" class="w-full dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-xs shadow-lg">Sauvegarder</button>
                 </div>
             </div>
         </div>
     </section>
 
     <div id="modal-view" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-4xl rounded-[2.5rem] p-10 max-h-[90vh] overflow-y-auto relative">
+        <div class="bg-white w-full max-w-4xl rounded-[2.5rem] p-10 max-h-[90vh] overflow-y-auto relative shadow-2xl">
             <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-400 hover:text-black transition"><i class="fas fa-times text-xl"></i></button>
             <div id="view-content"></div>
         </div>
@@ -192,7 +203,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDKNy6B4aifDrVDsglGhvU_eCMZOZF6q8g",
@@ -212,19 +223,17 @@
     let benefsData = [];
     let editKey = null;
 
-    // --- AUTHENTIFICATION ---
+    // --- AUTH ---
     document.getElementById('login-btn').addEventListener('click', async () => {
         const email = document.getElementById('auth-email').value;
         const pass = document.getElementById('auth-pass').value;
-        try { await signInWithEmailAndPassword(auth, email, pass); } 
-        catch (e) { document.getElementById('auth-error').classList.remove('hidden'); }
+        try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { document.getElementById('auth-error').classList.remove('hidden'); }
     });
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
             document.getElementById('auth-overlay').style.display = 'none';
-            document.getElementById('main-nav').classList.remove('hidden');
-            document.getElementById('app-content').classList.remove('hidden');
+            document.querySelectorAll('.hidden').forEach(el => el.classList.remove('hidden'));
             syncAll();
         } else {
             document.getElementById('auth-overlay').style.display = 'flex';
@@ -233,7 +242,7 @@
 
     document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-    // --- NAVIGATION ---
+    // --- FONCTIONS UI ---
     window.showSection = (id) => {
         document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('btn-active'));
@@ -241,11 +250,26 @@
         document.getElementById('nav-'+id).classList.add('btn-active');
     };
 
-    // --- GESTION FORMULAIRE ---
     window.processPhoto = (input) => {
         const reader = new FileReader();
         reader.onload = (e) => { currentPhoto = e.target.result; document.getElementById('f-photo-preview').src = e.target.result; };
-        reader.readAsAsDataURL(input.files[0]);
+        reader.readAsDataURL(input.files[0]);
+    };
+
+    window.addNoteRow = () => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td>`;
+        document.getElementById('f-sc-notes-body').appendChild(tr);
+    };
+
+    window.calcMoy = () => {
+        let pts = 0, coefs = 0;
+        document.querySelectorAll('#f-sc-notes-body tr').forEach(tr => {
+            const c = parseFloat(tr.querySelector('.n-coef').value) || 0;
+            const v = parseFloat(tr.querySelector('.n-val').value) || 0;
+            pts += (v * c); coefs += c;
+        });
+        document.getElementById('f-sc-moy-gen').innerText = coefs > 0 ? (pts / coefs).toFixed(2) : "0.00";
     };
 
     window.autoIMC = () => {
@@ -256,8 +280,9 @@
 
     window.openForm = (key = null) => {
         editKey = key;
-        const inputs = document.querySelectorAll('#sec-form input, #sec-form select');
+        const inputs = document.querySelectorAll('#sec-form input, #sec-form select, #sec-form textarea');
         inputs.forEach(i => i.value = "");
+        document.getElementById('f-sc-notes-body').innerHTML = `<tr><td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td></tr>`;
         document.getElementById('f-photo-preview').src = "https://via.placeholder.com/150";
         currentPhoto = "";
         
@@ -268,99 +293,80 @@
             document.getElementById('f-dob').value = b.dob;
             document.getElementById('f-age').value = b.age;
             document.getElementById('f-adresse').value = b.adresse;
-            document.getElementById('f-ba-date').value = b.ba_date || "";
             document.getElementById('f-ba-site').value = b.ba_site || "";
+            document.getElementById('f-fa-tut-nom').value = b.fa_tut_nom || "";
+            document.getElementById('f-sc-niv').value = b.sc_niv || "";
             document.getElementById('f-photo-preview').src = b.photo || "";
             currentPhoto = b.photo;
-            document.getElementById('form-mode-title').innerText = "Modification Dossier";
-        } else {
-            document.getElementById('form-mode-title').innerText = "Admission Bénéficiaire";
         }
         showSection('form');
     };
 
     window.submitForm = () => {
         const site = document.getElementById('f-ba-site').value;
-        const activ = document.getElementById('f-ba-activ').value;
+        const notes = [];
+        document.querySelectorAll('#f-sc-notes-body tr').forEach(tr => {
+            notes.push({ 
+                mat: tr.querySelector('.n-mat').value, 
+                coef: tr.querySelector('.n-coef').value, 
+                val: tr.querySelector('.n-val').value 
+            });
+        });
 
         const data = {
+            id: editKey ? benefsData.find(x => x.key === editKey).id : "BA-" + Date.now().toString().slice(-4),
             nom: document.getElementById('f-nom').value,
             sexe: document.getElementById('f-sexe').value,
             dob: document.getElementById('f-dob').value,
             age: document.getElementById('f-age').value,
             adresse: document.getElementById('f-adresse').value,
-            acte: document.getElementById('f-acte').value,
-            ba_date: document.getElementById('f-ba-date').value,
-            ba_resp: document.getElementById('f-ba-resp').value,
             ba_site: site,
-            ba_activ: activ,
+            ba_date: document.getElementById('f-ba-date').value,
             ba_social: document.getElementById('f-ba-social').value,
+            sc_niv: document.getElementById('f-sc-niv').value,
+            sc_moy: document.getElementById('f-sc-moy-gen').innerText,
+            sc_notes: notes,
+            fa_tut_nom: document.getElementById('f-fa-tut-nom').value,
+            fa_habitat: document.getElementById('f-fa-habitat').value,
             sa_imc: document.getElementById('f-sa-imc').value,
-            tut_nom: document.getElementById('f-so-tut-nom').value,
-            photo: currentPhoto,
-            id: editKey ? benefsData.find(x => x.key === editKey).id : "BA-" + Date.now().toString().slice(-4)
+            photo: currentPhoto
         };
 
-        // Sauvegarde des listes déroulantes
         if(site) set(ref(db, 'lists/sites/' + site.replace(/\./g, '')), site);
-        if(activ) set(ref(db, 'lists/activs/' + activ.replace(/\./g, '')), activ);
-
-        const targetRef = editKey ? ref(db, `beneficiaires/${editKey}`) : push(ref(db, 'beneficiaires'));
-        set(targetRef, data).then(() => {
-            alert("Enregistrement réussi !");
-            showSection('list');
-        });
+        const target = editKey ? ref(db, `beneficiaires/${editKey}`) : push(ref(db, 'beneficiaires'));
+        set(target, data).then(() => { alert("Succès !"); showSection('list'); });
     };
 
-    // --- SYNCHRONISATION ---
     function syncAll() {
-        // Beneficiaires
         onValue(ref(db, 'beneficiaires'), (snap) => {
             const data = snap.val();
             benefsData = data ? Object.keys(data).map(k => ({...data[k], key: k})) : [];
             renderTable();
         });
 
-        // Listes Dynamiques
-        onValue(ref(db, 'lists'), (snap) => {
-            const l = snap.val();
-            if(l) {
-                const fill = (id, obj) => {
-                    const el = document.getElementById(id);
-                    el.innerHTML = obj ? Object.values(obj).map(v => `<option value="${v}">`).join('') : '';
-                };
-                fill('list-sites', l.sites);
-                fill('list-activs', l.activs);
-            }
-        });
-
-        // Paramètres
         onValue(ref(db, 'settings'), (snap) => {
             const s = snap.val();
             if(s) {
-                document.getElementById('ong-name-display').innerText = s.name || "";
-                document.getElementById('ong-addr-display').innerText = s.addr || "";
-                document.getElementById('nav-logo').src = s.logo || "";
-                document.getElementById('login-logo').src = s.logo || "";
+                document.getElementById('ong-name-display').innerText = s.name;
+                document.getElementById('ong-addr-display').innerText = s.addr;
+                document.getElementById('nav-logo').src = s.logo;
+                document.getElementById('login-logo').src = s.logo;
                 document.getElementById('login-logo').classList.remove('hidden');
-                document.documentElement.style.setProperty('--p-col', s.color || "#0056b3");
-                document.getElementById('set-name').value = s.name || "";
-                document.getElementById('set-addr').value = s.addr || "";
-                document.getElementById('set-color').value = s.color || "#0056b3";
+                document.documentElement.style.setProperty('--p-col', s.color);
             }
-     });
-    }
+        });
 
+        onValue(ref(db, 'lists/sites'), (snap) => {
+            const s = snap.val();
+            document.getElementById('list-sites').innerHTML = s ? Object.values(s).map(v => `<option value="${v}">`).join('') : '';
+        });
+    }
     window.renderTable = () => {
         const term = document.getElementById('search-bar').value.toLowerCase();
-        const body = document.getElementById('main-table-body');
-        body.innerHTML = benefsData.filter(b => b.nom.toLowerCase().includes(term) || b.id.includes(term))
+        document.getElementById('main-table-body').innerHTML = benefsData.filter(b => b.nom.toLowerCase().includes(term))
             .map(b => `
                 <tr class="border-b hover:bg-slate-50 transition">
-                    <td class="py-4 flex items-center gap-3">
-                        <img src="${b.photo || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-full object-cover">
-                        <span class="font-bold">${b.nom}</span>
-                    </td>
+                    <td class="py-4 flex items-center gap-3"><img src="${b.photo}" class="w-10 h-10 rounded-full object-cover font-bold">${b.nom}</td>
                     <td class="text-xs font-mono text-blue-600">${b.id}</td>
                     <td class="text-xs">${b.ba_site || '-'}</td>
                     <td class="text-right space-x-2">
@@ -368,59 +374,39 @@
                         <button onclick="openForm('${b.key}')" class="p-2 text-slate-400 hover:text-green-600"><i class="fas fa-edit"></i></button>
                         <button onclick="deleteBenef('${b.key}')" class="p-2 text-slate-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
                     </td>
-                </tr>
-            `).join('');
+                </tr>`).join('');
     };
 
-    // --- ACTIONS BOUTONS ---
     window.viewBenef = (key) => {
         const b = benefsData.find(x => x.key === key);
         document.getElementById('view-content').innerHTML = `
-            <div class="flex flex-col md:flex-row gap-10 items-start">
-                <img src="${b.photo}" class="w-48 h-48 rounded-[2.5rem] object-cover border-8 border-slate-50 shadow-xl">
-                <div class="flex-1">
-                    <h2 class="text-3xl font-black uppercase mb-1">${b.nom}</h2>
-                    <p class="text-blue-600 font-bold tracking-widest mb-6">${b.id} • ${b.sexe}</p>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="p-4 bg-slate-50 rounded-2xl">
-                            <p class="text-[10px] font-black uppercase text-slate-400">Suivi Scolaire/Social</p>
-                            <p class="mt-2 text-sm"><b>Site :</b> ${b.ba_site || '-'}</p>
-                            <p class="text-sm"><b>Social :</b> ${b.ba_social || '-'}</p>
-                        </div>
-                        <div class="p-4 bg-blue-50 rounded-2xl">
-                            <p class="text-[10px] font-black uppercase text-blue-400">Santé Initiale</p>
-                            <p class="mt-2 text-sm"><b>IMC :</b> ${b.sa_imc || '-'}</p>
-                            <p class="text-sm"><b>Tuteur :</b> ${b.tut_nom || '-'}</p>
-                        </div>
-                    </div>
+            <div class="flex gap-8 mb-8">
+                <img src="${b.photo}" class="w-32 h-32 rounded-3xl object-cover border-4 border-white shadow-lg">
+                <div>
+                    <h2 class="text-2xl font-black uppercase">${b.nom}</h2>
+                    <p class="text-blue-600 font-bold">${b.id} | ${b.sc_niv}</p>
                 </div>
             </div>
-        `;
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="p-5 bg-slate-50 rounded-2xl">
+                    <h4 class="font-black text-xs uppercase mb-3 text-blue-600">Suivi Scolaire</h4>
+                    <p><b>Moyenne :</b> ${b.sc_moy || '0.00'}/20</p>
+                    <p><b>Site BA :</b> ${b.ba_site}</p>
+                </div>
+                <div class="p-5 bg-blue-50 rounded-2xl">
+                    <h4 class="font-black text-xs uppercase mb-3 text-blue-600">Famille & Habitat</h4>
+                    <p><b>Tuteur :</b> ${b.fa_tut_nom}</p>
+                    <p><b>Habitat :</b> ${b.fa_habitat}</p>
+                </div>
+            </div>`;
         document.getElementById('modal-view').classList.remove('hidden');
     };
 
     window.closeModal = () => document.getElementById('modal-view').classList.add('hidden');
-
-    window.deleteBenef = (key) => { if(confirm("Supprimer ce bénéficiaire définitivement ?")) remove(ref(db, `beneficiaires/${key}`)); };
-
-    // --- LOGIQUE PARAMÈTRES ---
-    window.uploadLogo = (input) => {
-        const reader = new FileReader();
-        reader.onload = (e) => { document.getElementById('nav-logo').src = e.target.result; };
-        reader.readAsDataURL(input.files[0]);
-    };
-    window.saveSettings = () => {
-        const s = {
-            name: document.getElementById('set-name').value,
-            addr: document.getElementById('set-addr').value,
-            color: document.getElementById('set-color').value,
-            logo: document.getElementById('nav-logo').src
-        };
-        set(ref(db, 'settings'), s).then(() => alert("Paramètres mis à jour !"));
-    };
-
+    window.deleteBenef = (key) => { if(confirm("Supprimer ?")) remove(ref(db, `beneficiaires/${key}`)); };
+    window.uploadLogo = (input) => { const r = new FileReader(); r.onload = (e) => document.getElementById('nav-logo').src = e.target.result; r.readAsDataURL(input.files[0]); };
+    window.saveSettings = () => { set(ref(db, 'settings'), { name: document.getElementById('set-name').value, addr: document.getElementById('set-addr').value, color: document.getElementById('set-color').value, logo: document.getElementById('nav-logo').src }).then(() => alert("Sauvé")); };
     window.updateTheme = (color) => { document.documentElement.style.setProperty('--p-col', color); };
-
 </script>
 </body>
 </html>
