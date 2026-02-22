@@ -3,146 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BEL AVENIR - Gestion Sociale Complète</title>
+    <title>BEL AVENIR - Gestion Centre Social & Holistique</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
-        :root { --ong-orange: #ff8c00; --ong-dark: #0f172a; }
-        body { font-family: 'Poppins', sans-serif; background: #f8fafc; color: var(--ong-dark); }
-        .card { background: white; border-radius: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #f1f5f9; }
-        .input-field { border: 1.5px solid #cbd5e1; padding: 0.6rem 1rem; border-radius: 0.75rem; width: 100%; font-size: 0.875rem; }
-        .label-text { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 0.2rem; display: block; }
-        .btn-primary { background: var(--ong-orange); color: white; font-weight: 700; border-radius: 0.75rem; transition: 0.3s; cursor: pointer; border: none; }
+        :root { --ong-blue: #0056b3; --ong-orange: #ff8c00; --ong-green: #10b981; }
+        body { font-family: 'Poppins', sans-serif; background: #f8fafc; color: #1e293b; }
+        .card { background: white; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); transition: 0.3s; }
+        .input-field { border: 1.5px solid #e2e8f0; padding: 12px; border-radius: 12px; width: 100%; transition: 0.3s; font-size: 0.875rem; }
+        .input-field:focus { border-color: var(--ong-blue); outline: none; box-shadow: 0 0 0 4px rgba(0,86,179,0.1); }
+        .btn-primary { background: var(--ong-blue); color: white; border-radius: 12px; font-weight: 700; transition: 0.3s; cursor: pointer; border: none; }
+        .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
+        .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
         .section-pane { display: none; }
-        .section-pane.active { display: block; }
-        #auth-overlay { position: fixed; inset: 0; background: var(--ong-dark); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .check-group { display: flex; flex-wrap: wrap; gap: 1rem; background: #f1f5f9; padding: 0.75rem; border-radius: 0.75rem; }
+        .section-pane.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Overlay de sécurité */
+        #auth-gate { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div id="auth-overlay">
+<div id="auth-gate">
     <div class="bg-white p-10 rounded-[2rem] shadow-2xl w-full max-w-md text-center">
-        <h2 class="text-2xl font-black mb-2">ONG BEL AVENIR</h2>
-        <p class="text-slate-400 text-sm mb-8">Veuillez vous identifier pour accéder au système</p>
-        <div class="space-y-4">
-            <input type="email" id="auth-email" placeholder="Email Firebase" class="input-field">
-            <input type="password" id="auth-pass" placeholder="Mot de passe" class="input-field">
-            <button id="login-btn" class="btn-primary w-full py-4 uppercase text-xs tracking-widest">Entrer</button>
+        <img src="https://ongbelavenir.org/wp-content/uploads/2019/02/logo-bel-avenir.png" class="h-12 mx-auto mb-6" alt="Logo">
+        <h2 class="text-2xl font-black mb-2 text-slate-800 uppercase">Accès Sécurisé</h2>
+        <p class="text-slate-400 text-xs mb-8">Identification requise pour le personnel de l'ONG</p>
+        <div class="space-y-4 text-left">
+            <div>
+                <label class="text-[10px] font-black uppercase text-slate-500 ml-1">Email professionnel</label>
+                <input type="email" id="login-email" class="input-field" placeholder="admin@ongbelavenir.org">
+            </div>
+            <div>
+                <label class="text-[10px] font-black uppercase text-slate-500 ml-1">Mot de passe</label>
+                <input type="password" id="login-pass" class="input-field" placeholder="••••••••">
+            </div>
+            <button id="btn-do-login" class="w-full btn-primary py-4 uppercase text-xs tracking-widest shadow-xl">Entrer dans le système</button>
         </div>
-        <p id="auth-error" class="text-red-500 text-xs mt-4 hidden"></p>
+        <p id="error-msg" class="text-red-500 text-[10px] mt-4 font-bold hidden"></p>
     </div>
 </div>
 
-<nav id="main-nav" class="bg-white border-b sticky top-0 z-50 hidden">
-    <div class="container mx-auto px-6 h-20 flex justify-between items-center">
-        <div class="flex gap-4">
-            <button onclick="showSection('home')" class="font-bold text-slate-600">ACCUEIL</button>
-            <button onclick="showSection('form')" class="font-bold text-slate-600">NOUVELLE FICHE</button>
-            <button onclick="showSection('list')" class="font-bold text-slate-600">REGISTRE</button>
+<nav class="bg-white border-b border-slate-200 p-4 sticky top-0 z-50 hidden" id="main-nav">
+    <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <img src="https://ongbelavenir.org/wp-content/uploads/2019/02/logo-bel-avenir.png" alt="Logo" class="h-10">
+            <div>
+                <h1 class="font-black text-blue-800 leading-tight uppercase text-sm">Bel Avenir</h1>
+                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Toliara, Madagascar</p>
+            </div>
         </div>
-        <button id="logout-btn" class="text-red-500 font-bold text-xs">DÉCONNEXION</button>
+        <div class="flex gap-4">
+            <button onclick="showSection('list')" class="text-[10px] font-black uppercase text-slate-500 hover:text-blue-600">Registre</button>
+            <button id="logout-btn" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase">Déconnexion</button>
+        </div>
     </div>
 </nav>
 
-<div class="container mx-auto px-6 py-10">
-    <section id="sec-home" class="section-pane active">
-        <div class="card p-10 text-center">
-            <h1 class="text-5xl font-black mb-4">Système Social <span class="text-orange-500">Expert</span></h1>
-            <p class="text-slate-500">Session active pour l'UID : <span id="user-uid" class="font-bold text-orange-600"></span></p>
-        </div>
-    </section>
+<div class="container mx-auto mt-8 px-4 pb-20 hidden" id="app-content">
+    <div class="flex flex-col lg:flex-row gap-8">
+        <aside class="lg:w-1/4 space-y-4">
+            <div class="card p-4 space-y-2">
+                <button onclick="showSection('list')" class="w-full text-left p-4 rounded-xl font-bold text-xs uppercase flex items-center gap-3 hover:bg-blue-50 hover:text-blue-600 transition"><i class="fas fa-list"></i> Liste des bénéficiaires</button>
+                <button onclick="prepareNew()" class="w-full text-left p-4 rounded-xl font-bold text-xs uppercase flex items-center gap-3 hover:bg-green-50 hover:text-green-600 transition"><i class="fas fa-plus-circle"></i> Nouvelle Fiche</button>
+            </div>
+            <div class="p-6 bg-blue-900 text-white rounded-3xl">
+                <p class="text-[9px] font-black uppercase opacity-60">Session active</p>
+                <p id="user-email-display" class="font-bold text-xs truncate mt-1"></p>
+            </div>
+        </aside>
 
-    <section id="sec-form" class="section-pane">
-        <div class="card p-10 border-t-8 border-orange-500">
-            <h2 class="text-2xl font-black mb-8 uppercase">Dossier du Bénéficiaire</h2>
-            
-            <div class="grid lg:grid-cols-4 gap-8 mb-12">
-                <div class="text-center">
-                    <img id="preview-photo" src="https://via.placeholder.com/150" class="w-40 h-40 rounded-[2rem] mx-auto object-cover border-4 border-slate-100 shadow-lg mb-4">
-                    <input type="file" id="benef-photo" class="hidden" onchange="previewPhoto(this)">
-                    <button onclick="document.getElementById('benef-photo').click()" class="text-[10px] font-black text-blue-600 uppercase">Charger Photo ID</button>
-                    <input type="text" id="f-id" placeholder="ID (ex: BA-100)" class="input-field mt-4 text-center font-bold text-orange-600">
+        <main class="lg:w-3/4">
+            <div id="sec-list" class="section-pane active card p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-black uppercase">Registre Social</h2>
+                    <input type="text" id="search-bar" placeholder="Rechercher nom..." class="input-field max-w-xs" oninput="renderTable()">
                 </div>
-                <div class="lg:col-span-3 grid md:grid-cols-3 gap-6">
-                    <div class="md:col-span-2"><label class="label-text">Nom et Prénom</label><input type="text" id="f-nom" class="input-field"></div>
-                    <div><label class="label-text">Sexe</label><select id="f-sexe" class="input-field"><option>Masculin</option><option>Féminin</option></select></div>
-                    <div><label class="label-text">Date & Lieu de naissance (Vers)</label><input type="text" id="f-dob" class="input-field"></div>
-                    <div><label class="label-text">Âge</label><input type="number" id="f-age" class="input-field"></div>
-                    <div class="md:col-span-3">
-                        <label class="label-text">Acte de naissance</label>
-                        <div class="check-group">
-                            <label><input type="radio" name="acte" value="En possède"> En possède</label>
-                            <label><input type="radio" name="acte" value="N'en possède pas"> N'en possède pas</label>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-[10px] uppercase text-slate-400 border-b">
+                                <th class="pb-4">Bénéficiaire</th>
+                                <th class="pb-4">Projet</th>
+                                <th class="pb-4">Santé</th>
+                                <th class="pb-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body" class="text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="sec-form" class="section-pane card p-8">
+                <div class="flex justify-between items-center mb-8 pb-4 border-b">
+                    <h2 class="text-xl font-black uppercase">Dossier Individuel</h2>
+                    <button onclick="saveData()" class="btn-primary px-8 py-2 text-[10px] uppercase shadow-md">Enregistrer</button>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <img id="prev-photo" src="https://via.placeholder.com/150" class="w-40 h-40 mx-auto rounded-3xl object-cover mb-4 border-4 border-white shadow-lg">
+                        <input type="file" id="f-photo" class="hidden" accept="image/*" onchange="previewImg(this)">
+                        <button onclick="document.getElementById('f-photo').click()" class="text-[10px] font-black text-blue-600 uppercase">Charger Photo</button>
+                        <input type="text" id="f-id" class="input-field mt-4 text-center font-bold text-orange-500" placeholder="ID (ex: BA-2024)">
+                    </div>
+
+                    <div class="md:col-span-2 grid md:grid-cols-2 gap-4">
+                        <div><label class="text-[10px] font-black uppercase text-slate-400">Nom Complet</label><input type="text" id="f-nom" class="input-field"></div>
+                        <div><label class="text-[10px] font-black uppercase text-slate-400">Sexe</label><select id="f-sexe" class="input-field"><option>Masculin</option><option>Féminin</option></select></div>
+                        <div><label class="text-[10px] font-black uppercase text-slate-400">Date de naissance</label><input type="text" id="f-dob" class="input-field" placeholder="JJ/MM/AAAA"></div>
+                        <div><label class="text-[10px] font-black uppercase text-slate-400">Site d'inscription</label><input type="text" id="f-site" class="input-field"></div>
+                    </div>
+                </div>
+
+                <div class="mt-12 grid md:grid-cols-2 gap-8">
+                    <div class="p-6 bg-blue-50 rounded-3xl">
+                        <h3 class="text-xs font-black uppercase mb-4 text-blue-800">Suivi Scolaire</h3>
+                        <input type="text" id="f-niv" placeholder="Dernier Niveau" class="input-field mb-2 bg-white">
+                        <input type="text" id="f-moy" placeholder="Moyenne Générale" class="input-field bg-white">
+                    </div>
+                    <div class="p-6 bg-green-50 rounded-3xl">
+                        <h3 class="text-xs font-black uppercase mb-4 text-green-800">Suivi Médical</h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="f-poids" placeholder="Poids (kg)" class="input-field bg-white">
+                            <input type="number" id="f-taille" placeholder="Taille (cm)" class="input-field bg-white">
+                        </div>
+                    </div>
+                    <div class="md:col-span-2 p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                        <h3 class="text-xs font-black uppercase mb-4">Contexte Familial</h3>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <input type="text" id="f-tut" placeholder="Nom du tuteur" class="input-field bg-white">
+                            <input type="text" id="f-contact" placeholder="Contact Tuteur" class="input-field bg-white">
+                            <input type="number" id="f-enfants" placeholder="Enfants à charge" class="input-field bg-white">
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="bg-slate-50 p-8 rounded-3xl mb-12">
-                <h3 class="text-orange-600 font-black text-xs uppercase mb-6">Situation Scolaire</h3>
-                <div class="grid md:grid-cols-4 gap-4 mb-6">
-                    <input type="text" id="f-last-niv" placeholder="Dernier Niveau" class="input-field">
-                    <input type="text" id="f-last-moy" placeholder="Moyenne Générale" class="input-field">
-                    <input type="text" id="f-insc-site" placeholder="Site d'inscription" class="input-field">
-                    <select id="f-bull" class="input-field"><option>Bulletin Oui</option><option>Bulletin Non</option></select>
-                </div>
-                
-                <div class="bg-white p-6 rounded-2xl border mb-6">
-                    <table class="w-full text-xs">
-                        <thead><tr class="text-slate-400 font-black text-left"><th>Matière</th><th>Coef</th><th>Note /20</th><th>Obs</th></tr></thead>
-                        <tbody id="notes-body">
-                            <tr>
-                                <td><input type="text" class="input-field n-mat"></td>
-                                <td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td>
-                                <td><input type="number" class="input-field n-val" oninput="calcMoy()"></td>
-                                <td><input type="text" class="input-field n-obs"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <button onclick="addNoteRow()" class="mt-4 text-[10px] font-black text-blue-600 uppercase">+ Ajouter une matière</button>
-                    <div class="mt-4 text-right font-black">Moyenne : <span id="auto-moy">0.00</span> / 20</div>
-                </div>
-            </div>
-
-            <div class="grid lg:grid-cols-2 gap-8 mb-12">
-                <div class="p-6 border rounded-3xl">
-                    <h3 class="text-xs font-black uppercase mb-4">Situation Familiale</h3>
-                    <input type="text" id="f-tut-nom" placeholder="Nom du tuteur" class="input-field mb-2">
-                    <input type="text" id="f-tut-contact" placeholder="Contact Tuteur" class="input-field mb-2">
-                    <input type="text" id="f-tut-prof" placeholder="Profession Tuteur" class="input-field">
-                </div>
-                <div class="p-6 border rounded-3xl">
-                    <h3 class="text-xs font-black uppercase mb-4">Habitat & Maison</h3>
-                    <input type="text" id="f-maison-etat" placeholder="État de la maison" class="input-field mb-2">
-                    <input type="text" id="f-maison-nat" placeholder="Nature (Matériaux)" class="input-field mb-2">
-                    <textarea id="f-obs" placeholder="Autres observations..." class="input-field h-20"></textarea>
-                </div>
-            </div>
-
-            <button onclick="saveData()" class="btn-primary w-full py-5 uppercase shadow-xl">Enregistrer le dossier complet</button>
-        </div>
-    </section>
-
-    <section id="sec-list" class="section-pane">
-        <h2 class="text-3xl font-black mb-8 uppercase">Registre des Bénéficiaires</h2>
-        <div class="card overflow-hidden">
-            <table class="w-full text-left text-sm">
-                <thead class="bg-slate-50 border-b text-[10px] font-black text-slate-400">
-                    <tr><th class="p-5">Bénéficiaire</th><th>Identifiant</th><th>Sexe</th><th class="text-right p-5">Actions</th></tr>
-                </thead>
-                <tbody id="table-body"></tbody>
-            </table>
-        </div>
-    </section>
+        </main>
+    </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+    // Configuration Firebase Originale
     const firebaseConfig = {
         apiKey: "AIzaSyDKNy6B4aifDrVDsglGhvU_eCMZOZF6q8g",
         authDomain: "bel-avenir-social-db-878f7.firebaseapp.com",
@@ -158,90 +167,98 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
     let photoData = "";
+    let dataList = [];
 
-    // GESTION CONNEXION
-    document.getElementById('login-btn').addEventListener('click', async () => {
-        const email = document.getElementById('auth-email').value;
-        const pass = document.getElementById('auth-pass').value;
+    // --- SYSTÈME D'AUTHENTIFICATION RÉEL ---
+    document.getElementById('btn-do-login').addEventListener('click', async () => {
+        const email = document.getElementById('login-email').value;
+        const pass = document.getElementById('login-pass').value;
+        const err = document.getElementById('error-msg');
         try {
             await signInWithEmailAndPassword(auth, email, pass);
+            err.classList.add('hidden');
         } catch (e) {
-            document.getElementById('auth-error').innerText = "Accès refusé.";
-            document.getElementById('auth-error').classList.remove('hidden');
+            err.innerText = "Accès refusé. Email ou code incorrect.";
+            err.classList.remove('hidden');
         }
     });
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('auth-gate').style.display = 'none';
             document.getElementById('main-nav').classList.remove('hidden');
-            document.getElementById('user-uid').innerText = user.uid;
+            document.getElementById('app-content').classList.remove('hidden');
+            document.getElementById('user-email-display').innerText = user.email;
             loadData();
         } else {
-            document.getElementById('auth-overlay').style.display = 'flex';
+            document.getElementById('auth-gate').style.display = 'flex';
         }
     });
 
     document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-    // FONCTIONS FORMULAIRE
+    // --- GESTION DES DONNÉES (CONTENU ORIGINAL) ---
     window.showSection = (id) => {
         document.querySelectorAll('.section-pane').forEach(s => s.classList.remove('active'));
-        document.getElementById('sec-'+id).classList.add('active');
+        document.getElementById('sec-' + id).classList.add('active');
     };
 
-    window.previewPhoto = (input) => {
+    window.previewImg = (input) => {
         const reader = new FileReader();
-        reader.onload = (e) => { photoData = e.target.result; document.getElementById('preview-photo').src = e.target.result; };
+        reader.onload = (e) => { photoData = e.target.result; document.getElementById('prev-photo').src = e.target.result; };
         reader.readAsDataURL(input.files[0]);
     };
 
-    window.addNoteRow = () => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td>`;
-        document.getElementById('notes-body').appendChild(tr);
-    };
-
-    window.calcMoy = () => {
-        let pts = 0, coefs = 0;
-        document.querySelectorAll('#notes-body tr').forEach(tr => {
-            const c = parseFloat(tr.querySelector('.n-coef').value) || 0;
-            const v = parseFloat(tr.querySelector('.n-val').value) || 0;
-            pts += (v * c); coefs += c;
-        });
-        const m = coefs > 0 ? (pts / coefs).toFixed(2) : "0.00";
-        document.getElementById('auto-moy').innerText = m;
-        return m;
+    window.prepareNew = () => {
+        photoData = "";
+        document.getElementById('prev-photo').src = "https://via.placeholder.com/150";
+        document.querySelectorAll('.input-field').forEach(i => i.value = "");
+        showSection('form');
     };
 
     window.saveData = () => {
         const payload = {
-            id: document.getElementById('f-id').value,
-            nom: document.getElementById('f-nom').value,
-            sexe: document.getElementById('f-sexe').value,
-            photo: photoData,
-            scol: { niv: document.getElementById('f-last-niv').value, moy: document.getElementById('auto-moy').innerText, site: document.getElementById('f-insc-site').value },
-            famille: { tuteur: document.getElementById('f-tut-nom').value, contact: document.getElementById('f-tut-contact').value },
-            habitat: { etat: document.getElementById('f-maison-etat').value, nature: document.getElementById('f-maison-nat').value }
+            f_id: document.getElementById('f-id').value,
+            f_nom: document.getElementById('f-nom').value,
+            f_sexe: document.getElementById('f-sexe').value,
+            f_dob: document.getElementById('f-dob').value,
+            f_site: document.getElementById('f-site').value,
+            f_photo: photoData,
+            scolaire: { niv: document.getElementById('f-niv').value, moy: document.getElementById('f-moy').value },
+            sante: { poids: document.getElementById('f-poids').value, taille: document.getElementById('f-taille').value },
+            social: { tuteur: document.getElementById('f-tut').value, tel: document.getElementById('f-contact').value, enf: document.getElementById('f-enfants').value }
         };
-        push(ref(db, 'beneficiaires'), payload).then(() => { alert("Dossier sauvegardé !"); showSection('list'); });
+        push(ref(db, 'beneficiaires'), payload).then(() => { alert("Dossier Enregistré !"); showSection('list'); });
     };
 
     function loadData() {
         onValue(ref(db, 'beneficiaires'), (snap) => {
-            const data = snap.val();
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = "";
-            if(data) {
-                Object.keys(data).forEach(k => {
-                    const b = data[k];
-                    tbody.innerHTML += `<tr class="border-b"><td class="p-4 flex items-center gap-2"><img src="${b.photo}" class="w-10 h-10 rounded-full object-cover"><b>${b.nom}</b></td><td>${b.id}</td><td>${b.sexe}</td><td class="text-right p-4"><button onclick="deleteB('${k}')" class="text-red-400"><i class="fas fa-trash"></i></button></td></tr>`;
-                });
-            }
+            const val = snap.val();
+            dataList = val ? Object.keys(val).map(k => ({...val[k], key: k})) : [];
+            renderTable();
         });
     }
 
-    window.deleteB = (key) => { if(confirm("Supprimer ce dossier ?")) remove(ref(db, 'beneficiaires/'+key)); };
+    window.renderTable = () => {
+        const term = document.getElementById('search-bar').value.toLowerCase();
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = dataList.filter(b => b.f_nom.toLowerCase().includes(term))
+            .map(b => `
+                <tr class="border-b hover:bg-slate-50 transition">
+                    <td class="py-4 flex items-center gap-3">
+                        <img src="${b.f_photo || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-xl object-cover">
+                        <div><p class="font-black text-slate-700">${b.f_nom}</p><p class="text-[9px] text-slate-400 font-bold uppercase">${b.f_id}</p></div>
+                    </td>
+                    <td class="text-xs font-bold text-slate-500">${b.f_site || '-'}</td>
+                    <td><span class="status-pill bg-blue-100 text-blue-700">${b.sante.poids || '0'}kg</span></td>
+                    <td class="text-right">
+                        <button onclick="deleteRow('${b.key}')" class="text-red-400 hover:text-red-600 p-2"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+    };
+
+    window.deleteRow = (key) => { if(confirm("Supprimer ce dossier ?")) remove(ref(db, 'beneficiaires/' + key)); };
 
 </script>
 </body>
