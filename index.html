@@ -10,19 +10,20 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
         :root { --p-col: #0056b3; --s-col: #ff8c00; }
         body { font-family: 'Poppins', sans-serif; background: #f1f5f9; color: #1e293b; transition: 0.3s; }
-        .card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; }
+        .card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; overflow: hidden; }
         .input-field { border: 1.5px solid #cbd5e1; padding: 10px; border-radius: 10px; width: 100%; font-size: 0.85rem; }
         .label-text { font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .btn-nav { padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; transition: 0.3s; color: #64748b; }
+        .btn-nav { padding: 12px 18px; border-radius: 12px; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; transition: 0.3s; color: #64748b; }
         .btn-active { background: var(--p-col) !important; color: white !important; }
         .section-pane { display: none; }
         .section-pane.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* Sécurité : Overlay forcé */
         #auth-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        #app-content, #main-nav { display: none; }
+        #app-content, #main-nav { display: none; } /* Sécurité : caché par défaut */
         .dynamic-p { color: var(--p-col); }
         .dynamic-bg-p { background-color: var(--p-col); }
+        .tab-btn { padding: 10px 20px; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; border-bottom: 3px solid transparent; }
+        .tab-btn.active { border-bottom-color: var(--p-col); color: var(--p-col); }
     </style>
 </head>
 <body>
@@ -30,52 +31,53 @@
 <div id="auth-overlay">
     <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center">
         <img id="login-logo" src="" class="h-20 mx-auto mb-6 hidden">
-        <h2 class="text-xl font-black mb-2 uppercase">Système Bel Avenir</h2>
+        <h2 class="text-xl font-black mb-2 uppercase">Accès Sécurisé</h2>
         <div class="space-y-4 mt-8">
             <input type="email" id="auth-email" placeholder="Email" class="input-field text-center">
             <input type="password" id="auth-pass" placeholder="Mot de passe" class="input-field text-center">
             <button id="login-btn" class="w-full dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg">Connexion</button>
         </div>
-        <p id="auth-error" class="text-red-500 text-[10px] mt-4 hidden font-bold">Identifiants incorrects ou accès restreint.</p>
+        <p id="auth-error" class="text-red-500 text-[10px] mt-4 hidden font-bold">Identifiants incorrects.</p>
     </div>
 </div>
 
 <nav id="main-nav" class="bg-white border-b sticky top-0 z-50 p-4">
-    <div class="container mx-auto flex justify-between items-center">
+    <div class="container mx-auto flex flex-wrap justify-between items-center gap-4">
         <div class="flex items-center gap-4">
-            <img id="nav-logo" src="" class="h-12 object-contain">
+            <img id="nav-logo" src="" class="h-10 object-contain">
             <div>
-                <h1 id="ong-name-display" class="font-black dynamic-p leading-tight uppercase text-sm"></h1>
-                <p id="ong-addr-display" class="text-[9px] text-slate-400 font-bold uppercase tracking-widest"></p>
+                <h1 id="ong-name-display" class="font-black dynamic-p leading-tight uppercase text-xs"></h1>
+                <p id="ong-addr-display" class="text-[8px] text-slate-400 font-bold uppercase tracking-widest"></p>
             </div>
         </div>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-1">
             <button onclick="showSection('list')" class="btn-nav btn-active" id="nav-list">Registre</button>
             <button onclick="openForm()" class="btn-nav" id="nav-form">Nouvelle Fiche</button>
+            <button onclick="showSection('activites')" class="btn-nav" id="nav-activites">Activités</button>
             <button onclick="showSection('settings')" class="btn-nav" id="nav-settings"><i class="fas fa-cog"></i></button>
-            <button id="logout-btn" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-black text-[10px] uppercase">Quitter</button>
+            <button id="logout-btn" class="bg-red-50 text-red-600 px-3 py-2 rounded-lg font-black text-[9px] uppercase">Quitter</button>
         </div>
     </div>
 </nav>
 
-<div class="container mx-auto py-8 px-4" id="app-content">
+<div class="container mx-auto py-6 px-4" id="app-content">
     
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="card p-4 flex items-center gap-4"><div class="p-3 bg-blue-100 rounded-xl text-blue-600"><i class="fas fa-users"></i></div><div><p class="text-[10px] font-bold text-slate-400 uppercase">Total</p><h3 id="dash-total" class="font-black text-lg">0</h3></div></div>
+        <div class="card p-4 flex items-center gap-4"><div class="p-3 bg-green-100 rounded-xl text-green-600"><i class="fas fa-calendar-check"></i></div><div><p class="text-[10px] font-bold text-slate-400 uppercase">Activités</p><h3 id="dash-act" class="font-black text-lg">0</h3></div></div>
+        <div class="card p-4 flex items-center gap-4"><div class="p-3 bg-orange-100 rounded-xl text-orange-600"><i class="fas fa-exchange-alt"></i></div><div><p class="text-[10px] font-bold text-slate-400 uppercase">Mouvements</p><h3 id="dash-mov" class="font-black text-lg">0</h3></div></div>
+        <div class="card p-4 flex items-center gap-4"><div class="p-3 bg-red-100 rounded-xl text-red-600"><i class="fas fa-briefcase-medical"></i></div><div><p class="text-[10px] font-bold text-slate-400 uppercase">Médical</p><h3 id="dash-med" class="font-black text-lg">0</h3></div></div>
+    </div>
+
     <section id="sec-list" class="section-pane active">
-        <div class="card p-8 shadow-sm">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-                <h2 class="text-2xl font-black uppercase">Registre des Bénéficiaires</h2>
-                <input type="text" id="search-bar" oninput="renderTable()" placeholder="Rechercher un nom ou un ID..." class="input-field max-w-md">
+        <div class="card p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black uppercase">Registre Bénéficiaires</h2>
+                <input type="text" id="search-bar" oninput="renderTable()" placeholder="Rechercher..." class="input-field max-w-xs">
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
-                    <thead>
-                        <tr class="text-[10px] uppercase text-slate-400 border-b">
-                            <th class="pb-4">Bénéficiaire</th>
-                            <th class="pb-4">ID Code</th>
-                            <th class="pb-4">Projet/Site</th>
-                            <th class="pb-4 text-right">Actions</th>
-                        </tr>
-                    </thead>
+                    <thead><tr class="text-[10px] uppercase text-slate-400 border-b"><th class="pb-3">Nom</th><th class="pb-3">ID</th><th class="pb-3">Âge</th><th class="pb-3 text-right">Actions</th></tr></thead>
                     <tbody id="main-table-body"></tbody>
                 </table>
             </div>
@@ -83,131 +85,150 @@
     </section>
 
     <section id="sec-form" class="section-pane">
-        <div class="card p-8 border-t-8 border-blue-600">
-            <div class="flex justify-between items-center mb-8 pb-4 border-b">
-                <h2 class="text-2xl font-black uppercase" id="form-mode-title">Admission Bénéficiaire</h2>
-                <button onclick="submitForm()" class="dynamic-bg-p text-white px-10 py-3 rounded-xl font-black uppercase text-xs shadow-md">Enregistrer le dossier</button>
+        <div class="card border-t-8 border-blue-600">
+            <div class="flex border-b overflow-x-auto bg-slate-50">
+                <button onclick="formTab('f-ident')" class="tab-btn active f-tab-nav">1. Identité</button>
+                <button onclick="formTab('f-suivi')" class="tab-btn f-tab-nav">2. Suivi BA</button>
+                <button onclick="formTab('f-scol')" class="tab-btn f-tab-nav">3. Scolarité</button>
+                <button onclick="formTab('f-med')" class="tab-btn f-tab-nav">4. Médical</button>
+                <button onclick="formTab('f-mov')" class="tab-btn f-tab-nav">5. Mouvement</button>
             </div>
 
-            <div class="grid lg:grid-cols-4 gap-8 mb-10">
-                <div class="text-center">
-                    <img id="f-photo-preview" src="https://via.placeholder.com/150" class="w-40 h-40 rounded-[2rem] mx-auto object-cover border-4 border-slate-100 mb-2 shadow-inner">
-                    <input type="file" id="f-photo-input" class="hidden" onchange="processPhoto(this)">
-                    <button onclick="document.getElementById('f-photo-input').click()" class="text-[10px] font-black text-blue-600 uppercase">Charger Photo</button>
-                </div>
-                <div class="lg:col-span-3 grid md:grid-cols-3 gap-4">
-                    <div class="md:col-span-2"><label class="label-text">Nom et Prénom</label><input type="text" id="f-nom" class="input-field"></div>
-                    <div><label class="label-text">Sexe</label><select id="f-sexe" class="input-field"><option value="">Choisir...</option><option>Masculin</option><option>Féminin</option></select></div>
-                    <div><label class="label-text">Date de naissance</label><input type="date" id="f-dob-date" class="input-field" onchange="updateAgeAtInscription()"></div>
-                    <div><label class="label-text">Lieu de naissance</label><input type="text" id="f-lieu" class="input-field" placeholder="ex: Toliara"></div>
-                    <div><label class="label-text">Acte de naissance</label><select id="f-acte" class="input-field"><option value="">Choisir...</option><option>Oui</option><option>Non</option><option>Inconnu</option></select></div>
-                    <div class="md:col-span-3"><label class="label-text">Adresse Exacte</label><input type="text" id="f-adresse" class="input-field"></div>
-                </div>
-            </div>
-
-            <div class="p-6 bg-slate-50 rounded-3xl mb-10 border border-slate-200">
-                <h3 class="text-xs font-black uppercase mb-6 dynamic-p"><i class="fas fa-hand-holding-heart mr-2"></i> Section : Suivi Bel Avenir</h3>
-                <div class="grid md:grid-cols-3 gap-6 mb-6">
-                    <div><label class="label-text">Date d'inscription</label><input type="date" id="f-ba-date" class="input-field" onchange="updateAgeAtInscription()"></div>
-                    <div><label class="label-text">Responsable du dossier</label><input type="text" id="f-ba-resp" class="input-field"></div>
-                    <div>
-                        <label class="label-text">Site / Projet d'inscription</label>
-                        <input list="list-sites" id="f-ba-site" class="input-field">
-                        <datalist id="list-sites"></datalist>
-                    </div>
-                </div>
-                
-                <div class="p-4 bg-white rounded-2xl border border-slate-200 mb-6">
-                    <div class="flex items-center gap-4 mb-4">
-                        <label class="label-text">Réinscription ?</label>
-                        <input type="checkbox" id="f-ba-reins-check" onchange="toggleReins(this.checked)" class="w-5 h-5">
-                    </div>
-                    <div id="reins-details" class="hidden grid md:grid-cols-4 gap-4 animate-pulse">
-                        <div><label class="label-text">Ancien Projet</label><input type="text" id="f-ba-old-proj" class="input-field"></div>
-                        <div><label class="label-text">Date ancienne inscrip.</label><input type="date" id="f-ba-old-date" class="input-field"></div>
-                        <div><label class="label-text">Niveau à l'époque</label><input type="text" id="f-ba-old-niv" class="input-field"></div>
-                        <div><label class="label-text">Âge lors de l'ancienne inscrip.</label><input type="text" id="f-ba-old-age" class="input-field bg-slate-100" readonly></div>
+            <div class="p-8">
+                <div id="f-ident" class="form-sub-section">
+                    <div class="grid md:grid-cols-4 gap-8">
+                        <div class="text-center">
+                            <img id="f-photo-preview" src="https://via.placeholder.com/150" class="w-40 h-40 rounded-3xl mx-auto object-cover border-4 border-slate-100 mb-2">
+                            <input type="file" id="f-photo-input" class="hidden" onchange="processPhoto(this)">
+                            <button onclick="document.getElementById('f-photo-input').click()" class="text-[10px] font-black text-blue-600 uppercase">Photo</button>
+                        </div>
+                        <div class="md:col-span-3 grid md:grid-cols-3 gap-4">
+                            <div class="md:col-span-2"><label class="label-text">Nom complet</label><input type="text" id="f-nom" class="input-field"></div>
+                            <div><label class="label-text">Sexe</label><select id="f-sexe" class="input-field"><option>Masculin</option><option>Féminin</option></select></div>
+                            <div><label class="label-text">Né(e) le / Vers</label><input type="text" id="f-dob" class="input-field" placeholder="ex: 12/05/2010 ou vers 2010" oninput="calcAgeAuto(this.value)"></div>
+                            <div><label class="label-text">Âge Actuel</label><input type="text" id="f-age-calc" class="input-field bg-slate-100" readonly></div>
+                            <div><label class="label-text">Lieu</label><input type="text" id="f-lieu" class="input-field"></div>
+                            <div class="md:col-span-3"><label class="label-text">Adresse</label><input type="text" id="f-adr" class="input-field"></div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div><label class="label-text">Situation Sociale</label><select id="f-ba-social" class="input-field"><option>Vunérable</option><option>Orphelin</option><option>Handicap</option><option>Victime d'agression</option></select></div>
-                    <div><label class="label-text">Activités Parascolaires</label><input list="list-activ" id="f-ba-activ" class="input-field"><datalist id="list-activ"></datalist></div>
+                <div id="f-suivi" class="form-sub-section hidden">
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div><label class="label-text">Date Inscription</label><input type="date" id="f-ba-date" class="input-field"></div>
+                        <div><label class="label-text">Projet / Site</label><input list="list-sites" id="f-ba-site" class="input-field"></div>
+                        <div><label class="label-text">Responsable</label><input type="text" id="f-ba-resp" class="input-field"></div>
+                        <div class="md:col-span-3 flex items-center gap-4 p-4 bg-blue-50 rounded-xl">
+                            <label class="font-bold text-xs uppercase">Réinscription ?</label>
+                            <input type="checkbox" id="f-ba-reins" class="w-5 h-5">
+                            <input type="text" id="f-ba-reins-prec" placeholder="Précisez l'ancien projet..." class="input-field flex-1">
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="p-6 border rounded-3xl mb-10">
-                <h3 class="text-xs font-black uppercase mb-4"><i class="fas fa-graduation-cap mr-2"></i> Suivi Scolaire & Bulletin</h3>
-                <div class="grid md:grid-cols-4 gap-4 mb-6">
-                    <div><label class="label-text">Niveau Actuel</label><input type="text" id="f-sc-niv" class="input-field"></div>
-                    <div><label class="label-text">Établissement</label><input type="text" id="f-sc-ecole" class="input-field"></div>
-                    <div><label class="label-text">Redoublant(e)</label><select id="f-sc-red" class="input-field"><option>Non</option><option>Oui</option></select></div>
-                    <div><label class="label-text">Bulletin disponible</label><select id="f-sc-bull" class="input-field"><option>Oui</option><option>Non</option></select></div>
+                <div id="f-scol" class="form-sub-section hidden">
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div><label class="label-text">Niveau</label><input type="text" id="f-sc-niv" class="input-field"></div>
+                        <div><label class="label-text">École</label><input type="text" id="f-sc-ecole" class="input-field"></div>
+                        <div><label class="label-text">Période Filtre</label><select id="f-sc-per" class="input-field"><option>Bimestre 1</option><option>Trimestre 1</option><option>Annuel</option></select></div>
+                    </div>
+                    <table class="w-full text-xs">
+                        <thead><tr class="text-left opacity-50"><th>Matière</th><th>Note /20</th><th>Observations</th></tr></thead>
+                        <tbody id="f-sc-notes">
+                            <tr><td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-val"></td><td><input type="text" class="input-field n-obs"></td></tr>
+                        </tbody>
+                    </table>
+                    <button onclick="addNoteRow()" class="mt-4 text-[10px] font-black text-blue-600 uppercase">+ Matière</button>
                 </div>
-                <table class="w-full text-xs mb-4">
-                    <thead><tr class="text-left font-black opacity-50"><th>Matière</th><th>Coef</th><th>Note /20</th><th>Observations</th></tr></thead>
-                    <tbody id="f-sc-notes-body">
-                        <tr>
-                            <td><input type="text" class="input-field n-mat"></td>
-                            <td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td>
-                            <td><input type="number" class="input-field n-val" oninput="calcMoy()"></td>
-                            <td><input type="text" class="input-field n-obs"></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="flex justify-between items-center">
-                    <button onclick="addNoteRow()" class="text-[10px] font-black text-blue-600 uppercase">+ Ajouter Matière</button>
-                    <div class="font-black text-lg">Moyenne Générale : <span id="f-sc-moy-gen" class="dynamic-p">0.00</span></div>
-                </div>
-            </div>
 
-            <div class="p-6 bg-blue-50/50 rounded-3xl mb-10">
-                <h3 class="text-xs font-black uppercase mb-6"><i class="fas fa-users mr-2"></i> Situation Familiale Détaillée</h3>
-                <div class="grid md:grid-cols-3 gap-6 mb-6">
-                    <div><label class="label-text">Tuteur Légal</label><select id="f-fa-tut" class="input-field"><option>Mère</option><option>Père</option><option>Père & Mère</option><option>Autre</option></select></div>
-                    <div><label class="label-text">Nom du tuteur</label><input type="text" id="f-fa-tut-nom" class="input-field"></div>
-                    <div><label class="label-text">Contact Urgence</label><input type="text" id="f-fa-tut-tel" class="input-field"></div>
-                    <div><label class="label-text">Enfants à la maison</label><input type="number" id="f-fa-kids" class="input-field"></div>
-                    <div><label class="label-text">État de la maison</label><input type="text" id="f-fa-habitat" class="input-field"></div>
-                    <div><label class="label-text">Profession tuteur</label><input type="text" id="f-fa-job" class="input-field"></div>
+                <div id="f-med" class="form-sub-section hidden">
+                    <h4 class="text-xs font-black uppercase mb-4 text-red-500">Accompagnement Médical Périodique</h4>
+                    <div class="grid md:grid-cols-4 gap-4 mb-6">
+                        <div><label class="label-text">Poids (kg)</label><input type="number" id="f-m-poids" class="input-field"></div>
+                        <div><label class="label-text">Taille (cm)</label><input type="number" id="f-m-taille" class="input-field"></div>
+                        <div><label class="label-text">Température</label><input type="text" id="f-m-temp" class="input-field"></div>
+                        <div><label class="label-text">Tension</label><input type="text" id="f-m-tens" class="input-field"></div>
+                    </div>
+                    <label class="label-text">Diagnostic & Traitement</label>
+                    <textarea id="f-m-diag" class="input-field h-24 mb-4"></textarea>
                 </div>
-                <label class="label-text">Accord Parental & Observations Libres</label>
-                <textarea id="f-fa-accord" class="input-field h-20"></textarea>
-            </div>
 
-            <div class="p-6 border rounded-3xl mb-10">
-                <h3 class="text-xs font-black uppercase mb-4"><i class="fas fa-heartbeat mr-2"></i> Évaluation de santé initiale</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div><label class="label-text">Poids (kg)</label><input type="number" id="f-sa-poids" class="input-field" oninput="autoIMC()"></div>
-                    <div><label class="label-text">Taille (cm)</label><input type="number" id="f-sa-taille" class="input-field" oninput="autoIMC()"></div>
-                    <div><label class="label-text">IMC</label><input type="text" id="f-sa-imc" class="input-field bg-slate-100" readonly></div>
-                    <div><label class="label-text">Température (°C)</label><input type="number" id="f-sa-temp" class="input-field"></div>
+                <div id="f-mov" class="form-sub-section hidden">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div><label class="label-text">Type de mouvement</label><select id="f-mov-type" class="input-field"><option>Aucun</option><option>Transfert</option><option>Décharge</option><option>Quitter</option><option>Renvoyé</option></select></div>
+                        <div><label class="label-text">Date</label><input type="date" id="f-mov-date" class="input-field"></div>
+                        <div><label class="label-text">Origine</label><input type="text" id="f-mov-ori" class="input-field"></div>
+                        <div><label class="label-text">Destination (si transfert)</label><input type="text" id="f-mov-dest" class="input-field"></div>
+                        <div class="md:col-span-2"><label class="label-text">Motif / Justificatif</label><textarea id="f-mov-motif" class="input-field h-20"></textarea></div>
+                    </div>
+                </div>
+
+                <div class="mt-10 pt-6 border-t flex justify-end gap-4">
+                    <button onclick="showSection('list')" class="px-6 py-3 font-bold text-xs uppercase text-slate-400">Annuler</button>
+                    <button onclick="submitForm()" class="dynamic-bg-p text-white px-10 py-3 rounded-xl font-black uppercase text-xs shadow-lg">Enregistrer tout le dossier</button>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section id="sec-activites" class="section-pane">
+        <div class="card p-8">
+            <h2 class="text-xl font-black uppercase mb-6">Cadre Logique : Suivi Activités</h2>
+            <div class="grid md:grid-cols-4 gap-4 mb-8 p-6 bg-slate-50 rounded-2xl">
+                <div><label class="label-text">Date</label><input type="date" id="act-date" class="input-field"></div>
+                <div><label class="label-text">Type d'activité</label><input type="text" id="act-type" class="input-field"></div>
+                <div><label class="label-text">Heure Début/Fin</label><input type="text" id="act-h" class="input-field" placeholder="ex: 08h - 12h"></div>
+                <div><label class="label-text">Responsable</label><input type="text" id="act-resp" class="input-field"></div>
+                <div class="md:col-span-4"><button onclick="saveActivity()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black uppercase text-[10px]">Ajouter l'activité au registre</button></div>
+            </div>
+            <div id="activities-list" class="space-y-4"></div>
         </div>
     </section>
 
     <section id="sec-settings" class="section-pane">
-        <div class="card p-10">
-            <h2 class="text-2xl font-black uppercase mb-10">Configuration ONG</h2>
-            <div class="grid lg:grid-cols-2 gap-12">
-                <div class="space-y-6">
-                    <div><label class="label-text">Logo ONG</label><input type="file" onchange="uploadLogo(this)" class="input-field"></div>
-                    <div><label class="label-text">Nom ONG</label><input type="text" id="set-name" class="input-field"></div>
-                    <div><label class="label-text">Adresse</label><input type="text" id="set-addr" class="input-field"></div>
+        <div class="card p-8">
+            <h2 class="text-xl font-black uppercase mb-8">Personnalisation ONG</h2>
+            <div class="grid md:grid-cols-2 gap-10">
+                <div class="space-y-4">
+                    <div><label class="label-text">Logo</label><input type="file" onchange="uploadLogo(this)" class="input-field"></div>
+                    <div><label class="label-text">Nom</label><input type="text" id="set-name" class="input-field"></div>
+                    <div><label class="label-text">Adresse / Contact</label><input type="text" id="set-addr" class="input-field"></div>
+                    <div><label class="label-text">Couleur</label><input type="color" id="set-color" class="w-full h-12 rounded-xl cursor-pointer" onchange="updateTheme(this.value)"></div>
+                    <button onclick="saveSettings()" class="w-full dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-[10px] shadow-lg">Appliquer les modifications</button>
                 </div>
-                <div class="space-y-6">
-                    <div><label class="label-text">Couleur Thème</label><input type="color" id="set-color" class="w-full h-12 rounded-xl cursor-pointer" onchange="updateTheme(this.value)"></div>
-                    <button onclick="saveSettings()" class="w-full dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-xs shadow-lg">Sauvegarder</button>
+                <div class="bg-slate-50 rounded-3xl p-8 border border-dashed border-slate-300 flex items-center justify-center text-center">
+                    <p class="text-xs text-slate-400 font-bold uppercase">Les changements s'appliquent en temps réel pour tous les utilisateurs connectés.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <div id="modal-view" class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-4xl rounded-[2.5rem] p-10 max-h-[95vh] overflow-y-auto relative">
-            <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-400 hover:text-black transition"><i class="fas fa-times text-xl"></i></button>
-            <div id="view-content"></div>
+    <div id="modal-view" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white w-full max-w-5xl rounded-[2.5rem] h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+            <div class="p-8 border-b flex justify-between items-center bg-slate-50">
+                <div class="flex items-center gap-6">
+                    <img id="v-photo" class="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-md">
+                    <div>
+                        <h2 id="v-nom" class="text-2xl font-black uppercase"></h2>
+                        <p id="v-id" class="text-blue-600 font-black text-xs"></p>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-black"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+            
+            <div class="flex border-b">
+                <button onclick="viewTab('v-tab-1')" class="view-tab-btn active p-4 text-[10px] font-black uppercase">Identité & Social</button>
+                <button onclick="viewTab('v-tab-2')" class="view-tab-btn p-4 text-[10px] font-black uppercase">Scolarité</button>
+                <button onclick="viewTab('v-tab-3')" class="view-tab-btn p-4 text-[10px] font-black uppercase">Médical</button>
+                <button onclick="viewTab('v-tab-4')" class="view-tab-btn p-4 text-[10px] font-black uppercase">Mouvements</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-10">
+                <div id="v-tab-1" class="view-pane grid md:grid-cols-2 gap-8"></div>
+                <div id="v-tab-2" class="view-pane hidden"></div>
+                <div id="v-tab-3" class="view-pane hidden"></div>
+                <div id="v-tab-4" class="view-pane hidden"></div>
+            </div>
         </div>
     </div>
 
@@ -237,16 +258,6 @@
     let editKey = null;
 
     // --- SÉCURITÉ & AUTH ---
-    document.getElementById('login-btn').addEventListener('click', async () => {
-        const email = document.getElementById('auth-email').value;
-        const pass = document.getElementById('auth-pass').value;
-        try { 
-            await signInWithEmailAndPassword(auth, email, pass);
-        } catch (e) { 
-            document.getElementById('auth-error').classList.remove('hidden'); 
-        }
-    });
-
     onAuthStateChanged(auth, (user) => {
         if (user) {
             document.getElementById('auth-overlay').style.display = 'none';
@@ -255,56 +266,37 @@
             syncAll();
         } else {
             document.getElementById('auth-overlay').style.display = 'flex';
-            document.getElementById('main-nav').style.display = 'none';
-            document.getElementById('app-content').style.display = 'none';
         }
+    });
+
+    document.getElementById('login-btn').addEventListener('click', async () => {
+        const e = document.getElementById('auth-email').value, p = document.getElementById('auth-pass').value;
+        try { await signInWithEmailAndPassword(auth, e, p); } catch { document.getElementById('auth-error').classList.remove('hidden'); }
     });
 
     document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-    // --- LOGIQUE FORMULAIRE ---
-    window.toggleReins = (val) => {
-        document.getElementById('reins-details').classList.toggle('hidden', !val);
-        if(val) updateAgeAtInscription();
-    };
-
-    window.updateAgeAtInscription = () => {
-        const dob = new Date(document.getElementById('f-dob-date').value);
-        const oldDate = new Date(document.getElementById('f-ba-old-date').value);
-        if(!isNaN(dob) && !isNaN(oldDate)) {
-            let age = oldDate.getFullYear() - dob.getFullYear();
-            const m = oldDate.getMonth() - dob.getMonth();
-            if (m < 0 || (m === 0 && oldDate.getDate() < dob.getDate())) age--;
-            document.getElementById('f-ba-old-age').value = age + " ans";
+    // --- LOGIQUE CALCULS ---
+    window.calcAgeAuto = (str) => {
+        if(!str) return;
+        const year = str.match(/\d{4}/);
+        if(year) {
+            const age = new Date().getFullYear() - parseInt(year[0]);
+            document.getElementById('f-age-calc').value = age + " ans" + (str.toLowerCase().includes('vers') ? ' (Environ)' : '');
         }
     };
 
-    window.calcMoy = () => {
-        let pts = 0, coefs = 0;
-        document.querySelectorAll('#f-sc-notes-body tr').forEach(tr => {
-            const c = parseFloat(tr.querySelector('.n-coef').value) || 0;
-            const v = parseFloat(tr.querySelector('.n-val').value) || 0;
-            pts += (v * c); coefs += c;
-        });
-        document.getElementById('f-sc-moy-gen').innerText = coefs > 0 ? (pts / coefs).toFixed(2) : "0.00";
-    };
-
-    window.autoIMC = () => {
-        const p = parseFloat(document.getElementById('f-sa-poids').value);
-        const t = parseFloat(document.getElementById('f-sa-taille').value) / 100;
-        if(p && t) document.getElementById('f-sa-imc').value = (p / (t*t)).toFixed(1);
+    window.formTab = (id) => {
+        document.querySelectorAll('.form-sub-section').forEach(s => s.classList.add('hidden'));
+        document.querySelectorAll('.f-tab-nav').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.remove('hidden');
+        event.target.classList.add('active');
     };
 
     window.addNoteRow = () => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td>`;
-        document.getElementById('f-sc-notes-body').appendChild(tr);
-    };
-
-    window.processPhoto = (input) => {
-        const reader = new FileReader();
-        reader.onload = (e) => { currentPhoto = e.target.result; document.getElementById('f-photo-preview').src = e.target.result; };
-        reader.readAsDataURL(input.files[0]);
+        tr.innerHTML = `<td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-val"></td><td><input type="text" class="input-field n-obs"></td>`;
+        document.getElementById('f-sc-notes').appendChild(tr);
     };
 
     // --- ACTIONS ---
@@ -312,52 +304,73 @@
         document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('btn-active'));
         document.getElementById('sec-'+id).classList.add('active');
-        document.getElementById('nav-'+id).classList.add('btn-active');
+        if(document.getElementById('nav-'+id)) document.getElementById('nav-'+id).classList.add('btn-active');
     };
 
     window.openForm = (key = null) => {
         editKey = key;
-        document.querySelectorAll('#sec-form input, #sec-form select, #sec-form textarea').forEach(i => i.value = "");
-        document.getElementById('f-ba-reins-check').checked = false;
-        document.getElementById('reins-details').classList.add('hidden');
+        document.querySelectorAll('#sec-form input, #sec-form textarea').forEach(i => i.value = "");
+        document.getElementById('f-sc-notes').innerHTML = `<tr><td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-val"></td><td><input type="text" class="input-field n-obs"></td></tr>`;
         document.getElementById('f-photo-preview').src = "https://via.placeholder.com/150";
         currentPhoto = "";
         
         if(key) {
             const b = benefsData.find(x => x.key === key);
-            document.getElementById('f-nom').value = b.nom;
-            document.getElementById('f-sexe').value = b.sexe;
-            document.getElementById('f-dob-date').value = b.dob;
-            document.getElementById('f-ba-site').value = b.ba_site || "";
-            document.getElementById('f-photo-preview').src = b.photo || "";
-            currentPhoto = b.photo;
+            document.getElementById('f-nom').value = b.nom || "";
+            document.getElementById('f-dob').value = b.dob || "";
+            document.getElementById('f-age-calc').value = b.age || "";
+            document.getElementById('f-photo-preview').src = b.photo || "https://via.placeholder.com/150";
+            currentPhoto = b.photo || "";
         }
         showSection('form');
+        formTab('f-ident');
     };
 
     window.submitForm = () => {
-        const data = {
-            id: editKey ? benefsData.find(x => x.key === editKey).id : "BA-" + Date.now().toString().slice(-4),
-            nom: document.getElementById('f-nom').value,
-            sexe: document.getElementById('f-sexe').value,
-            dob: document.getElementById('f-dob-date').value,
-            ba_site: document.getElementById('f-ba-site').value,
-            ba_is_reins: document.getElementById('f-ba-reins-check').checked,
-            ba_old_proj: document.getElementById('f-ba-old-proj').value,
-            ba_old_age: document.getElementById('f-ba-old-age').value,
-            sc_moy: document.getElementById('f-sc-moy-gen').innerText,
-            photo: currentPhoto
-        };
-        const refPath = editKey ? ref(db, `beneficiaires/${editKey}`) : push(ref(db, 'beneficiaires'));
-        set(refPath, data).then(() => { alert("Enregistré !"); showSection('list'); });
-    };
+        const notes = [];
+        document.querySelectorAll('#f-sc-notes tr').forEach(tr => {
+            notes.push({ mat: tr.querySelector('.n-mat').value, val: tr.querySelector('.n-val').value, obs: tr.querySelector('.n-obs').value });
+        });
 
+        const data = {
+            id: editKey ? benefsData.find(x => x.key === editKey).id : "BA-" + Date.now().toString().slice(-5),
+            nom: document.getElementById('f-nom').value,
+            dob: document.getElementById('f-dob').value,
+            age: document.getElementById('f-age-calc').value,
+            sexe: document.getElementById('f-sexe').value,
+            photo: currentPhoto,
+            ba_site: document.getElementById('f-ba-site').value,
+            sc_notes: notes,
+            med_poids: document.getElementById('f-m-poids').value,
+            med_diag: document.getElementById('f-m-diag').value,
+            mov_type: document.getElementById('f-mov-type').value,
+            mov_date: document.getElementById('f-mov-date').value
+        };
+
+        const target = editKey ? ref(db, `beneficiaires/${editKey}`) : push(ref(db, 'beneficiaires'));
+        set(target, data).then(() => { alert("Dossier enregistré avec succès !"); showSection('list'); });
+    };
+    // --- SYNC & RENDER ---
     function syncAll() {
         onValue(ref(db, 'beneficiaires'), (snap) => {
             const d = snap.val();
             benefsData = d ? Object.keys(d).map(k => ({...d[k], key: k})) : [];
             renderTable();
+            updateDash();
         });
+
+        onValue(ref(db, 'activites'), (snap) => {
+            const d = snap.val();
+            const list = document.getElementById('activities-list');
+            list.innerHTML = d ? Object.values(d).reverse().map(a => `
+                <div class="bg-white p-4 border rounded-xl flex justify-between items-center">
+                    <div><span class="text-[10px] font-black text-blue-600 uppercase">${a.date}</span><h4 class="font-bold">${a.type}</h4></div>
+                    <div class="text-right text-xs text-slate-400 font-bold">${a.h} • Resp: ${a.resp}</div>
+                </div>
+            `).join('') : '<p class="text-center text-slate-300 py-10">Aucune activité enregistrée</p>';
+            document.getElementById('dash-act').innerText = d ? Object.keys(d).length : 0;
+        });
+
         onValue(ref(db, 'settings'), (snap) => {
             const s = snap.val();
             if(s) {
@@ -369,16 +382,24 @@
             }
         });
     }
+
+    function updateDash() {
+        document.getElementById('dash-total').innerText = benefsData.length;
+        document.getElementById('dash-mov').innerText = benefsData.filter(b => b.mov_type !== 'Aucun').length;
+        document.getElementById('dash-med').innerText = benefsData.filter(b => b.med_diag).length;
+    }
+
     window.renderTable = () => {
-        const term = document.getElementById('search-bar').value.toLowerCase();
-        document.getElementById('main-table-body').innerHTML = benefsData.filter(b => b.nom.toLowerCase().includes(term))
+        const q = document.getElementById('search-bar').value.toLowerCase();
+        document.getElementById('main-table-body').innerHTML = benefsData.filter(b => b.nom.toLowerCase().includes(q) || b.id.includes(q))
             .map(b => `
-                <tr class="border-b hover:bg-slate-50">
-                    <td class="py-4 flex items-center gap-3"><img src="${b.photo}" class="w-10 h-10 rounded-full object-cover"><b>${b.nom}</b></td>
-                    <td class="text-xs font-mono">${b.id}</td>
-                    <td>${b.ba_site || '-'}</td>
-                    <td class="text-right">
+                <tr class="border-b hover:bg-slate-50 transition">
+                    <td class="py-4 font-bold text-slate-700">${b.nom}</td>
+                    <td class="text-xs text-blue-600 font-mono">${b.id}</td>
+                    <td class="text-xs">${b.age || '-'}</td>
+                    <td class="text-right space-x-1">
                         <button onclick="viewBenef('${b.key}')" class="p-2 text-slate-400 hover:text-blue-600"><i class="fas fa-eye"></i></button>
+                        <button onclick="openForm('${b.key}')" class="p-2 text-slate-400 hover:text-green-600"><i class="fas fa-edit"></i></button>
                         <button onclick="deleteBenef('${b.key}')" class="p-2 text-slate-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`).join('');
@@ -386,34 +407,78 @@
 
     window.viewBenef = (key) => {
         const b = benefsData.find(x => x.key === key);
-        document.getElementById('view-content').innerHTML = `
-            <div class="flex gap-8 items-center mb-8">
-                <img src="${b.photo}" class="w-32 h-32 rounded-3xl object-cover shadow-lg">
-                <div>
-                    <h2 class="text-2xl font-black uppercase">${b.nom}</h2>
-                    <p class="text-blue-600 font-bold">${b.id}</p>
-                </div>
+        document.getElementById('v-photo').src = b.photo || "https://via.placeholder.com/150";
+        document.getElementById('v-nom').innerText = b.nom;
+        document.getElementById('v-id').innerText = b.id;
+
+        document.getElementById('v-tab-1').innerHTML = `
+            <div class="p-6 bg-slate-50 rounded-2xl">
+                <p class="label-text">Identité</p>
+                <p class="text-sm"><b>Sexe:</b> ${b.sexe}</p>
+                <p class="text-sm"><b>Né(e):</b> ${b.dob}</p>
+                <p class="text-sm"><b>Âge:</b> ${b.age}</p>
             </div>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="p-6 bg-slate-50 rounded-2xl">
-                    <h3 class="font-black text-xs uppercase mb-4 text-blue-600">Détails Bel Avenir</h3>
-                    <p><b>Réinscrit :</b> ${b.ba_is_reins ? 'OUI' : 'NON'}</p>
-                    <p><b>Ancien Projet :</b> ${b.ba_old_proj || '-'}</p>
-                    <p><b>Âge à l'inscription initiale :</b> ${b.ba_old_age || '-'}</p>
-                </div>
-                <div class="p-6 bg-blue-50 rounded-2xl">
-                    <h3 class="font-black text-xs uppercase mb-4 text-blue-600">Scolarité</h3>
-                    <p><b>Moyenne Générale :</b> ${b.sc_moy || '0.00'}/20</p>
-                </div>
+            <div class="p-6 bg-slate-50 rounded-2xl">
+                <p class="label-text">Suivi Bel Avenir</p>
+                <p class="text-sm"><b>Site:</b> ${b.ba_site || '-'}</p>
+                <p class="text-sm"><b>Inscription:</b> ${b.ba_date || '-'}</p>
             </div>`;
+
+        document.getElementById('v-tab-2').innerHTML = `
+            <h4 class="font-black text-xs uppercase mb-4">Relevé de notes périodique</h4>
+            <table class="w-full text-sm border-collapse">
+                ${b.sc_notes ? b.sc_notes.map(n => `<tr class="border-b"><td class="py-2"><b>${n.mat}</b></td><td class="text-blue-600">${n.val}/20</td><td class="italic text-slate-400">${n.obs}</td></tr>`).join('') : 'Aucune note'}
+            </table>`;
+
+        document.getElementById('v-tab-3').innerHTML = `
+            <div class="p-6 border-l-4 border-red-500 bg-red-50">
+                <h4 class="font-black text-xs uppercase text-red-600 mb-2">Dernier examen médical</h4>
+                <p class="text-sm"><b>Constantes:</b> ${b.med_poids}kg • ${b.med_diag || 'Aucun diagnostic saisi'}</p>
+            </div>`;
+
+        document.getElementById('v-tab-4').innerHTML = `
+            <div class="p-6 border-l-4 border-orange-500 bg-orange-50">
+                <h4 class="font-black text-xs uppercase text-orange-600 mb-2">Mouvement de dossier</h4>
+                <p class="text-sm"><b>Statut actuel:</b> ${b.mov_type || 'Actif'}</p>
+                <p class="text-sm"><b>Date mouvement:</b> ${b.mov_date || '-'}</p>
+            </div>`;
+
         document.getElementById('modal-view').classList.remove('hidden');
+        viewTab('v-tab-1');
+    };
+
+    window.viewTab = (id) => {
+        document.querySelectorAll('.view-pane').forEach(p => p.classList.add('hidden'));
+        document.querySelectorAll('.view-tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.remove('hidden');
+        event.target.classList.add('active');
     };
 
     window.closeModal = () => document.getElementById('modal-view').classList.add('hidden');
-    window.deleteBenef = (key) => { if(confirm("Supprimer ?")) remove(ref(db, `beneficiaires/${key}`)); };
-    window.uploadLogo = (input) => { const r = new FileReader(); r.onload = (e) => document.getElementById('nav-logo').src = e.target.result; r.readAsDataURL(input.files[0]); };
-    window.saveSettings = () => { set(ref(db, 'settings'), { name: document.getElementById('set-name').value, addr: document.getElementById('set-addr').value, color: document.getElementById('set-color').value, logo: document.getElementById('nav-logo').src }).then(() => alert("Ok")); };
+    window.deleteBenef = (key) => { if(confirm("Supprimer ce dossier définitivement ?")) remove(ref(db, `beneficiaires/${key}`)); };
+    window.saveActivity = () => {
+        const a = { date: document.getElementById('act-date').value, type: document.getElementById('act-type').value, h: document.getElementById('act-h').value, resp: document.getElementById('act-resp').value };
+        push(ref(db, 'activites'), a).then(() => { alert("Activité ajoutée !"); });
+    };
+
+    window.processPhoto = (input) => {
+        const r = new FileReader();
+        r.onload = (e) => { currentPhoto = e.target.result; document.getElementById('f-photo-preview').src = e.target.result; };
+        r.readAsDataURL(input.files[0]);
+    };
+
+    window.uploadLogo = (input) => {
+        const r = new FileReader();
+        r.onload = (e) => { document.getElementById('nav-logo').src = e.target.result; };
+        r.readAsDataURL(input.files[0]);
+    };
+
+    window.saveSettings = () => {
+        set(ref(db, 'settings'), { name: document.getElementById('set-name').value, addr: document.getElementById('set-addr').value, color: document.getElementById('set-color').value, logo: document.getElementById('nav-logo').src }).then(() => alert("Paramètres mis à jour !"));
+    };
+
     window.updateTheme = (c) => { document.documentElement.style.setProperty('--p-col', c); };
+
 </script>
 </body>
 </html>
