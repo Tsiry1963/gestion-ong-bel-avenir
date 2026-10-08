@@ -1,718 +1,5614 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BEL AVENIR - Gestion Sociale Expert V2</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
-        :root { --p-col: #0056b3; --s-col: #ff8c00; --stat-stable: #10b981; --stat-watch: #f59e0b; --stat-crit: #ef4444; }
-        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; color: #1e293b; transition: 0.3s; overflow-x: hidden; }
-        .card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .input-field { border: 1.5px solid #cbd5e1; padding: 10px; border-radius: 10px; width: 100%; font-size: 0.85rem; outline: none; transition: 0.2s; }
-        .input-field:focus { border-color: var(--p-col); box-shadow: 0 0 0 3px rgba(0,86,179,0.1); }
-        .label-text { font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .btn-nav { padding: 10px 15px; border-radius: 10px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; transition: 0.3s; color: #64748b; display: flex; align-items: center; gap: 8px; }
-        .btn-active { background: var(--p-col) !important; color: white !important; }
-        .section-pane { display: none; }
-        .section-pane.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        #auth-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: white; border-right: 1px solid #e2e8f0; z-index: 40; transition: 0.3s; }
-        .main-content { margin-left: 260px; padding: 20px; transition: 0.3s; }
-        .dynamic-p { color: var(--p-col); }
-        .dynamic-bg-p { background-color: var(--p-col); }
-        .sub-tab { padding: 12px 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; border-bottom: 3px solid transparent; cursor: pointer; color: #94a3b8; }
-        .sub-tab.active { border-color: var(--p-col); color: var(--p-col); background: rgba(0,86,179,0.05); }
-        .badge { padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; }
-        @media (max-width: 1024px) { .sidebar { left: -260px; } .main-content { margin-left: 0; } .sidebar.open { left: 0; } }
-    </style>
-</head>
-<body>
 
-<div id="auth-overlay">
-    <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center">
-        <img id="login-logo" src="" class="h-20 mx-auto mb-6 hidden">
-        <h2 class="text-xl font-black mb-2 uppercase">Authentification Sociale</h2>
-        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-8">ONG BEL AVENIR</p>
-        <div class="space-y-4">
-            <input type="email" id="auth-email" placeholder="Email professionnel" class="input-field text-center">
-            <input type="password" id="auth-pass" placeholder="Mot de passe" class="input-field text-center">
-            <button id="login-btn" class="w-full dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg hover:opacity-90 transition">Accéder au système</button>
-        </div>
-        <p id="auth-error" class="text-red-500 text-[10px] mt-4 hidden font-bold">Accès refusé. Identifiants incorrects.</p>
-    </div>
-</div>
+<meta charset="UTF-8">
 
-<div id="app-wrapper" class="hidden">
-    <aside class="sidebar" id="sidebar">
-        <div class="p-6 border-b">
-            <div class="flex items-center gap-3">
-                <img id="nav-logo" src="" class="h-10 w-10 object-contain">
-                <div>
-                    <h2 class="font-black text-xs dynamic-p leading-none">BEL AVENIR</h2>
-                    <span class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Gestion Holistique</span>
-                </div>
-            </div>
-        </div>
-        <div class="p-4 space-y-1">
-            <p class="text-[9px] font-black text-slate-400 uppercase px-3 mb-2">Navigation</p>
-            <button onclick="showSection('dash')" class="btn-nav w-full btn-active" id="nav-dash"><i class="fas fa-chart-line"></i> Tableaux de Bord</button>
-            <button onclick="showSection('list')" class="btn-nav w-full" id="nav-list"><i class="fas fa-users"></i> Bénéficiaires <span id="cnt-benef" class="badge bg-slate-100 ml-auto">0</span></button>
-            <button onclick="showSection('act')" class="btn-nav w-full" id="nav-act"><i class="fas fa-calendar-check"></i> Suivi Activités</button>
-            <button onclick="showSection('med')" class="btn-nav w-full" id="nav-med"><i class="fas fa-hand-holding-medical"></i> Médical</button>
-            <button onclick="showSection('scol')" class="btn-nav w-full" id="nav-scol"><i class="fas fa-graduation-cap"></i> Scolaire</button>
-            <button onclick="showSection('mouv')" class="btn-nav w-full" id="nav-mouv"><i class="fas fa-folder-open"></i> Administratif</button>
-            
-            <div class="pt-6">
-                <p class="text-[9px] font-black text-slate-400 uppercase px-3 mb-2">Système</p>
-                <button onclick="showSection('settings')" class="btn-nav w-full" id="nav-settings"><i class="fas fa-cog"></i> Paramètres</button>
-                <button id="logout-btn" class="btn-nav w-full text-red-500"><i class="fas fa-power-off"></i> Déconnexion</button>
-            </div>
-        </div>
-    </aside>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-    <main class="main-content">
-        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-2xl border">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="lg:hidden p-2 text-slate-600"><i class="fas fa-bars"></i></button>
-                <h2 id="page-title" class="font-black uppercase text-sm tracking-widest">Dashboard Global</h2>
-            </div>
-            <div class="flex items-center gap-6">
-                <div class="text-right hidden md:block">
-                    <p id="user-display" class="text-[10px] font-black uppercase">Social User</p>
-                    <p id="ong-name-display" class="text-[8px] text-slate-400 font-bold"></p>
-                </div>
-                <button onclick="openForm()" class="dynamic-bg-p text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase shadow-lg">+ Nouveau Dossier</button>
-            </div>
-        </header>
+<meta name="theme-color" content="#5b4bdb">
 
-        <section id="sec-dash" class="section-pane active">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <div class="card p-6 border-l-4 border-blue-600">
-                    <div class="flex justify-between items-start">
-                        <div><p class="label-text">Bénéficiaires Actifs</p><h3 id="stat-total" class="text-3xl font-black">0</h3></div>
-                        <i class="fas fa-user-check text-blue-100 text-3xl"></i>
-                    </div>
-                </div>
-                <div class="card p-6 border-l-4 border-green-500">
-                    <div><p class="label-text">Répartition Genre</p><div class="flex gap-4 mt-2"><span class="text-xs font-bold">M: <span id="stat-m">0</span></span><span class="text-xs font-bold">F: <span id="stat-f">0</span></span></div></div>
-                </div>
-                <div class="card p-6 border-l-4 border-orange-500">
-                    <div><p class="label-text">Taux de présence</p><h3 class="text-3xl font-black">84%</h3></div>
-                </div>
-                <div class="card p-6 border-l-4 border-red-500">
-                    <div><p class="label-text">Urgences Médicales</p><h3 class="text-3xl font-black text-red-500">0</h3></div>
-                </div>
-            </div>
-            <div class="grid lg:grid-cols-2 gap-8">
-                <div class="card p-8"><h4 class="font-black uppercase text-xs mb-6">Mouvements de population</h4><canvas id="chart-mouv"></canvas></div>
-                <div class="card p-8"><h4 class="font-black uppercase text-xs mb-6">Répartition par Site</h4><canvas id="chart-sites"></canvas></div>
-            </div>
-        </section>
+<title>Livret de Famille Fanera</title>
 
-        <section id="sec-list" class="section-pane">
-            <div class="card p-8">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-                    <h2 class="text-xl font-black uppercase">Registre Holistique</h2>
-                    <div class="flex gap-2 w-full md:w-auto">
-                        <input type="text" id="search-bar" oninput="renderTable()" placeholder="Nom, ID, Site..." class="input-field max-w-xs">
-                        <select id="filter-site" onchange="renderTable()" class="input-field w-32"><option value="">Tous Sites</option></select>
-                        <select id="filter-statut" onchange="renderTable()" class="input-field w-32"><option value="">Tous Statuts</option><option>Actif</option><option>Transféré</option><option>Quitté</option></select>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="text-[10px] uppercase text-slate-400 border-b">
-                                <th class="pb-4">Bénéficiaire</th>
-                                <th class="pb-4">ID Unique</th>
-                                <th class="pb-4">Projet/Site</th>
-                                <th class="pb-4">Cycle</th>
-                                <th class="pb-4">Statut</th>
-                                <th class="pb-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="main-table-body"></tbody>
-                    </table>
-                </div>
-                <div class="mt-6 flex justify-between items-center">
-                    <p class="text-[10px] font-bold text-slate-400">Affichage de <span id="table-count">0</span> bénéficiaires</p>
-                    <div class="flex gap-2"><button class="p-2 border rounded-lg bg-slate-50"><i class="fas fa-file-excel text-green-600"></i></button><button class="p-2 border rounded-lg bg-slate-50"><i class="fas fa-file-pdf text-red-600"></i></button></div>
-                </div>
-            </div>
-        </section>
+<style>
 
-        <section id="sec-form" class="section-pane">
-            <div class="card p-8 border-t-8 border-blue-600">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h2 class="text-2xl font-black uppercase" id="form-mode-title">Admission Bénéficiaire</h2>
-                        <p class="text-[10px] font-bold text-slate-400">ID GÉNÉRÉ: <span id="f-id-preview" class="text-blue-600">---</span></p>
-                    </div>
-                    <div class="flex gap-3">
-                        <button onclick="showSection('list')" class="px-6 py-3 rounded-xl font-black uppercase text-xs border">Annuler</button>
-                        <button onclick="submitForm()" class="dynamic-bg-p text-white px-10 py-3 rounded-xl font-black uppercase text-xs shadow-md">Enregistrer le dossier</button>
-                    </div>
-                </div>
+/* =========================================================
+   VARIABLES
+========================================================= */
 
-                <div class="flex border-b mb-8 overflow-x-auto scrollbar-hide">
-                    <button onclick="showFormTab('ft-ident')" class="sub-tab active" id="btn-ft-ident">1. Identité & Santé</button>
-                    <button onclick="showFormTab('ft-ba')" class="sub-tab" id="btn-ft-ba">2. Suivi Bel Avenir</button>
-                    <button onclick="showFormTab('ft-scol')" class="sub-tab" id="btn-ft-scol">3. Scolarité & Notes</button>
-                    <button onclick="showFormTab('ft-fam')" class="sub-tab" id="btn-ft-fam">4. Situation Familiale</button>
-                    <button onclick="showFormTab('ft-accord')" class="sub-tab" id="btn-ft-accord">5. Accord & Validation</button>
-                </div>
+:root{
 
-                <div id="form-tabs-content">
-                    <div id="ft-ident" class="form-tab-pane">
-                        <div class="grid lg:grid-cols-4 gap-8">
-                            <div class="text-center">
-                                <div class="relative inline-block">
-                                    <img id="f-photo-preview" src="https://via.placeholder.com/150" class="w-48 h-48 rounded-[2.5rem] mx-auto object-cover border-4 border-white shadow-xl mb-4">
-                                    <button onclick="document.getElementById('f-photo-input').click()" class="absolute bottom-6 right-2 bg-blue-600 text-white p-3 rounded-full shadow-lg"><i class="fas fa-camera"></i></button>
-                                </div>
-                                <input type="file" id="f-photo-input" class="hidden" onchange="processPhoto(this)">
-                                <div class="p-4 bg-slate-50 rounded-2xl mt-4">
-                                    <label class="label-text">État Nutritionnel (IMC)</label>
-                                    <h4 id="f-imc-val" class="text-xl font-black">-</h4>
-                                </div>
-                            </div>
-                            <div class="lg:col-span-3 space-y-6">
-                                <div class="grid md:grid-cols-3 gap-4">
-                                    <div class="md:col-span-2"><label class="label-text">Nom et Prénom Complet *</label><input type="text" id="f-nom" class="input-field font-bold" required></div>
-                                    <div><label class="label-text">Sexe *</label><select id="f-sexe" class="input-field" onchange="generateID()" required><option value="">Choisir...</option><option value="M">Masculin</option><option value="F">Féminin</option></select></div>
-                                    <div><label class="label-text">Date de naissance</label><div class="flex gap-1"><input type="text" id="f-dob-vers" placeholder="Vers" class="w-16 input-field"><input type="date" id="f-dob-date" class="input-field" onchange="updateAge()"></div></div>
-                                    <div><label class="label-text">Âge Actuel</label><input type="text" id="f-age-calc" class="input-field bg-slate-100 font-black" readonly></div>
-                                    <div><label class="label-text">Acte de naissance</label><select id="f-acte" class="input-field"><option>OUI</option><option>NON</option><option>NE SAIT PAS</option></select></div>
-                                </div>
-                                <div class="grid md:grid-cols-4 gap-4 p-6 bg-red-50 rounded-3xl">
-                                    <div class="md:col-span-4 font-black text-[10px] text-red-600 uppercase mb-2">Évaluation de santé initiale</div>
-                                    <div><label class="label-text">Poids (kg)</label><input type="number" id="f-sa-poids" class="input-field" oninput="autoIMC()"></div>
-                                    <div><label class="label-text">Taille (cm)</label><input type="number" id="f-sa-taille" class="input-field" oninput="autoIMC()"></div>
-                                    <div><label class="label-text">Température</label><input type="number" id="f-sa-temp" class="input-field"></div>
-                                    <div><label class="label-text">État d'hygiène</label><select id="f-sa-hyg" class="input-field"><option>Bon</option><option>Moyen</option><option>Précaire</option></select></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    --primary:#5b4bdb;
+    --primary-dark:#4638bd;
+    --primary-light:#eeeaff;
 
-                    <div id="ft-ba" class="form-tab-pane hidden">
-                        <div class="grid md:grid-cols-3 gap-6">
-                            <div><label class="label-text">Code Projet *</label><input type="text" id="f-ba-proj-code" placeholder="ex: OCN" class="input-field font-black uppercase" oninput="generateID()" required></div>
-                            <div><label class="label-text">Date d'inscription</label><input type="date" id="f-ba-date" class="input-field"></div>
-                            <div><label class="label-text">Site / Projet d'accueil</label><input list="list-sites" id="f-ba-site" class="input-field"><datalist id="list-sites"></datalist></div>
-                            <div><label class="label-text">Responsable Saisie</label><input type="text" id="f-ba-resp" class="input-field"></div>
-                            <div><label class="label-text">Situation Sociale</label><select id="f-ba-social" class="input-field"><option>Vulnerable</option><option>Orphelin</option><option>Handicap</option><option>Victime d'agression</option></select></div>
-                            <div class="flex items-end pb-2"><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="f-ba-reins" class="w-5 h-5 accent-blue-600"> <span class="label-text mb-0">Réinscription ?</span></label></div>
-                        </div>
-                    </div>
+    --secondary:#00a884;
+    --secondary-dark:#008f70;
 
-                    <div id="ft-scol" class="form-tab-pane hidden">
-                        <div class="grid md:grid-cols-4 gap-4 mb-6 p-6 bg-blue-50 rounded-3xl">
-                            <div><label class="label-text">Niveau Actuel</label><select id="f-sc-niv" class="input-field" onchange="autoCycle()"><option>CP</option><option>CE1</option><option>CE2</option><option>CM1</option><option>CM2</option><option>6ème</option><option>5ème</option><option>4ème</option><option>3ème</option><option>2nde</option><option>1ère</option><option>Tle</option></select></div>
-                            <div><label class="label-text">Établissement</label><input type="text" id="f-sc-ecole" class="input-field"></div>
-                            <div><label class="label-text">Cycle Détecté</label><input type="text" id="f-sc-cycle" class="input-field bg-slate-200 font-bold" readonly></div>
-                            <div><label class="label-text">Statut</label><select id="f-sc-pass" class="input-field"><option>Passant(e)</option><option>Redoublant(e)</option></select></div>
-                        </div>
-                        <h4 class="label-text mb-4">Relevé de notes (Dernière année)</h4>
-                        <table class="w-full text-xs">
-                            <thead class="text-slate-400 uppercase"><tr><th class="pb-2 text-left">Matière</th><th class="pb-2 text-left">Coef</th><th class="pb-2 text-left">Note /20</th><th class="pb-2 text-left">Observation</th></tr></thead>
-                            <tbody id="f-sc-notes-body">
-                                <tr><td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td></tr>
-                            </tbody>
-                        </table>
-                        <div class="flex justify-between items-center mt-4">
-                            <button onclick="addNoteRow()" class="text-[10px] font-black text-blue-600 uppercase">+ Ajouter Matière</button>
-                            <div class="text-right">
-                                <p class="label-text">Moyenne Générale</p>
-                                <span id="f-sc-moy" class="text-2xl font-black dynamic-p">0.00</span>
-                            </div>
-                        </div>
-                    </div>
+    --danger:#e53935;
+    --danger-dark:#c62828;
 
-                    <div id="ft-fam" class="form-tab-pane hidden">
-                        <div class="grid md:grid-cols-3 gap-6">
-                            <div><label class="label-text">Tuteur Principal</label><select id="f-fa-tut-type" class="input-field"><option>Mère</option><option>Père</option><option>Père & Mère</option><option>Autre</option></select></div>
-                            <div><label class="label-text">Nom du tuteur</label><input type="text" id="f-fa-tut-nom" class="input-field"></div>
-                            <div><label class="label-text">Contact Urgence</label><input type="text" id="f-fa-tut-tel" class="input-field"></div>
-                            <div class="md:col-span-3"><label class="label-text">Nombre d'enfants à charge (M/F)</label><div class="flex gap-4"><input type="number" placeholder="Garçons" id="f-fa-kids-m" class="input-field"><input type="number" placeholder="Filles" id="f-fa-kids-f" class="input-field"></div></div>
-                        </div>
-                    </div>
+    --warning:#f59e0b;
 
-                    <div id="ft-accord" class="form-tab-pane hidden">
-                        <div class="p-8 border-2 border-dashed rounded-3xl">
-                            <h4 class="font-black uppercase text-center mb-6">Accord Parental & Engagement</h4>
-                            <textarea id="f-accord-txt" class="input-field h-40 mb-6" placeholder="Saisir les termes de l'accord parental ici..."></textarea>
-                            <div class="grid md:grid-cols-2 gap-10">
-                                <div class="text-center border-t pt-4"><p class="label-text">Signature Tuteur</p><div class="h-20 italic text-slate-300">Emplacement Signature</div></div>
-                                <div class="text-center border-t pt-4"><p class="label-text">Pour l'ONG BEL AVENIR</p><div class="h-20 italic text-slate-300">Cachet et Signature</div></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    --dark:#202124;
+    --text:#34363b;
+    --muted:#6b7280;
 
-        <section id="sec-act" class="section-pane">
-            <div class="card p-8">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-xl font-black uppercase">Feuille d'émargement & Activités</h2>
-                    <button onclick="toggleActForm()" class="dynamic-bg-p text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase">Nouvelle Activité</button>
-                </div>
-                <div id="act-form" class="hidden grid md:grid-cols-4 gap-4 p-6 bg-slate-50 rounded-3xl mb-8 border">
-                    <div class="md:col-span-2"><label class="label-text">Intitulé de l'activité / Projet</label><input type="text" id="act-title" class="input-field"></div>
-                    <div><label class="label-text">Site</label><input type="text" id="act-site" class="input-field"></div>
-                    <div><label class="label-text">Date</label><input type="date" id="act-date" class="input-field"></div>
-                    <div class="md:col-span-4"><label class="label-text">Classes Concernées</label>
-                        <div class="flex flex-wrap gap-4 mt-2" id="act-classes-check">
-                            <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" value="Primaire"> PRIMAIRE</label>
-                            <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" value="College"> COLLÈGE</label>
-                            <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" value="Lycee"> LYCÉE</label>
-                        </div>
-                    </div>
-                    <button onclick="generateAttendance()" class="md:col-span-4 bg-slate-800 text-white py-3 rounded-xl font-black uppercase text-[10px]">Générer liste de présence</button>
-                </div>
-                <div id="attendance-box" class="hidden">
-                    <div class="flex justify-between items-end mb-4">
-                        <h4 class="font-black uppercase text-xs">Appel des bénéficiaires (<span id="att-count">0</span>)</h4>
-                        <div class="text-right text-[10px] font-black uppercase">Présents: <span id="att-pres" class="text-green-600">0</span> | Taux: <span id="att-rate">0%</span></div>
-                    </div>
-                    <div class="max-h-96 overflow-y-auto border rounded-2xl p-4">
-                        <table class="w-full text-xs">
-                            <tbody id="attendance-list"></tbody>
-                        </table>
-                    </div>
-                    <button onclick="saveActivity()" class="w-full mt-4 dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-xs">Valider l'activité et l'appel</button>
-                </div>
-            </div>
-        </section>
+    --background:#f4f6fb;
+    --white:#ffffff;
 
-        <section id="sec-med" class="section-pane">
-            <div class="card p-8">
-                <h2 class="text-xl font-black uppercase mb-8">Dossier Médical Centralisé</h2>
-                <div class="grid md:grid-cols-4 gap-4 mb-8">
-                    <input type="text" id="med-search-id" placeholder="ID Bénéficiaire..." class="input-field">
-                    <button onclick="loadMedicalHistory()" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">Charger Historique</button>
-                </div>
-                <div id="med-history-container" class="space-y-4">
-                    <div class="p-20 text-center text-slate-300"><i class="fas fa-notes-medical text-5xl mb-4"></i><p class="font-bold text-xs uppercase">Sélectionner un bénéficiaire pour voir son suivi</p></div>
-                </div>
-            </div>
-        </section>
+    --border:#e1e4ea;
 
-        <section id="sec-mouv" class="section-pane">
-            <div class="card p-8">
-                <h2 class="text-xl font-black uppercase mb-8">Sorties & Transferts de Site</h2>
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-slate-50 rounded-3xl">
-                    <div><label class="label-text">ID Bénéficiaire</label><input type="text" id="mov-id" class="input-field font-black" onblur="checkBenefMov()"></div>
-                    <div><label class="label-text">Action</label><select id="mov-type" class="input-field" onchange="toggleMovDest()"><option>Transfert</option><option>Quitter</option><option>Renvoyer</option></select></div>
-                    <div id="mov-dest-box"><label class="label-text">Site de Destination</label><select id="mov-dest" class="input-field"></select></div>
-                    <div><label class="label-text">Date d'effet</label><input type="date" id="mov-date" class="input-field"></div>
-                    <div class="md:col-span-2"><label class="label-text">Motif officiel</label><input type="text" id="mov-reason" class="input-field"></div>
-                    <button onclick="processMovement()" class="md:col-span-2 bg-red-600 text-white py-3 rounded-xl font-black uppercase text-xs shadow-lg mt-4">Confirmer le mouvement</button>
-                </div>
-            </div>
-        </section>
-        
-        <section id="sec-settings" class="section-pane">
-            <div class="card p-10">
-                <h2 class="text-xl font-black uppercase mb-10">Configuration Bel Avenir</h2>
-                <div class="grid lg:grid-cols-2 gap-12">
-                    <div class="space-y-6">
-                        <div><label class="label-text">Logo de l'ONG</label><input type="file" onchange="uploadLogo(this)" class="input-field"></div>
-                        <div><label class="label-text">Nom de l'Institution</label><input type="text" id="set-name" class="input-field"></div>
-                        <div><label class="label-text">Sites Actifs (Séparez par virgule)</label><input type="text" id="set-sites" class="input-field" placeholder="Toliara, Fianarantsoa..."></div>
-                    </div>
-                    <div class="space-y-6">
-                        <div><label class="label-text">Couleur Primaire</label><input type="color" id="set-color" class="w-full h-12 rounded-xl cursor-pointer" onchange="updateTheme(this.value)"></div>
-                        <button onclick="saveSettings()" class="w-full dynamic-bg-p text-white py-4 rounded-xl font-black uppercase text-xs shadow-lg">Mettre à jour les paramètres</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-</div>
+    --shadow:
+        0 8px 25px rgba(30,40,80,.08);
 
-<div id="modal-view" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-6xl rounded-[3rem] p-10 max-h-[95vh] overflow-hidden flex flex-col relative shadow-2xl">
-        <button onclick="closeModal()" class="absolute top-10 right-10 text-slate-300 hover:text-red-500 transition text-2xl"><i class="fas fa-times"></i></button>
-        <div id="modal-header-info" class="flex items-center gap-8 mb-8 border-b pb-8"></div>
-        <div class="flex border-b mb-8 overflow-x-auto scrollbar-hide">
-            <button onclick="showModalTab('v-dash')" class="sub-tab active" id="btn-v-dash">Tableau de bord</button>
-            <button onclick="showModalTab('v-ident')" class="sub-tab" id="btn-v-ident">Fiche Identité</button>
-            <button onclick="showModalTab('v-scol')" class="sub-tab" id="btn-v-scol">Scolarité</button>
-            <button onclick="showModalTab('v-med')" class="sub-tab" id="btn-v-med">Santé</button>
-            <button onclick="showModalTab('v-social')" class="sub-tab" id="btn-v-social">Social & Famille</button>
-            <button onclick="showModalTab('v-hist')" class="sub-tab" id="btn-v-hist">Historique</button>
-        </div>
-        <div id="modal-tab-container" class="flex-1 overflow-y-auto pr-4"></div>
-    </div>
-    </div>
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, push, set, onValue, remove, update, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    --radius:18px;
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDKNy6B4aifDrVDsglGhvU_eCMZOZF6q8g",
-      authDomain: "bel-avenir-social-db-878f7.firebaseapp.com",
-      databaseURL: "https://bel-avenir-social-db-878f7-default-rtdb.firebaseio.com",
-      projectId: "bel-avenir-social-db-878f7",
-      storageBucket: "bel-avenir-social-db-878f7.firebasestorage.app",
-      messagingSenderId: "483959875408",
-      appId: "1:483959875408:web:e7708cd4100a9fe9752e55",
-      measurementId: "G-YMWKP5DBKC"
-    };
+}
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
 
-    let benefsData = [];
-    let currentPhoto = "";
-    let activeBenefKey = null;
-    let sitesList = [];
+/* =========================================================
+   RESET
+========================================================= */
 
-    // AUTHENTICATION
-    document.getElementById('login-btn').addEventListener('click', async () => {
-        const email = document.getElementById('auth-email').value;
-        const pass = document.getElementById('auth-pass').value;
-        try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { 
-            document.getElementById('auth-error').classList.remove('hidden'); 
-        }
-    });
+*{
+    box-sizing:border-box;
+}
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById('auth-overlay').style.display = 'none';
-            document.getElementById('app-wrapper').classList.remove('hidden');
-            syncAll();
-        } else {
-            document.getElementById('auth-overlay').style.display = 'flex';
-            document.getElementById('app-wrapper').classList.add('hidden');
-        }
-    });
+html{
+    scroll-behavior:smooth;
+}
 
-    document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+body{
 
-    // NAVIGATION
-    window.showSection = (id) => {
-        document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('btn-active'));
-        document.getElementById('sec-'+id).classList.add('active');
-        document.getElementById('nav-'+id).classList.add('btn-active');
-        document.getElementById('page-title').innerText = document.getElementById('nav-'+id).innerText;
-        if(window.innerWidth < 1024) toggleSidebar();
-    };
+    margin:0;
 
-    window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('open');
-    window.showFormTab = (id) => {
-        document.querySelectorAll('.form-tab-pane').forEach(p => p.classList.add('hidden'));
-        document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.remove('hidden');
-        document.getElementById('btn-'+id).classList.add('active');
-    };
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
-    // LOGIC: ID GENERATION
-    window.generateID = () => {
-        const proj = document.getElementById('f-ba-proj-code').value.toUpperCase();
-        const year = new Date().getFullYear().toString().slice(-2);
-        const sexe = document.getElementById('f-sexe').value || "?";
-        if(proj.length >= 2) {
-            const count = (benefsData.length + 1).toString().padStart(3, '0');
-            const generated = `${proj}-${year}-${sexe}-${count}`;
-            document.getElementById('f-id-preview').innerText = generated;
-        }
-    };
+    background:var(--background);
 
-    // LOGIC: AGE & CYCLE
-    window.updateAge = () => {
-        const d = document.getElementById('f-dob-date').value;
-        if(d) {
-            const age = new Date().getFullYear() - new Date(d).getFullYear();
-            document.getElementById('f-age-calc').value = age + " ans";
-        }
-    };
+    color:var(--text);
 
-    window.autoCycle = () => {
-        const niv = document.getElementById('f-sc-niv').value;
-        const p = ["CP", "CE1", "CE2", "CM1", "CM2"];
-        const c = ["6ème", "5ème", "4ème", "3ème"];
-        const cycle = p.includes(niv) ? "PRIMAIRE" : (c.includes(niv) ? "COLLÈGE" : "LYCÉE");
-        document.getElementById('f-sc-cycle').value = cycle;
-    };
+    min-height:100vh;
 
-    // FORM HELPERS
-    window.processPhoto = (input) => {
-        const r = new FileReader();
-        r.onload = (e) => { currentPhoto = e.target.result; document.getElementById('f-photo-preview').src = e.target.result; };
-        r.readAsDataURL(input.files[0]);
-    };
+}
 
-    window.autoIMC = () => {
-        const p = parseFloat(document.getElementById('f-sa-poids').value);
-        const t = parseFloat(document.getElementById('f-sa-taille').value) / 100;
-        if(p && t) {
-            const imc = (p / (t*t)).toFixed(1);
-            document.getElementById('f-imc-val').innerText = imc;
-            let status = "NORMAL";
-            if(imc < 18.5) status = "MAIGREUR";
-            if(imc > 25) status = "SURPOIDS";
-            document.getElementById('f-imc-val').className = "text-xl font-black " + (status === 'NORMAL' ? 'text-green-500' : 'text-red-500');
-        }
-    };
+button,
+input,
+select,
+textarea{
 
-    window.addNoteRow = () => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td><input type="text" class="input-field n-mat"></td><td><input type="number" class="input-field n-coef" oninput="calcMoy()"></td><td><input type="number" class="input-field n-val" oninput="calcMoy()"></td><td><input type="text" class="input-field n-obs"></td>`;
-        document.getElementById('f-sc-notes-body').appendChild(tr);
-    };
+    font-family:inherit;
 
-    window.calcMoy = () => {
-        let pts = 0, coefs = 0;
-        document.querySelectorAll('#f-sc-notes-body tr').forEach(tr => {
-            const c = parseFloat(tr.querySelector('.n-coef').value) || 0;
-            const v = parseFloat(tr.querySelector('.n-val').value) || 0;
-            pts += (v * c); coefs += c;
-        });
-        document.getElementById('f-sc-moy').innerText = coefs > 0 ? (pts / coefs).toFixed(2) : "0.00";
-    };
+}
 
-    // DATA SUBMISSION
-    window.submitForm = () => {
-        const id = document.getElementById('f-id-preview').innerText;
-        if(id === "---") return alert("Veuillez remplir les champs obligatoires (Nom, Sexe, Projet)");
+button{
 
-        const notes = [];
-        document.querySelectorAll('#f-sc-notes-body tr').forEach(tr => {
-            if(tr.querySelector('.n-mat').value) {
-                notes.push({ mat: tr.querySelector('.n-mat').value, coef: tr.querySelector('.n-coef').value, val: tr.querySelector('.n-val').value });
-            }
-        });
+    cursor:pointer;
 
-        const data = {
-            id: id,
-            nom: document.getElementById('f-nom').value,
-            sexe: document.getElementById('f-sexe').value,
-            dob: document.getElementById('f-dob-date').value,
-            dob_vers: document.getElementById('f-dob-vers').value,
-            photo: currentPhoto,
-            statut: "Actif",
-            site: document.getElementById('f-ba-site').value,
-            cycle: document.getElementById('f-sc-cycle').value,
-            niveau: document.getElementById('f-sc-niv').value,
-            moyenne: document.getElementById('f-sc-moy').innerText,
-            notes: notes,
-            created_at: new Date().toISOString(),
-            responsable: auth.currentUser.email
-        };
+}
 
-        push(ref(db, 'beneficiaires'), data).then(() => {
-            alert("Bénéficiaire enregistré avec succès !");
-            showSection('list');
-        });
-    };
+img{
 
-    // SYNC & TABLES
-    function syncAll() {
-        onValue(ref(db, 'beneficiaires'), (snap) => {
-            const d = snap.val();
-            benefsData = d ? Object.keys(d).map(k => ({...d[k], key: k})) : [];
-            renderTable();
-            updateStats();
-        });
-        onValue(ref(db, 'settings'), (snap) => {
-            const s = snap.val();
-            if(s) {
-                document.getElementById('ong-name-display').innerText = s.name;
-                document.getElementById('nav-logo').src = s.logo;
-                document.documentElement.style.setProperty('--p-col', s.color);
-                sitesList = s.sites ? s.sites.split(',').map(x => x.trim()) : [];
-                updateSiteFilters();
-            }
-        });
-    }
+    max-width:100%;
 
-    function updateSiteFilters() {
-        const options = '<option value="">Tous Sites</option>' + sitesList.map(s => `<option>${s}</option>`).join('');
-        document.getElementById('filter-site').innerHTML = options;
-        document.getElementById('list-sites').innerHTML = sitesList.map(s => `<option value="${s}">`).join('');
-        document.getElementById('mov-dest').innerHTML = sitesList.map(s => `<option>${s}</option>`).join('');
-    }
+}
 
-    window.renderTable = () => {
-        const term = document.getElementById('search-bar').value.toLowerCase();
-        const siteF = document.getElementById('filter-site').value;
-        const statF = document.getElementById('filter-statut').value;
 
-        const filtered = benefsData.filter(b => 
-            (b.nom.toLowerCase().includes(term) || b.id.toLowerCase().includes(term)) &&
-            (siteF === "" || b.site === siteF) &&
-            (statF === "" || b.statut === statF)
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header{
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            #7c6ff0
         );
 
-        document.getElementById('main-table-body').innerHTML = filtered.map(b => `
-            <tr class="border-b hover:bg-slate-50 transition">
-                <td class="py-4 flex items-center gap-3">
-                    <img src="${b.photo || 'https://via.placeholder.com/50'}" class="w-10 h-10 rounded-full object-cover">
-                    <span class="font-bold">${b.nom}</span>
-                </td>
-                <td class="text-xs font-black text-blue-600">${b.id}</td>
-                <td class="text-xs font-bold uppercase">${b.site || '-'}</td>
-                <td class="text-[10px]"><span class="bg-slate-100 px-2 py-1 rounded-lg font-bold">${b.cycle || '-'}</span></td>
-                <td><span class="badge ${b.statut === 'Actif' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">${b.statut}</span></td>
-                <td class="text-right">
-                    <button onclick="viewBenef('${b.key}')" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"><i class="fas fa-eye"></i></button>
-                    <button onclick="deleteBenef('${b.key}')" class="p-2 text-red-400 hover:bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>
-        `).join('');
-        document.getElementById('table-count').innerText = filtered.length;
-        document.getElementById('cnt-benef').innerText = filtered.length;
-    };
+    color:white;
 
-    function updateStats() {
-        const total = benefsData.length;
-        const masc = benefsData.filter(b => b.sexe === 'M').length;
-        const fem = benefsData.filter(b => b.sexe === 'F').length;
-        
-        document.getElementById('stat-total').innerText = total;
-        document.getElementById('stat-m').innerText = masc;
-        document.getElementById('stat-f').innerText = fem;
-        
-        initCharts();
+    padding:
+        18px
+        20px;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,.15);
+
+}
+
+.header-content{
+
+    max-width:1300px;
+
+    margin:auto;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+}
+
+.brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    min-width:0;
+
+}
+
+.logo{
+
+    width:52px;
+
+    height:52px;
+
+    flex-shrink:0;
+
+    border-radius:16px;
+
+    background:white;
+
+    color:var(--primary);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:26px;
+
+    font-weight:bold;
+
+}
+
+.brand-text{
+
+    min-width:0;
+
+}
+
+.brand h1{
+
+    margin:0;
+
+    font-size:23px;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+.brand p{
+
+    margin:
+        5px
+        0
+        0;
+
+    font-size:13px;
+
+    opacity:.9;
+
+}
+
+.header-actions{
+
+    display:flex;
+
+    gap:8px;
+
+    flex-wrap:wrap;
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.nav-wrapper{
+
+    max-width:1300px;
+
+    margin:
+        18px
+        auto
+        0;
+
+    padding:
+        0
+        20px;
+
+}
+
+.nav{
+
+    display:flex;
+
+    gap:8px;
+
+    overflow-x:auto;
+
+    scrollbar-width:none;
+
+    padding-bottom:4px;
+
+}
+
+.nav::-webkit-scrollbar{
+
+    display:none;
+
+}
+
+.nav button{
+
+    border:0;
+
+    background:white;
+
+    color:var(--muted);
+
+    padding:
+        11px
+        16px;
+
+    border-radius:12px;
+
+    box-shadow:var(--shadow);
+
+    white-space:nowrap;
+
+    font-weight:600;
+
+    transition:.2s;
+
+}
+
+.nav button:hover{
+
+    color:var(--primary);
+
+}
+
+.nav button.active{
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+
+/* =========================================================
+   CONTENEUR
+========================================================= */
+
+.container{
+
+    max-width:1300px;
+
+    margin:auto;
+
+    padding:
+        20px
+        20px
+        60px;
+
+}
+
+.page{
+
+    display:none;
+
+}
+
+.page.active{
+
+    display:block;
+
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.card{
+
+    background:var(--white);
+
+    border:1px solid var(--border);
+
+    border-radius:var(--radius);
+
+    padding:24px;
+
+    box-shadow:var(--shadow);
+
+    margin-bottom:20px;
+
+}
+
+.card h2{
+
+    margin:
+        0
+        0
+        10px;
+
+    color:var(--dark);
+
+}
+
+.card h3{
+
+    margin-top:0;
+
+}
+
+
+/* =========================================================
+   WELCOME
+========================================================= */
+
+.welcome{
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #f0efff
+        );
+
+    border-radius:24px;
+
+    padding:32px;
+
+    margin-bottom:20px;
+
+}
+
+.welcome h2{
+
+    margin:
+        0
+        0
+        8px;
+
+    font-size:29px;
+
+}
+
+.welcome p{
+
+    color:var(--muted);
+
+    line-height:1.6;
+
+}
+
+
+/* =========================================================
+   STATISTIQUES
+========================================================= */
+
+.stats{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:16px;
+
+    margin-bottom:20px;
+
+}
+
+.stat{
+
+    background:white;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:18px;
+
+    padding:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    box-shadow:var(--shadow);
+
+}
+
+.stat-icon{
+
+    width:50px;
+
+    height:50px;
+
+    flex-shrink:0;
+
+    border-radius:15px;
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:23px;
+
+}
+
+.stat strong{
+
+    display:block;
+
+    font-size:25px;
+
+    color:var(--dark);
+
+}
+
+.stat span{
+
+    display:block;
+
+    color:var(--muted);
+
+    font-size:13px;
+
+    margin-top:3px;
+
+}
+
+
+/* =========================================================
+   BOUTONS
+========================================================= */
+
+.btn{
+
+    border:0;
+
+    border-radius:12px;
+
+    padding:
+        12px
+        17px;
+
+    font-weight:600;
+
+    transition:.2s;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:7px;
+
+}
+
+.btn:hover{
+
+    transform:translateY(-1px);
+
+}
+
+.btn-primary{
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+.btn-primary:hover{
+
+    background:var(--primary-dark);
+
+}
+
+.btn-success{
+
+    background:var(--secondary);
+
+    color:white;
+
+}
+
+.btn-success:hover{
+
+    background:var(--secondary-dark);
+
+}
+
+.btn-danger{
+
+    background:var(--danger);
+
+    color:white;
+
+}
+
+.btn-danger:hover{
+
+    background:var(--danger-dark);
+
+}
+
+.btn-warning{
+
+    background:var(--warning);
+
+    color:white;
+
+}
+
+.btn-light{
+
+    background:#f0f1f5;
+
+    color:#333;
+
+}
+
+.btn-white{
+
+    background:white;
+
+    color:var(--primary);
+
+}
+
+.btn-small{
+
+    padding:
+        9px
+        11px;
+
+    font-size:13px;
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.searchbar{
+
+    display:flex;
+
+    gap:10px;
+
+    margin:
+        20px
+        0;
+
+}
+
+.searchbar input{
+
+    flex:1;
+
+}
+
+
+/* =========================================================
+   FORMULAIRES
+========================================================= */
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
+
+    gap:18px;
+
+}
+
+.form-group{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:7px;
+
+    min-width:0;
+
+}
+
+.form-group.full{
+
+    grid-column:
+        1 /
+        -1;
+
+}
+
+.form-group label{
+
+    font-size:13px;
+
+    font-weight:700;
+
+    color:#4b5563;
+
+}
+
+.form-group small{
+
+    color:var(--muted);
+
+    font-size:11px;
+
+}
+
+input,
+select,
+textarea{
+
+    width:100%;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:11px;
+
+    padding:
+        12px
+        13px;
+
+    background:white;
+
+    color:var(--dark);
+
+    outline:none;
+
+    transition:.2s;
+
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(91,75,219,.09);
+
+}
+
+input[readonly]{
+
+    background:#f3f3f7;
+
+    color:var(--primary);
+
+    font-weight:bold;
+
+}
+
+textarea{
+
+    min-height:100px;
+
+    resize:vertical;
+
+}
+
+.section-title{
+
+    grid-column:
+        1 /
+        -1;
+
+    color:var(--primary);
+
+    border-bottom:
+        1px solid
+        var(--border);
+
+    padding-bottom:10px;
+
+    margin-top:12px;
+
+}
+
+
+/* =========================================================
+   PHOTO
+========================================================= */
+
+.photo-box{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    padding:18px;
+
+    border:
+        1px dashed
+        #c9cbd2;
+
+    border-radius:15px;
+
+}
+
+.photo-preview{
+
+    width:95px;
+
+    height:95px;
+
+    flex-shrink:0;
+
+    border-radius:20px;
+
+    object-fit:cover;
+
+    background:#eeeeF5;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+}
+
+
+/* =========================================================
+   ACTIONS FORMULAIRE
+========================================================= */
+
+.form-actions{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:10px;
+
+    margin-top:25px;
+
+}
+
+
+/* =========================================================
+   MEMBRES
+========================================================= */
+
+.members-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,minmax(0,1fr));
+
+    gap:18px;
+
+}
+
+.member-card{
+
+    background:white;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:20px;
+
+    padding:20px;
+
+    box-shadow:var(--shadow);
+
+    transition:.2s;
+
+}
+
+.member-card:hover{
+
+    transform:translateY(-3px);
+
+}
+
+.member-top{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+}
+
+.avatar{
+
+    width:65px;
+
+    height:65px;
+
+    flex-shrink:0;
+
+    border-radius:18px;
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:23px;
+
+    font-weight:bold;
+
+    object-fit:cover;
+
+}
+
+.member-name{
+
+    font-size:17px;
+
+    font-weight:bold;
+
+    color:var(--dark);
+
+}
+
+.member-id{
+
+    font-size:11px;
+
+    color:var(--primary);
+
+    margin-top:5px;
+
+}
+
+.member-info{
+
+    margin:
+        17px
+        0;
+
+    color:#555;
+
+    font-size:13px;
+
+    line-height:1.9;
+
+}
+
+.member-actions{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:7px;
+
+}
+
+
+/* =========================================================
+   ARBRE FAMILIAL
+========================================================= */
+
+.tree{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:30px;
+
+}
+
+.tree-generation{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+
+}
+
+.tree-node{
+
+    min-width:180px;
+
+    max-width:240px;
+
+    background:white;
+
+    border:
+        2px solid
+        #e7e3ff;
+
+    border-radius:18px;
+
+    padding:17px;
+
+    text-align:center;
+
+    box-shadow:var(--shadow);
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.tree-node:hover{
+
+    border-color:var(--primary);
+
+    transform:translateY(-2px);
+
+}
+
+.tree-node strong{
+
+    display:block;
+
+    color:var(--dark);
+
+}
+
+.tree-node small{
+
+    display:block;
+
+    color:var(--muted);
+
+    margin-top:5px;
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:
+        rgba(0,0,0,.55);
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:20px;
+
+    z-index:3000;
+
+}
+
+.modal.show{
+
+    display:flex;
+
+}
+
+.modal-content{
+
+    background:white;
+
+    width:
+        min(900px,100%);
+
+    max-height:92vh;
+
+    overflow-y:auto;
+
+    border-radius:22px;
+
+    padding:25px;
+
+}
+
+.modal-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-bottom:20px;
+
+}
+
+.close{
+
+    border:0;
+
+    background:#eee;
+
+    width:40px;
+
+    height:40px;
+
+    border-radius:50%;
+
+    font-size:18px;
+
+}
+
+
+/* =========================================================
+   PROFIL
+========================================================= */
+
+.profile-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    border-bottom:
+        1px solid
+        var(--border);
+
+    padding-bottom:20px;
+
+}
+
+.profile-avatar{
+
+    width:100px;
+
+    height:100px;
+
+    flex-shrink:0;
+
+    border-radius:25px;
+
+    object-fit:cover;
+
+    background:var(--primary-light);
+
+}
+
+.profile-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
+
+    gap:14px;
+
+    margin-top:20px;
+
+}
+
+.profile-item{
+
+    background:#f8f8fb;
+
+    border-radius:13px;
+
+    padding:15px;
+
+}
+
+.profile-item span{
+
+    display:block;
+
+    color:var(--muted);
+
+    font-size:12px;
+
+    margin-bottom:5px;
+
+}
+
+.profile-item strong{
+
+    font-size:14px;
+
+    color:var(--dark);
+
+    word-break:break-word;
+
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty{
+
+    text-align:center;
+
+    padding:50px 20px;
+
+    color:var(--muted);
+
+    grid-column:
+        1 /
+        -1;
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast{
+
+    position:fixed;
+
+    left:50%;
+
+    bottom:25px;
+
+    transform:
+        translateX(-50%)
+        translateY(100px);
+
+    background:#222;
+
+    color:white;
+
+    padding:
+        14px
+        20px;
+
+    border-radius:12px;
+
+    z-index:5000;
+
+    opacity:0;
+
+    transition:.3s;
+
+    max-width:
+        calc(100% - 30px);
+
+    text-align:center;
+
+}
+
+.toast.show{
+
+    opacity:1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLETTE
+========================================================= */
+
+@media(max-width:1000px){
+
+    .stats{
+
+        grid-template-columns:
+            repeat(2,1fr);
+
     }
 
-    // MODAL VIEW & DASHBOARD
-    window.viewBenef = (key) => {
-        activeBenefKey = key;
-        const b = benefsData.find(x => x.key === key);
-        const statusCol = b.moyenne < 10 ? 'bg-red-500' : (b.moyenne < 12 ? 'bg-yellow-500' : 'bg-green-500');
-        
-        document.getElementById('modal-header-info').innerHTML = `
-            <div class="relative">
-                <img src="${b.photo}" class="w-24 h-24 rounded-3xl object-cover shadow-xl">
-                <div class="absolute -bottom-2 -right-2 w-6 h-6 rounded-full border-4 border-white ${statusCol}"></div>
+    .members-grid{
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE MOBILE
+========================================================= */
+
+@media(max-width:700px){
+
+    .header{
+
+        padding:
+            13px
+            15px;
+
+    }
+
+    .header-content{
+
+        align-items:center;
+
+    }
+
+    .header-actions{
+
+        display:none;
+
+    }
+
+    .logo{
+
+        width:44px;
+
+        height:44px;
+
+        border-radius:13px;
+
+    }
+
+    .brand h1{
+
+        font-size:18px;
+
+    }
+
+    .brand p{
+
+        font-size:11px;
+
+    }
+
+    .nav-wrapper{
+
+        padding:
+            0
+            12px;
+
+        margin-top:12px;
+
+    }
+
+    .nav button{
+
+        padding:
+            10px
+            13px;
+
+        font-size:12px;
+
+    }
+
+    .container{
+
+        padding:
+            15px
+            15px
+            45px;
+
+    }
+
+    .welcome{
+
+        padding:22px;
+
+        border-radius:19px;
+
+    }
+
+    .welcome h2{
+
+        font-size:22px;
+
+    }
+
+    .stats{
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+
+        gap:10px;
+
+    }
+
+    .stat{
+
+        padding:14px;
+
+        border-radius:15px;
+
+        gap:9px;
+
+    }
+
+    .stat-icon{
+
+        width:40px;
+
+        height:40px;
+
+        font-size:18px;
+
+    }
+
+    .stat strong{
+
+        font-size:21px;
+
+    }
+
+    .stat span{
+
+        font-size:11px;
+
+    }
+
+    .card{
+
+        padding:17px;
+
+        border-radius:17px;
+
+    }
+
+    .form-grid{
+
+        grid-template-columns:
+            1fr;
+
+        gap:15px;
+
+    }
+
+    .form-group.full{
+
+        grid-column:auto;
+
+    }
+
+    .section-title{
+
+        grid-column:auto;
+
+        font-size:16px;
+
+    }
+
+    .members-grid{
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .searchbar{
+
+        flex-direction:column;
+
+    }
+
+    .searchbar .btn{
+
+        width:100%;
+
+    }
+
+    .form-actions{
+
+        flex-direction:column-reverse;
+
+    }
+
+    .form-actions .btn{
+
+        width:100%;
+
+    }
+
+    .photo-box{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .profile-grid{
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .profile-header{
+
+        align-items:flex-start;
+
+    }
+
+    .profile-avatar{
+
+        width:80px;
+
+        height:80px;
+
+    }
+
+    .tree-node{
+
+        width:100%;
+
+        max-width:none;
+
+    }
+
+}
+
+
+/* =========================================================
+   TRES PETITS TELEPHONES
+========================================================= */
+
+@media(max-width:400px){
+
+    .stats{
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .welcome{
+
+        padding:18px;
+
+    }
+
+    .card{
+
+        padding:14px;
+
+    }
+
+    .member-card{
+
+        padding:15px;
+
+    }
+
+}
+
+
+/* =========================================================
+   IMPRESSION
+========================================================= */
+
+@media print{
+
+    body{
+
+        background:white;
+
+    }
+
+    .header,
+    .nav-wrapper,
+    .btn,
+    .member-actions{
+
+        display:none !important;
+
+    }
+
+    .container{
+
+        padding:0;
+
+    }
+
+    .card{
+
+        border:0;
+
+        box-shadow:none;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+====================================================== -->
+
+<header class="header">
+
+    <div class="header-content">
+
+        <div class="brand">
+
+            <div class="logo">
+                F
             </div>
+
+            <div class="brand-text">
+
+                <h1>
+                    Famille Fanera
+                </h1>
+
+                <p>
+                    Livret familial numérique
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <button
+                class="btn btn-white"
+                onclick="exportData()"
+            >
+                📥 Exporter
+            </button>
+
+            <button
+                class="btn btn-white"
+                onclick="openImport()"
+            >
+                📤 Importer
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     NAVIGATION
+====================================================== -->
+
+<div class="nav-wrapper">
+
+    <nav class="nav">
+
+        <button
+            class="active"
+            onclick="showPage('dashboard',this)"
+        >
+            🏠 Accueil
+        </button>
+
+        <button
+            onclick="showPage('members',this)"
+        >
+            👨‍👩‍👧 Membres
+        </button>
+
+        <button
+            onclick="goAdd()"
+        >
+            ➕ Ajouter
+        </button>
+
+        <button
+            onclick="showPage('tree',this)"
+        >
+            🌳 Famille
+        </button>
+
+        <button
+            onclick="showPage('settings',this)"
+        >
+            ⚙️ Données
+        </button>
+
+    </nav>
+
+</div>
+
+
+<!-- =====================================================
+     CONTENU
+====================================================== -->
+
+<main class="container">
+
+
+<!-- =====================================================
+     ACCUEIL
+====================================================== -->
+
+<section
+    id="dashboard"
+    class="page active"
+>
+
+    <div class="welcome">
+
+        <h2>
+            Bienvenue dans la famille Fanera 👋
+        </h2>
+
+        <p>
+            Ce livret familial permet de conserver
+            les informations des membres de la famille,
+            leurs coordonnées et leurs liens familiaux.
+        </p>
+
+        <button
+            class="btn btn-primary"
+            onclick="goAdd()"
+        >
+            ➕ Ajouter un membre
+        </button>
+
+    </div>
+
+
+    <div class="stats">
+
+
+        <div class="stat">
+
+            <div class="stat-icon">
+                👨‍👩‍👧
+            </div>
+
             <div>
-                <h2 class="text-2xl font-black uppercase mb-1">${b.nom}</h2>
-                <div class="flex gap-3 items-center">
-                    <span class="text-xs font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-lg">${b.id}</span>
-                    <span class="text-[10px] font-black uppercase text-slate-400"><i class="fas fa-map-marker-alt"></i> ${b.site}</span>
-                </div>
-            </div>
-            <div class="ml-auto flex gap-4">
-                <div class="text-center bg-slate-50 p-4 rounded-2xl min-w-[100px] border">
-                    <p class="label-text">Moyenne</p><h4 class="text-xl font-black">${b.moyenne}</h4>
-                </div>
-                <div class="text-center bg-slate-50 p-4 rounded-2xl min-w-[100px] border">
-                    <p class="label-text">Assiduité</p><h4 class="text-xl font-black">92%</h4>
-                </div>
-            </div>
-        `;
-        showModalTab('v-dash');
-        document.getElementById('modal-view').classList.remove('hidden');
-    };
 
-    window.showModalTab = (tid) => {
-        const b = benefsData.find(x => x.key === activeBenefKey);
-        document.querySelectorAll('#modal-view .sub-tab').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('btn-'+tid).classList.add('active');
-        
-        let content = "";
-        if(tid === 'v-dash') {
-            content = `
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="card p-6 bg-blue-50 border-blue-100">
-                        <h5 class="label-text mb-4">Score Holistique</h5>
-                        <div class="flex items-center justify-center h-32">
-                            <div class="text-4xl font-black text-blue-600">84%</div>
+                <strong id="statTotal">
+                    0
+                </strong>
+
+                <span>
+                    Membres
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-icon">
+                ♂
+            </div>
+
+            <div>
+
+                <strong id="statMen">
+                    0
+                </strong>
+
+                <span>
+                    Hommes
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-icon">
+                ♀
+            </div>
+
+            <div>
+
+                <strong id="statWomen">
+                    0
+                </strong>
+
+                <span>
+                    Femmes
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-icon">
+                📍
+            </div>
+
+            <div>
+
+                <strong id="statCities">
+                    0
+                </strong>
+
+                <span>
+                    Localités
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            Membres récemment ajoutés
+        </h3>
+
+        <div
+            id="recentMembers"
+            class="members-grid"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     MEMBRES
+====================================================== -->
+
+<section
+    id="members"
+    class="page"
+>
+
+    <div class="card">
+
+        <h2>
+            👨‍👩‍👧 Membres de la famille
+        </h2>
+
+        <div class="searchbar">
+
+            <input
+                id="searchInput"
+                type="search"
+                placeholder="Rechercher un nom, ID, téléphone, ville..."
+                oninput="renderMembers()"
+            >
+
+            <button
+                class="btn btn-primary"
+                onclick="goAdd()"
+            >
+                ➕ Ajouter
+            </button>
+
+        </div>
+
+
+        <div
+            id="membersList"
+            class="members-grid"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     AJOUT / MODIFICATION
+====================================================== -->
+
+<section
+    id="add"
+    class="page"
+>
+
+    <div class="card">
+
+        <h2 id="formTitle">
+            ➕ Ajouter un membre
+        </h2>
+
+
+        <form id="memberForm">
+
+            <input
+                type="hidden"
+                id="editIndex"
+            >
+
+
+            <div class="form-grid">
+
+
+                <!-- IDENTIFICATION -->
+
+                <h3 class="section-title">
+
+                    🪪 Identification
+
+                </h3>
+
+
+                <div class="form-group">
+
+                    <label>
+                        ID familial
+                    </label>
+
+                    <input
+                        id="memberId"
+                        readonly
+                    >
+
+                    <small>
+                        Généré automatiquement.
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Nom *
+                    </label>
+
+                    <input
+                        id="lastName"
+                        required
+                        autocomplete="family-name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Prénoms *
+                    </label>
+
+                    <input
+                        id="firstName"
+                        required
+                        autocomplete="given-name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Sexe
+                    </label>
+
+                    <select id="gender">
+
+                        <option value="">
+                            -- Choisir --
+                        </option>
+
+                        <option value="Masculin">
+                            Masculin
+                        </option>
+
+                        <option value="Féminin">
+                            Féminin
+                        </option>
+
+                        <option value="Autre">
+                            Autre / préfère ne pas préciser
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Date de naissance
+                    </label>
+
+                    <input
+                        type="date"
+                        id="birthDate"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Lieu de naissance
+                    </label>
+
+                    <input
+                        id="birthPlace"
+                    >
+
+                </div>
+
+
+                <!-- COORDONNEES -->
+
+                <h3 class="section-title">
+
+                    📞 Coordonnées
+
+                </h3>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Téléphone principal
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="phone"
+                        placeholder="+261..."
+                        autocomplete="tel"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Deuxième téléphone
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="phone2"
+                        placeholder="+261..."
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        WhatsApp
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="whatsapp"
+                        placeholder="+261..."
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        E-mail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        autocomplete="email"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Facebook / réseau social
+                    </label>
+
+                    <input
+                        id="social"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Adresse
+                    </label>
+
+                    <input
+                        id="address"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Commune / Ville
+                    </label>
+
+                    <input
+                        id="city"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        District
+                    </label>
+
+                    <input
+                        id="district"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Région
+                    </label>
+
+                    <input
+                        id="region"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Pays
+                    </label>
+
+                    <input
+                        id="country"
+                        value="Madagascar"
+                    >
+
+                </div>
+
+
+                <!-- FAMILLE -->
+
+                <h3 class="section-title">
+
+                    👨‍👩‍👧 Relations familiales
+
+                </h3>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Père
+                    </label>
+
+                    <select
+                        id="father"
+                    >
+
+                        <option value="">
+                            -- Aucun / non renseigné --
+                        </option>
+
+                    </select>
+
+                    <small>
+                        Sélectionnez un membre déjà enregistré.
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Mère
+                    </label>
+
+                    <select
+                        id="mother"
+                    >
+
+                        <option value="">
+                            -- Aucune / non renseignée --
+                        </option>
+
+                    </select>
+
+                    <small>
+                        Sélectionnez un membre déjà enregistré.
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Conjoint(e)
+                    </label>
+
+                    <select
+                        id="spouse"
+                    >
+
+                        <option value="">
+                            -- Aucun / non renseigné --
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Situation matrimoniale
+                    </label>
+
+                    <select id="marital">
+
+                        <option value="">
+                            -- Choisir --
+                        </option>
+
+                        <option value="Célibataire">
+                            Célibataire
+                        </option>
+
+                        <option value="En couple">
+                            En couple
+                        </option>
+
+                        <option value="Concubinage">
+                            Concubinage
+                        </option>
+
+                        <option value="Pacsé(e)">
+                            Pacsé(e)
+                        </option>
+
+                        <option value="Marié(e)">
+                            Marié(e)
+                        </option>
+
+                        <option value="Marié(e) civilement">
+                            Marié(e) civilement
+                        </option>
+
+                        <option value="Marié(e) religieusement">
+                            Marié(e) religieusement
+                        </option>
+
+                        <option value="Séparé(e)">
+                            Séparé(e)
+                        </option>
+
+                        <option value="Divorcé(e)">
+                            Divorcé(e)
+                        </option>
+
+                        <option value="Veuf / Veuve">
+                            Veuf / Veuve
+                        </option>
+
+                        <option value="Remarié(e)">
+                            Remarié(e)
+                        </option>
+
+                        <option value="Autre">
+                            Autre
+                        </option>
+
+                        <option value="Non renseigné">
+                            Ne souhaite pas préciser
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Date de mariage
+                    </label>
+
+                    <input
+                        type="date"
+                        id="marriageDate"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Lieu de mariage
+                    </label>
+
+                    <input
+                        id="marriagePlace"
+                    >
+
+                </div>
+
+
+                <!-- VIE -->
+
+                <h3 class="section-title">
+
+                    💼 Vie personnelle et professionnelle
+
+                </h3>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Profession / activité
+                    </label>
+
+                    <input
+                        id="job"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Employeur / établissement
+                    </label>
+
+                    <input
+                        id="workplace"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Niveau d'étude
+                    </label>
+
+                    <select id="education">
+
+                        <option value="">
+                            -- Choisir --
+                        </option>
+
+                        <option>
+                            Aucun / non scolarisé
+                        </option>
+
+                        <option>
+                            Primaire
+                        </option>
+
+                        <option>
+                            Collège
+                        </option>
+
+                        <option>
+                            Lycée
+                        </option>
+
+                        <option>
+                            Formation professionnelle
+                        </option>
+
+                        <option>
+                            Universitaire
+                        </option>
+
+                        <option>
+                            Master
+                        </option>
+
+                        <option>
+                            Doctorat
+                        </option>
+
+                        <option>
+                            Autre
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Groupe sanguin
+                    </label>
+
+                    <select id="blood">
+
+                        <option value="">
+                            -- Non renseigné --
+                        </option>
+
+                        <option>A+</option>
+                        <option>A-</option>
+                        <option>B+</option>
+                        <option>B-</option>
+                        <option>AB+</option>
+                        <option>AB-</option>
+                        <option>O+</option>
+                        <option>O-</option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label>
+                        Informations complémentaires
+                    </label>
+
+                    <textarea
+                        id="notes"
+                        placeholder="Informations que le membre souhaite ajouter..."
+                    ></textarea>
+
+                </div>
+
+
+                <!-- PHOTO -->
+
+                <h3 class="section-title">
+
+                    📷 Photo du membre
+
+                </h3>
+
+
+                <div class="form-group full">
+
+                    <div class="photo-box">
+
+                        <img
+                            id="photoPreview"
+                            class="photo-preview"
+                            alt="Photo"
+                        >
+
+                        <div>
+
+                            <input
+                                type="file"
+                                id="photo"
+                                accept="image/*"
+                                capture="environment"
+                            >
+
+                            <small>
+                                Sur Android, vous pouvez choisir une photo
+                                depuis la galerie ou prendre une photo.
+                            </small>
+
                         </div>
-                        <p class="text-[9px] font-bold text-center uppercase mt-4 text-blue-400">Évolution positive</p>
+
                     </div>
-                    <div class="md:col-span-2 card p-6">
-                        <h5 class="label-text mb-4">Évolution des performances</h5>
-                        <canvas id="modal-chart" height="100"></canvas>
-                    </div>
+
                 </div>
-                <div class="grid grid-cols-4 gap-4 mt-6">
-                    <div class="p-4 bg-slate-50 rounded-2xl border text-center"><p class="label-text">Santé</p><span class="badge bg-green-100 text-green-600">Stable</span></div>
-                    <div class="p-4 bg-slate-50 rounded-2xl border text-center"><p class="label-text">Scolaire</p><span class="badge bg-yellow-100 text-yellow-600">À suivre</span></div>
-                    <div class="p-4 bg-slate-50 rounded-2xl border text-center"><p class="label-text">Social</p><span class="badge bg-green-100 text-green-600">Serein</span></div>
-                    <div class="p-4 bg-slate-50 rounded-2xl border text-center"><p class="label-text">Participation</p><span class="badge bg-blue-100 text-blue-600">Actif</span></div>
-                </div>
-            `;
-        } else if(tid === 'v-ident') {
-            content = `<div class="grid md:grid-cols-2 gap-8"><div class="space-y-4">
-                <div class="p-4 bg-slate-50 rounded-xl"><p class="label-text">Date de Naissance</p><b>${b.dob}</b></div>
-                <div class="p-4 bg-slate-50 rounded-xl"><p class="label-text">Sexe</p><b>${b.sexe === 'M' ? 'Masculin' : 'Féminin'}</b></div>
-            </div></div>`;
-        }
-        
-        document.getElementById('modal-tab-container').innerHTML = content;
-        if(tid === 'v-dash') {
-            setTimeout(() => {
-                new Chart(document.getElementById('modal-chart'), {
-                    type: 'line',
-                    data: { labels: ['Jan','Fev','Mar','Avr'], datasets: [{ label: 'Moyenne', data: [11, 12.5, 12, 13.8], borderColor: '#0056b3', tension: 0.4 }] },
-                    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 20 } } }
-                });
-            }, 100);
-        }
-    };
 
-    window.closeModal = () => document.getElementById('modal-view').classList.add('hidden');
 
-    // MOVEMENTS LOGIC
-    window.processMovement = () => {
-        const id = document.getElementById('mov-id').value;
-        const type = document.getElementById('mov-type').value;
-        const dest = document.getElementById('mov-dest').value;
-        const b = benefsData.find(x => x.id === id);
-        
-        if(!b) return alert("ID Bénéficiaire introuvable");
-        
-        const updates = {};
-        updates[`beneficiaires/${b.key}/statut`] = type === 'Transfert' ? 'Actif' : type;
-        if(type === 'Transfert') updates[`beneficiaires/${b.key}/site`] = dest;
-        
-        update(ref(db), updates).then(() => {
-            alert("Mouvement enregistré avec succès !");
-            showSection('list');
-        });
-    };
+            </div>
 
-    // CHARTS INITIALIZATION
-    function initCharts() {
-        const ctxS = document.getElementById('chart-sites').getContext('2d');
-        new Chart(ctxS, {
-            type: 'doughnut',
-            data: { 
-                labels: sitesList, 
-                datasets: [{ data: sitesList.map(s => benefsData.filter(b => b.site === s).length), backgroundColor: ['#0056b3','#ff8c00','#10b981','#ef4444'] }] 
-            },
-            options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
-        });
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    onclick="cancelForm()"
+                >
+                    ↩️ Annuler
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    💾 Enregistrer
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     ARBRE FAMILIAL
+====================================================== -->
+
+<section
+    id="tree"
+    class="page"
+>
+
+    <div class="card">
+
+        <h2>
+            🌳 Arbre familial
+        </h2>
+
+        <p>
+            Les relations enregistrées dans les fiches
+            sont utilisées pour construire cette vue.
+        </p>
+
+        <div
+            id="familyTree"
+            class="tree"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     DONNEES
+====================================================== -->
+
+<section
+    id="settings"
+    class="page"
+>
+
+    <div class="card">
+
+        <h2>
+            ⚙️ Gestion des données
+        </h2>
+
+        <p>
+            Les données sont conservées localement dans
+            le navigateur de cet appareil.
+        </p>
+
+
+        <hr>
+
+
+        <h3>
+            💾 Sauvegarde
+        </h3>
+
+        <p>
+            Il est recommandé d'exporter régulièrement
+            vos données.
+        </p>
+
+
+        <button
+            class="btn btn-primary"
+            onclick="exportData()"
+        >
+            📥 Exporter les données
+        </button>
+
+
+        <button
+            class="btn btn-light"
+            onclick="openImport()"
+        >
+            📤 Importer une sauvegarde
+        </button>
+
+
+        <input
+            type="file"
+            id="importFile"
+            accept=".json"
+            hidden
+            onchange="importData(event)"
+        >
+
+
+        <hr>
+
+
+        <h3>
+            ⚠️ Zone dangereuse
+        </h3>
+
+        <p>
+            Cette opération supprimera toutes les données
+            enregistrées sur cet appareil.
+        </p>
+
+
+        <button
+            class="btn btn-danger"
+            onclick="deleteAll()"
+        >
+            🗑️ Supprimer toutes les données
+        </button>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+<!-- =====================================================
+     MODAL PROFIL
+====================================================== -->
+
+<div
+    id="profileModal"
+    class="modal"
+>
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>
+                Fiche familiale
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeModal()"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <div
+            id="profileContent"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MESSAGE
+====================================================== -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script>
+
+/* =========================================================
+   CONFIGURATION
+========================================================= */
+
+const STORAGE_KEY =
+    "FAMILLE_FANERA_V2";
+
+
+let members =
+    loadMembers();
+
+
+let currentPhoto = "";
+
+
+/* =========================================================
+   CHARGEMENT
+========================================================= */
+
+function loadMembers(){
+
+    try{
+
+        const data =
+            localStorage.getItem(STORAGE_KEY);
+
+        if(!data)
+            return [];
+
+        const parsed =
+            JSON.parse(data);
+
+        return Array.isArray(parsed)
+            ? parsed
+            : [];
+
+    }catch(error){
+
+        console.error(error);
+
+        return [];
+
     }
 
-    // UTILITIES
-    window.uploadLogo = (i) => { const r = new FileReader(); r.onload = (e) => document.getElementById('nav-logo').src = e.target.result; r.readAsDataURL(i.files[0]); };
-    window.saveSettings = () => { 
-        set(ref(db, 'settings'), { 
-            name: document.getElementById('set-name').value, 
-            color: document.getElementById('set-color').value, 
-            logo: document.getElementById('nav-logo').src,
-            sites: document.getElementById('set-sites').value
-        }); 
-        alert("Configuration sauvegardée."); 
+}
+
+
+/* =========================================================
+   SAUVEGARDE
+========================================================= */
+
+function saveMembers(){
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(members)
+    );
+
+    updateDashboard();
+
+}
+
+
+/* =========================================================
+   ID
+========================================================= */
+
+function generateId(){
+
+    const year =
+        new Date().getFullYear();
+
+    let number =
+        members.length + 1;
+
+
+    let id =
+        "FAN-" +
+        year +
+        "-" +
+        String(number).padStart(4,"0");
+
+
+    while(
+        members.some(
+            m => m.id === id
+        )
+    ){
+
+        number++;
+
+        id =
+            "FAN-" +
+            year +
+            "-" +
+            String(number).padStart(4,"0");
+
+    }
+
+
+    return id;
+
+}
+
+
+/* =========================================================
+   SECURITE HTML
+========================================================= */
+
+function escapeHTML(value){
+
+    if(
+        value === undefined ||
+        value === null
+    ){
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(/&/g,"&amp;")
+
+        .replace(/</g,"&lt;")
+
+        .replace(/>/g,"&gt;")
+
+        .replace(/"/g,"&quot;")
+
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+   INITIALS
+========================================================= */
+
+function initials(member){
+
+    const first =
+        member.firstName || "";
+
+    const last =
+        member.lastName || "";
+
+
+    const result =
+        first.charAt(0) +
+        last.charAt(0);
+
+
+    return result
+        .toUpperCase();
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function showToast(message){
+
+    const toast =
+        document.getElementById("toast");
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add("show");
+
+
+    setTimeout(
+        () => {
+
+            toast.classList.remove("show");
+
+        },
+        2800
+    );
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(
+    pageId,
+    button = null
+){
+
+    document
+        .querySelectorAll(".page")
+        .forEach(
+            page =>
+                page.classList.remove("active")
+        );
+
+
+    const page =
+        document.getElementById(pageId);
+
+
+    if(page){
+
+        page.classList.add("active");
+
+    }
+
+
+    document
+        .querySelectorAll(".nav button")
+        .forEach(
+            btn =>
+                btn.classList.remove("active")
+        );
+
+
+    if(button){
+
+        button.classList.add("active");
+
+    }
+
+
+    if(pageId === "dashboard"){
+
+        updateDashboard();
+
+    }
+
+
+    if(pageId === "members"){
+
+        renderMembers();
+
+    }
+
+
+    if(pageId === "tree"){
+
+        renderTree();
+
+    }
+
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+}
+
+
+/* =========================================================
+   AJOUT
+========================================================= */
+
+function goAdd(){
+
+    const addButton =
+        document
+            .querySelectorAll(".nav button")[2];
+
+
+    showPage(
+        "add",
+        addButton
+    );
+
+
+    resetForm();
+
+}
+
+
+/* =========================================================
+   RESET FORMULAIRE
+========================================================= */
+
+function resetForm(){
+
+    const form =
+        document.getElementById("memberForm");
+
+
+    form.reset();
+
+
+    document.getElementById(
+        "editIndex"
+    ).value = "";
+
+
+    document.getElementById(
+        "memberId"
+    ).value = generateId();
+
+
+    document.getElementById(
+        "country"
+    ).value = "Madagascar";
+
+
+    currentPhoto = "";
+
+
+    document.getElementById(
+        "photoPreview"
+    ).src = "";
+
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "➕ Ajouter un membre";
+
+
+    updateRelationSelects();
+
+}
+
+
+/* =========================================================
+   ANNULATION
+========================================================= */
+
+function cancelForm(){
+
+    const membersButton =
+        document
+            .querySelectorAll(".nav button")[1];
+
+
+    showPage(
+        "members",
+        membersButton
+    );
+
+}
+
+
+/* =========================================================
+   RELATIONS FAMILIALES
+========================================================= */
+
+/*
+   Cette fonction est importante.
+
+   Elle reconstruit les listes Père,
+   Mère et Conjoint à partir des membres
+   actuellement enregistrés.
+
+   Le problème fréquent dans ce type de
+   formulaire est de réinitialiser les
+   select sans conserver les valeurs
+   précédemment sélectionnées.
+
+   Ici nous conservons les valeurs.
+*/
+
+function updateRelationSelects(
+    excludeIndex = -1,
+    savedFather = "",
+    savedMother = "",
+    savedSpouse = ""
+){
+
+    const father =
+        document.getElementById("father");
+
+    const mother =
+        document.getElementById("mother");
+
+    const spouse =
+        document.getElementById("spouse");
+
+
+    const oldFather =
+        savedFather || father.value;
+
+    const oldMother =
+        savedMother || mother.value;
+
+    const oldSpouse =
+        savedSpouse || spouse.value;
+
+
+    father.innerHTML = "";
+
+    mother.innerHTML = "";
+
+    spouse.innerHTML = "";
+
+
+    addEmptyOption(
+        father,
+        "-- Aucun / non renseigné --"
+    );
+
+    addEmptyOption(
+        mother,
+        "-- Aucune / non renseignée --"
+    );
+
+    addEmptyOption(
+        spouse,
+        "-- Aucun / non renseigné --"
+    );
+
+
+    members.forEach(
+        (member,index) => {
+
+            /*
+             Ne pas permettre qu'une personne
+             se sélectionne elle-même comme père,
+             mère ou conjoint.
+            */
+
+            if(index === excludeIndex){
+
+                return;
+
+            }
+
+
+            const label =
+                member.firstName +
+                " " +
+                member.lastName +
+                " — " +
+                member.id;
+
+
+            addOption(
+                father,
+                member.id,
+                label
+            );
+
+
+            addOption(
+                mother,
+                member.id,
+                label
+            );
+
+
+            addOption(
+                spouse,
+                member.id,
+                label
+            );
+
+        }
+    );
+
+
+    /*
+       Restaurer les anciennes valeurs.
+    */
+
+    if(
+        optionExists(
+            father,
+            oldFather
+        )
+    ){
+
+        father.value =
+            oldFather;
+
+    }
+
+
+    if(
+        optionExists(
+            mother,
+            oldMother
+        )
+    ){
+
+        mother.value =
+            oldMother;
+
+    }
+
+
+    if(
+        optionExists(
+            spouse,
+            oldSpouse
+        )
+    ){
+
+        spouse.value =
+            oldSpouse;
+
+    }
+
+}
+
+
+/* =========================================================
+   OPTION VIDE
+========================================================= */
+
+function addEmptyOption(
+    select,
+    text
+){
+
+    const option =
+        document.createElement("option");
+
+
+    option.value = "";
+
+    option.textContent = text;
+
+
+    select.appendChild(option);
+
+}
+
+
+/* =========================================================
+   OPTION MEMBRE
+========================================================= */
+
+function addOption(
+    select,
+    value,
+    text
+){
+
+    const option =
+        document.createElement("option");
+
+
+    option.value =
+        value;
+
+
+    option.textContent =
+        text;
+
+
+    select.appendChild(option);
+
+}
+
+
+/* =========================================================
+   OPTION EXISTE
+========================================================= */
+
+function optionExists(
+    select,
+    value
+){
+
+    if(!value)
+        return true;
+
+
+    return Array
+        .from(select.options)
+        .some(
+            option =>
+                option.value === value
+        );
+
+}
+
+
+/* =========================================================
+   COLLECTE FORMULAIRE
+========================================================= */
+
+function collectForm(){
+
+    return {
+
+        id:
+            document.getElementById(
+                "memberId"
+            ).value,
+
+        firstName:
+            document.getElementById(
+                "firstName"
+            ).value.trim(),
+
+        lastName:
+            document.getElementById(
+                "lastName"
+            ).value.trim(),
+
+        gender:
+            document.getElementById(
+                "gender"
+            ).value,
+
+        birthDate:
+            document.getElementById(
+                "birthDate"
+            ).value,
+
+        birthPlace:
+            document.getElementById(
+                "birthPlace"
+            ).value.trim(),
+
+
+        phone:
+            document.getElementById(
+                "phone"
+            ).value.trim(),
+
+        phone2:
+            document.getElementById(
+                "phone2"
+            ).value.trim(),
+
+        whatsapp:
+            document.getElementById(
+                "whatsapp"
+            ).value.trim(),
+
+        email:
+            document.getElementById(
+                "email"
+            ).value.trim(),
+
+        social:
+            document.getElementById(
+                "social"
+            ).value.trim(),
+
+        address:
+            document.getElementById(
+                "address"
+            ).value.trim(),
+
+        city:
+            document.getElementById(
+                "city"
+            ).value.trim(),
+
+        district:
+            document.getElementById(
+                "district"
+            ).value.trim(),
+
+        region:
+            document.getElementById(
+                "region"
+            ).value.trim(),
+
+        country:
+            document.getElementById(
+                "country"
+            ).value.trim(),
+
+
+        father:
+            document.getElementById(
+                "father"
+            ).value,
+
+        mother:
+            document.getElementById(
+                "mother"
+            ).value,
+
+        spouse:
+            document.getElementById(
+                "spouse"
+            ).value,
+
+        marital:
+            document.getElementById(
+                "marital"
+            ).value,
+
+        marriageDate:
+            document.getElementById(
+                "marriageDate"
+            ).value,
+
+        marriagePlace:
+            document.getElementById(
+                "marriagePlace"
+            ).value.trim(),
+
+
+        job:
+            document.getElementById(
+                "job"
+            ).value.trim(),
+
+        workplace:
+            document.getElementById(
+                "workplace"
+            ).value.trim(),
+
+        education:
+            document.getElementById(
+                "education"
+            ).value,
+
+        blood:
+            document.getElementById(
+                "blood"
+            ).value,
+
+        notes:
+            document.getElementById(
+                "notes"
+            ).value.trim(),
+
+
+        photo:
+            currentPhoto,
+
+        updatedAt:
+            new Date().toISOString()
+
     };
-    window.updateTheme = (c) => document.documentElement.style.setProperty('--p-col', c);
-    window.deleteBenef = (k) => { if(confirm("Supprimer ce dossier définitivement ?")) remove(ref(db, `beneficiaires/${k}`)); };
-    window.toggleActForm = () => document.getElementById('act-form').classList.toggle('hidden');
+
+}
+
+
+/* =========================================================
+   ENREGISTREMENT
+========================================================= */
+
+document
+    .getElementById("memberForm")
+    .addEventListener(
+        "submit",
+        function(event){
+
+            event.preventDefault();
+
+
+            const member =
+                collectForm();
+
+
+            if(
+                !member.firstName ||
+                !member.lastName
+            ){
+
+                showToast(
+                    "Veuillez renseigner le nom et les prénoms."
+                );
+
+                return;
+
+            }
+
+
+            const editIndex =
+                document.getElementById(
+                    "editIndex"
+                ).value;
+
+
+            if(editIndex !== ""){
+
+                /*
+                   Modification
+                */
+
+                members[
+                    Number(editIndex)
+                ] = member;
+
+
+                showToast(
+                    "Membre modifié avec succès."
+                );
+
+            }else{
+
+                /*
+                   Nouvel enregistrement
+                */
+
+                members.push(member);
+
+
+                showToast(
+                    "Membre enregistré avec succès."
+                );
+
+            }
+
+
+            saveMembers();
+
+
+            /*
+               Important :
+               après l'ajout d'un membre,
+               les listes Père/Mère/Conjoint
+               sont reconstruites.
+            */
+
+            updateRelationSelects();
+
+
+            renderMembers();
+
+
+            const membersButton =
+                document
+                    .querySelectorAll(".nav button")[1];
+
+
+            showPage(
+                "members",
+                membersButton
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   PHOTO
+========================================================= */
+
+document
+    .getElementById("photo")
+    .addEventListener(
+        "change",
+        function(event){
+
+            const file =
+                event.target.files[0];
+
+
+            if(!file)
+                return;
+
+
+            if(
+                !file.type.startsWith("image/")
+            ){
+
+                showToast(
+                    "Veuillez sélectionner une image."
+                );
+
+                return;
+
+            }
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function(e){
+
+                    currentPhoto =
+                        e.target.result;
+
+
+                    document
+                        .getElementById(
+                            "photoPreview"
+                        )
+                        .src =
+                        currentPhoto;
+
+                };
+
+
+            reader.readAsDataURL(file);
+
+        }
+    );
+
+
+/* =========================================================
+   TABLEAU DE BORD
+========================================================= */
+
+function updateDashboard(){
+
+    const total =
+        members.length;
+
+
+    const men =
+        members.filter(
+            m =>
+                m.gender === "Masculin"
+        ).length;
+
+
+    const women =
+        members.filter(
+            m =>
+                m.gender === "Féminin"
+        ).length;
+
+
+    const cities =
+        new Set(
+            members
+                .map(
+                    m =>
+                        (m.city || "")
+                            .trim()
+                            .toLowerCase()
+                )
+                .filter(Boolean)
+        ).size;
+
+
+    document.getElementById(
+        "statTotal"
+    ).textContent =
+        total;
+
+
+    document.getElementById(
+        "statMen"
+    ).textContent =
+        men;
+
+
+    document.getElementById(
+        "statWomen"
+    ).textContent =
+        women;
+
+
+    document.getElementById(
+        "statCities"
+    ).textContent =
+        cities;
+
+
+    const recent =
+        [...members]
+            .reverse()
+            .slice(0,3);
+
+
+    const container =
+        document.getElementById(
+            "recentMembers"
+        );
+
+
+    if(!recent.length){
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                <div style="font-size:45px">
+                    👨‍👩‍👧
+                </div>
+
+                <p>
+                    Aucun membre enregistré.
+                </p>
+
+                <button
+                    class="btn btn-primary"
+                    onclick="goAdd()"
+                >
+                    ➕ Ajouter le premier membre
+                </button>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        recent
+            .map(memberCard)
+            .join("");
+
+}
+
+
+/* =========================================================
+   CARTE MEMBRE
+========================================================= */
+
+function memberCard(member){
+
+    const index =
+        members.indexOf(member);
+
+
+    const photo =
+        member.photo
+
+            ? `
+                <img
+                    class="avatar"
+                    src="${member.photo}"
+                    alt=""
+                >
+              `
+
+            : `
+                <div class="avatar">
+                    ${escapeHTML(initials(member))}
+                </div>
+              `;
+
+
+    return `
+
+        <div class="member-card">
+
+
+            <div class="member-top">
+
+                ${photo}
+
+                <div>
+
+                    <div class="member-name">
+
+                        ${escapeHTML(
+                            member.firstName
+                        )}
+
+                        ${escapeHTML(
+                            member.lastName
+                        )}
+
+                    </div>
+
+
+                    <div class="member-id">
+
+                        🪪
+                        ${escapeHTML(
+                            member.id
+                        )}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="member-info">
+
+                ${
+                    member.gender
+                        ? "⚧ " +
+                          escapeHTML(
+                              member.gender
+                          ) +
+                          "<br>"
+                        : ""
+                }
+
+
+                ${
+                    member.birthDate
+                        ? "🎂 " +
+                          formatDate(
+                              member.birthDate
+                          ) +
+                          "<br>"
+                        : ""
+                }
+
+
+                ${
+                    member.phone
+                        ? "📞 " +
+                          escapeHTML(
+                              member.phone
+                          ) +
+                          "<br>"
+                        : ""
+                }
+
+
+                ${
+                    member.city
+                        ? "📍 " +
+                          escapeHTML(
+                              member.city
+                          )
+                        : ""
+                }
+
+            </div>
+
+
+            <div class="member-actions">
+
+                <button
+                    class="btn btn-light btn-small"
+                    onclick="viewMember(${index})"
+                >
+                    👁️ Voir
+                </button>
+
+
+                <button
+                    class="btn btn-primary btn-small"
+                    onclick="editMember(${index})"
+                >
+                    ✏️ Modifier
+                </button>
+
+
+                <button
+                    class="btn btn-danger btn-small"
+                    onclick="deleteMember(${index})"
+                >
+                    🗑️
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   AFFICHER MEMBRES
+========================================================= */
+
+function renderMembers(){
+
+    const input =
+        document.getElementById(
+            "searchInput"
+        );
+
+
+    const query =
+        input
+            ? input.value
+                .toLowerCase()
+                .trim()
+            : "";
+
+
+    const filtered =
+        members.filter(
+            member => {
+
+                const text = [
+
+                    member.id,
+
+                    member.firstName,
+
+                    member.lastName,
+
+                    member.phone,
+
+                    member.phone2,
+
+                    member.whatsapp,
+
+                    member.email,
+
+                    member.city,
+
+                    member.district,
+
+                    member.region,
+
+                    member.job
+
+                ]
+                .join(" ")
+                .toLowerCase();
+
+
+                return text.includes(query);
+
+            }
+        );
+
+
+    const container =
+        document.getElementById(
+            "membersList"
+        );
+
+
+    if(!filtered.length){
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                <div style="font-size:45px">
+                    🔎
+                </div>
+
+                <p>
+                    Aucun membre trouvé.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        filtered
+            .map(memberCard)
+            .join("");
+
+}
+
+
+/* =========================================================
+   MODIFICATION
+========================================================= */
+
+function editMember(index){
+
+    const member =
+        members[index];
+
+
+    if(!member)
+        return;
+
+
+    document.getElementById(
+        "editIndex"
+    ).value =
+        index;
+
+
+    document.getElementById(
+        "memberId"
+    ).value =
+        member.id;
+
+
+    document.getElementById(
+        "firstName"
+    ).value =
+        member.firstName || "";
+
+
+    document.getElementById(
+        "lastName"
+    ).value =
+        member.lastName || "";
+
+
+    document.getElementById(
+        "gender"
+    ).value =
+        member.gender || "";
+
+
+    document.getElementById(
+        "birthDate"
+    ).value =
+        member.birthDate || "";
+
+
+    document.getElementById(
+        "birthPlace"
+    ).value =
+        member.birthPlace || "";
+
+
+    document.getElementById(
+        "phone"
+    ).value =
+        member.phone || "";
+
+
+    document.getElementById(
+        "phone2"
+    ).value =
+        member.phone2 || "";
+
+
+    document.getElementById(
+        "whatsapp"
+    ).value =
+        member.whatsapp || "";
+
+
+    document.getElementById(
+        "email"
+    ).value =
+        member.email || "";
+
+
+    document.getElementById(
+        "social"
+    ).value =
+        member.social || "";
+
+
+    document.getElementById(
+        "address"
+    ).value =
+        member.address || "";
+
+
+    document.getElementById(
+        "city"
+    ).value =
+        member.city || "";
+
+
+    document.getElementById(
+        "district"
+    ).value =
+        member.district || "";
+
+
+    document.getElementById(
+        "region"
+    ).value =
+        member.region || "";
+
+
+    document.getElementById(
+        "country"
+    ).value =
+        member.country ||
+        "Madagascar";
+
+
+    document.getElementById(
+        "marital"
+    ).value =
+        member.marital || "";
+
+
+    document.getElementById(
+        "marriageDate"
+    ).value =
+        member.marriageDate || "";
+
+
+    document.getElementById(
+        "marriagePlace"
+    ).value =
+        member.marriagePlace || "";
+
+
+    document.getElementById(
+        "job"
+    ).value =
+        member.job || "";
+
+
+    document.getElementById(
+        "workplace"
+    ).value =
+        member.workplace || "";
+
+
+    document.getElementById(
+        "education"
+    ).value =
+        member.education || "";
+
+
+    document.getElementById(
+        "blood"
+    ).value =
+        member.blood || "";
+
+
+    document.getElementById(
+        "notes"
+    ).value =
+        member.notes || "";
+
+
+    currentPhoto =
+        member.photo || "";
+
+
+    document.getElementById(
+        "photoPreview"
+    ).src =
+        currentPhoto;
+
+
+    /*
+       On reconstruit les listes
+       en excluant le membre actuel.
+    */
+
+    updateRelationSelects(
+        index,
+        member.father || "",
+        member.mother || "",
+        member.spouse || ""
+    );
+
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "✏️ Modifier le membre";
+
+
+    const addButton =
+        document
+            .querySelectorAll(".nav button")[2];
+
+
+    showPage(
+        "add",
+        addButton
+    );
+
+}
+
+
+/* =========================================================
+   SUPPRESSION MEMBRE
+========================================================= */
+
+function deleteMember(index){
+
+    const member =
+        members[index];
+
+
+    if(!member)
+        return;
+
+
+    const confirmed =
+        confirm(
+            "Voulez-vous vraiment supprimer " +
+            member.firstName +
+            " " +
+            member.lastName +
+            " ?"
+        );
+
+
+    if(!confirmed)
+        return;
+
+
+    /*
+       Avant suppression, on retire
+       également les liens qui pointent
+       vers cette personne.
+    */
+
+    const deletedId =
+        member.id;
+
+
+    members.splice(
+        index,
+        1
+    );
+
+
+    members.forEach(
+        m => {
+
+            if(m.father === deletedId)
+                m.father = "";
+
+            if(m.mother === deletedId)
+                m.mother = "";
+
+            if(m.spouse === deletedId)
+                m.spouse = "";
+
+        }
+    );
+
+
+    saveMembers();
+
+    updateRelationSelects();
+
+    renderMembers();
+
+    showToast(
+        "Membre supprimé."
+    );
+
+}
+
+
+/* =========================================================
+   PROFIL
+========================================================= */
+
+function viewMember(index){
+
+    const member =
+        members[index];
+
+
+    if(!member)
+        return;
+
+
+    const photo =
+        member.photo
+
+            ? `
+                <img
+                    class="profile-avatar"
+                    src="${member.photo}"
+                    alt=""
+                >
+              `
+
+            : `
+                <div
+                    class="profile-avatar"
+                    style="
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:32px;
+                        color:var(--primary);
+                    "
+                >
+                    ${escapeHTML(
+                        initials(member)
+                    )}
+                </div>
+              `;
+
+
+    document.getElementById(
+        "profileContent"
+    ).innerHTML = `
+
+        <div>
+
+            <div class="profile-header">
+
+                ${photo}
+
+                <div>
+
+                    <h2>
+                        ${escapeHTML(
+                            member.firstName
+                        )}
+                        ${escapeHTML(
+                            member.lastName
+                        )}
+                    </h2>
+
+                    <p style="color:var(--primary)">
+                        🪪
+                        ${escapeHTML(
+                            member.id
+                        )}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-grid">
+
+                ${profileItem(
+                    "Sexe",
+                    member.gender
+                )}
+
+                ${profileItem(
+                    "Date de naissance",
+                    member.birthDate
+                        ? formatDate(
+                            member.birthDate
+                          )
+                        : ""
+                )}
+
+                ${profileItem(
+                    "Lieu de naissance",
+                    member.birthPlace
+                )}
+
+                ${profileItem(
+                    "Téléphone",
+                    member.phone
+                )}
+
+                ${profileItem(
+                    "Deuxième téléphone",
+                    member.phone2
+                )}
+
+                ${profileItem(
+                    "WhatsApp",
+                    member.whatsapp
+                )}
+
+                ${profileItem(
+                    "E-mail",
+                    member.email
+                )}
+
+                ${profileItem(
+                    "Réseau social",
+                    member.social
+                )}
+
+                ${profileItem(
+                    "Adresse",
+                    member.address
+                )}
+
+                ${profileItem(
+                    "Commune / Ville",
+                    member.city
+                )}
+
+                ${profileItem(
+                    "District",
+                    member.district
+                )}
+
+                ${profileItem(
+                    "Région",
+                    member.region
+                )}
+
+                ${profileItem(
+                    "Pays",
+                    member.country
+                )}
+
+                ${profileItem(
+                    "Père",
+                    getMemberName(
+                        member.father
+                    )
+                )}
+
+                ${profileItem(
+                    "Mère",
+                    getMemberName(
+                        member.mother
+                    )
+                )}
+
+                ${profileItem(
+                    "Conjoint(e)",
+                    getMemberName(
+                        member.spouse
+                    )
+                )}
+
+                ${profileItem(
+                    "Situation matrimoniale",
+                    member.marital
+                )}
+
+                ${profileItem(
+                    "Date de mariage",
+                    member.marriageDate
+                        ? formatDate(
+                            member.marriageDate
+                          )
+                        : ""
+                )}
+
+                ${profileItem(
+                    "Lieu de mariage",
+                    member.marriagePlace
+                )}
+
+                ${profileItem(
+                    "Profession",
+                    member.job
+                )}
+
+                ${profileItem(
+                    "Employeur / établissement",
+                    member.workplace
+                )}
+
+                ${profileItem(
+                    "Niveau d'étude",
+                    member.education
+                )}
+
+                ${profileItem(
+                    "Groupe sanguin",
+                    member.blood
+                )}
+
+                ${profileItem(
+                    "Informations complémentaires",
+                    member.notes
+                )}
+
+            </div>
+
+
+            <div
+                style="
+                    margin-top:25px;
+                    display:flex;
+                    gap:10px;
+                    flex-wrap:wrap;
+                "
+            >
+
+                <button
+                    class="btn btn-primary"
+                    onclick="
+                        editMember(${index});
+                        closeModal();
+                    "
+                >
+                    ✏️ Modifier
+                </button>
+
+
+                <button
+                    class="btn btn-light"
+                    onclick="
+                        printMember(${index})
+                    "
+                >
+                    🖨️ Imprimer
+                </button>
+
+
+                ${
+                    member.phone
+                    ?
+                    `
+                    <a
+                        class="btn btn-success"
+                        href="tel:${encodeURIComponent(member.phone)}"
+                    >
+                        📞 Appeler
+                    </a>
+                    `
+                    :
+                    ""
+                }
+
+
+                ${
+                    member.whatsapp
+                    ?
+                    `
+                    <a
+                        class="btn btn-success"
+                        target="_blank"
+                        href="https://wa.me/${cleanPhone(member.whatsapp)}"
+                    >
+                        💬 WhatsApp
+                    </a>
+                    `
+                    :
+                    ""
+                }
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.getElementById(
+        "profileModal"
+    ).classList.add("show");
+
+}
+
+
+/* =========================================================
+   PROFILE ITEM
+========================================================= */
+
+function profileItem(
+    label,
+    value
+){
+
+    if(
+        value === undefined ||
+        value === null ||
+        value === ""
+    ){
+
+        value =
+            "Non renseigné";
+
+    }
+
+
+    return `
+
+        <div class="profile-item">
+
+            <span>
+                ${escapeHTML(label)}
+            </span>
+
+            <strong>
+                ${escapeHTML(value)}
+            </strong>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   NOM MEMBRE
+========================================================= */
+
+function getMemberName(id){
+
+    if(!id)
+        return "";
+
+
+    const member =
+        members.find(
+            m =>
+                m.id === id
+        );
+
+
+    if(!member)
+        return "Membre inconnu";
+
+
+    return (
+        member.firstName +
+        " " +
+        member.lastName +
+        " (" +
+        member.id +
+        ")"
+    );
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function closeModal(){
+
+    document.getElementById(
+        "profileModal"
+    ).classList.remove("show");
+
+}
+
+
+document
+    .getElementById("profileModal")
+    .addEventListener(
+        "click",
+        function(event){
+
+            if(
+                event.target === this
+            ){
+
+                closeModal();
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   ARBRE
+========================================================= */
+
+function renderTree(){
+
+    const container =
+        document.getElementById(
+            "familyTree"
+        );
+
+
+    if(!members.length){
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                <div style="font-size:50px">
+                    🌳
+                </div>
+
+                <p>
+                    Ajoutez des membres pour
+                    construire l'arbre familial.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    /*
+       Personnes sans père ni mère renseignés.
+    */
+
+    const roots =
+        members.filter(
+            m =>
+                !m.father &&
+                !m.mother
+        );
+
+
+    /*
+       Personnes ayant au moins un parent.
+    */
+
+    const children =
+        members.filter(
+            m =>
+                m.father ||
+                m.mother
+        );
+
+
+    let html = "";
+
+
+    if(roots.length){
+
+        html += `
+
+            <div>
+
+                <h3 style="text-align:center">
+                    👑 Génération principale
+                </h3>
+
+                <div class="tree-generation">
+
+                    ${roots
+                        .map(treeNode)
+                        .join("")}
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+
+    if(children.length){
+
+        html += `
+
+            <div>
+
+                <h3 style="text-align:center">
+                    👨‍👩‍👧 Descendance
+                </h3>
+
+                <div class="tree-generation">
+
+                    ${children
+                        .map(treeNode)
+                        .join("")}
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+
+    container.innerHTML =
+        html;
+
+}
+
+
+/* =========================================================
+   NOEUD ARBRE
+========================================================= */
+
+function treeNode(member){
+
+    const index =
+        members.indexOf(member);
+
+
+    return `
+
+        <div
+            class="tree-node"
+            onclick="viewMember(${index})"
+        >
+
+            <strong>
+
+                ${escapeHTML(
+                    member.firstName
+                )}
+
+                ${escapeHTML(
+                    member.lastName
+                )}
+
+            </strong>
+
+
+            <small>
+
+                🪪
+                ${escapeHTML(
+                    member.id
+                )}
+
+            </small>
+
+
+            ${
+                member.city
+
+                    ?
+                    `
+                    <small>
+                        📍
+                        ${escapeHTML(
+                            member.city
+                        )}
+                    </small>
+                    `
+
+                    :
+                    ""
+            }
+
+
+            ${
+                member.father
+
+                    ?
+                    `
+                    <small>
+                        👨 Père :
+                        ${escapeHTML(
+                            getMemberName(
+                                member.father
+                            )
+                        )}
+                    </small>
+                    `
+
+                    :
+                    ""
+            }
+
+
+            ${
+                member.mother
+
+                    ?
+                    `
+                    <small>
+                        👩 Mère :
+                        ${escapeHTML(
+                            getMemberName(
+                                member.mother
+                            )
+                        )}
+                    </small>
+                    `
+
+                    :
+                    ""
+            }
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   EXPORT
+========================================================= */
+
+function exportData(){
+
+    if(!members.length){
+
+        showToast(
+            "Aucune donnée à exporter."
+        );
+
+        return;
+
+    }
+
+
+    const data = {
+
+        application:
+            "Livret de Famille Fanera",
+
+        version:
+            "2.0",
+
+        exportedAt:
+            new Date().toISOString(),
+
+        members:
+            members
+
+    };
+
+
+    const blob =
+        new Blob(
+            [
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const link =
+        document.createElement("a");
+
+
+    const date =
+        new Date()
+            .toISOString()
+            .slice(0,10);
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        "livret-famille-fanera-" +
+        date +
+        ".json";
+
+
+    document
+        .body
+        .appendChild(link);
+
+
+    link.click();
+
+
+    link.remove();
+
+
+    setTimeout(
+        () =>
+            URL.revokeObjectURL(url),
+        1000
+    );
+
+
+    showToast(
+        "Sauvegarde exportée avec succès."
+    );
+
+}
+
+
+/* =========================================================
+   IMPORT
+========================================================= */
+
+function openImport(){
+
+    document
+        .getElementById(
+            "importFile"
+        )
+        .click();
+
+}
+
+
+function importData(event){
+
+    const file =
+        event.target.files[0];
+
+
+    if(!file)
+        return;
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(e){
+
+            try{
+
+                const data =
+                    JSON.parse(
+                        e.target.result
+                    );
+
+
+                if(
+                    !data ||
+                    !Array.isArray(
+                        data.members
+                    )
+                ){
+
+                    throw new Error(
+                        "Format invalide"
+                    );
+
+                }
+
+
+                const confirmation =
+                    confirm(
+                        "Importer " +
+                        data.members.length +
+                        " membre(s) ?\n\n" +
+                        "Les données actuelles seront remplacées."
+                    );
+
+
+                if(!confirmation)
+                    return;
+
+
+                members =
+                    data.members;
+
+
+                saveMembers();
+
+
+                updateRelationSelects();
+
+                renderMembers();
+
+                renderTree();
+
+
+                showToast(
+                    members.length +
+                    " membre(s) importé(s)."
+                );
+
+
+            }catch(error){
+
+                console.error(error);
+
+
+                alert(
+                    "Impossible d'importer cette sauvegarde.\n\n" +
+                    "Le fichier JSON semble invalide."
+                );
+
+            }
+
+        };
+
+
+    reader.readAsText(file);
+
+
+    event.target.value = "";
+
+}
+
+
+/* =========================================================
+   SUPPRIMER TOUT
+========================================================= */
+
+function deleteAll(){
+
+    if(!members.length){
+
+        showToast(
+            "Aucune donnée à supprimer."
+        );
+
+        return;
+
+    }
+
+
+    const confirmation =
+        prompt(
+            "Pour confirmer la suppression totale, tapez exactement : SUPPRIMER"
+        );
+
+
+    if(
+        confirmation !==
+        "SUPPRIMER"
+    ){
+
+        showToast(
+            "Suppression annulée."
+        );
+
+        return;
+
+    }
+
+
+    members = [];
+
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+
+    resetForm();
+
+    updateDashboard();
+
+    renderMembers();
+
+    renderTree();
+
+
+    showToast(
+        "Toutes les données ont été supprimées."
+    );
+
+}
+
+
+/* =========================================================
+   IMPRESSION
+========================================================= */
+
+function printMember(index){
+
+    const member =
+        members[index];
+
+
+    if(!member)
+        return;
+
+
+    const photo =
+        member.photo
+
+            ?
+            `
+            <img
+                src="${member.photo}"
+                style="
+                    width:120px;
+                    height:120px;
+                    object-fit:cover;
+                    border-radius:20px;
+                "
+            >
+            `
+
+            :
+            "";
+
+
+    const html = `
+
+        <!DOCTYPE html>
+
+        <html>
+
+        <head>
+
+            <meta charset="UTF-8">
+
+            <title>
+                Fiche familiale
+            </title>
+
+
+            <style>
+
+                body{
+
+                    font-family:
+                        Arial,
+                        sans-serif;
+
+                    padding:40px;
+
+                    color:#222;
+
+                }
+
+
+                .header{
+
+                    display:flex;
+
+                    gap:20px;
+
+                    align-items:center;
+
+                    border-bottom:
+                        2px solid #ddd;
+
+                    padding-bottom:20px;
+
+                }
+
+
+                h1{
+
+                    color:#5b4bdb;
+
+                }
+
+
+                table{
+
+                    width:100%;
+
+                    border-collapse:collapse;
+
+                    margin-top:25px;
+
+                }
+
+
+                td{
+
+                    padding:11px;
+
+                    border:
+                        1px solid #ddd;
+
+                }
+
+
+                td:first-child{
+
+                    width:35%;
+
+                    font-weight:bold;
+
+                    background:#f5f5f5;
+
+                }
+
+            </style>
+
+        </head>
+
+
+        <body>
+
+
+            <div class="header">
+
+                ${photo}
+
+
+                <div>
+
+                    <h1>
+
+                        ${escapeHTML(
+                            member.firstName
+                        )}
+
+                        ${escapeHTML(
+                            member.lastName
+                        )}
+
+                    </h1>
+
+
+                    <p>
+
+                        ID familial :
+
+                        <strong>
+
+                            ${escapeHTML(
+                                member.id
+                            )}
+
+                        </strong>
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <table>
+
+
+                ${printRow(
+                    "Sexe",
+                    member.gender
+                )}
+
+
+                ${printRow(
+                    "Date de naissance",
+                    member.birthDate
+                        ? formatDate(
+                            member.birthDate
+                          )
+                        : ""
+                )}
+
+
+                ${printRow(
+                    "Lieu de naissance",
+                    member.birthPlace
+                )}
+
+
+                ${printRow(
+                    "Téléphone",
+                    member.phone
+                )}
+
+
+                ${printRow(
+                    "Deuxième téléphone",
+                    member.phone2
+                )}
+
+
+                ${printRow(
+                    "WhatsApp",
+                    member.whatsapp
+                )}
+
+
+                ${printRow(
+                    "E-mail",
+                    member.email
+                )}
+
+
+                ${printRow(
+                    "Adresse",
+                    member.address
+                )}
+
+
+                ${printRow(
+                    "Commune / Ville",
+                    member.city
+                )}
+
+
+                ${printRow(
+                    "District",
+                    member.district
+                )}
+
+
+                ${printRow(
+                    "Région",
+                    member.region
+                )}
+
+
+                ${printRow(
+                    "Pays",
+                    member.country
+                )}
+
+
+                ${printRow(
+                    "Père",
+                    getMemberName(
+                        member.father
+                    )
+                )}
+
+
+                ${printRow(
+                    "Mère",
+                    getMemberName(
+                        member.mother
+                    )
+                )}
+
+
+                ${printRow(
+                    "Conjoint(e)",
+                    getMemberName(
+                        member.spouse
+                    )
+                )}
+
+
+                ${printRow(
+                    "Situation matrimoniale",
+                    member.marital
+                )}
+
+
+                ${printRow(
+                    "Date de mariage",
+                    member.marriageDate
+                        ? formatDate(
+                            member.marriageDate
+                          )
+                        : ""
+                )}
+
+
+                ${printRow(
+                    "Profession",
+                    member.job
+                )}
+
+
+                ${printRow(
+                    "Employeur",
+                    member.workplace
+                )}
+
+
+                ${printRow(
+                    "Niveau d'étude",
+                    member.education
+                )}
+
+
+                ${printRow(
+                    "Groupe sanguin",
+                    member.blood
+                )}
+
+
+                ${printRow(
+                    "Informations complémentaires",
+                    member.notes
+                )}
+
+            </table>
+
+
+            <p
+                style="
+                    margin-top:40px;
+                    color:#777;
+                "
+            >
+
+                Livret de Famille Fanera —
+
+                Fiche générée le
+
+                ${new Date()
+                    .toLocaleDateString(
+                        "fr-FR"
+                    )}
+
+            </p>
+
+
+        </body>
+
+        </html>
+
+    `;
+
+
+    const printWindow =
+        window.open(
+            "",
+            "_blank"
+        );
+
+
+    if(!printWindow){
+
+        alert(
+            "Le navigateur bloque la fenêtre d'impression. Autorisez les fenêtres pop-up."
+        );
+
+        return;
+
+    }
+
+
+    printWindow.document.write(
+        html
+    );
+
+
+    printWindow.document.close();
+
+
+    printWindow.focus();
+
+
+    setTimeout(
+        () => {
+
+            printWindow.print();
+
+        },
+        500
+    );
+
+}
+
+
+/* =========================================================
+   LIGNE IMPRESSION
+========================================================= */
+
+function printRow(
+    label,
+    value
+){
+
+    if(
+        value === undefined ||
+        value === null ||
+        value === ""
+    ){
+
+        value =
+            "Non renseigné";
+
+    }
+
+
+    return `
+
+        <tr>
+
+            <td>
+                ${escapeHTML(label)}
+            </td>
+
+            <td>
+                ${escapeHTML(value)}
+            </td>
+
+        </tr>
+
+    `;
+
+}
+
+
+/* =========================================================
+   NETTOYER TELEPHONE WHATSAPP
+========================================================= */
+
+function cleanPhone(phone){
+
+    return String(phone)
+        .replace(
+            /[^0-9]/g,
+            ""
+        );
+
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+function formatDate(date){
+
+    if(!date)
+        return "";
+
+
+    const parts =
+        date.split("-");
+
+
+    if(parts.length !== 3)
+        return date;
+
+
+    return (
+        parts[2] +
+        "/" +
+        parts[1] +
+        "/" +
+        parts[0]
+    );
+
+}
+
+
+/* =========================================================
+   INITIALISATION
+========================================================= */
+
+function init(){
+
+    updateDashboard();
+
+    renderMembers();
+
+    renderTree();
+
+    resetForm();
+
+}
+
+
+/* =========================================================
+   LANCEMENT
+========================================================= */
+
+init();
+
 </script>
+
 </body>
 </html>
